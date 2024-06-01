@@ -59,7 +59,7 @@ public class User {
     private String username;
 
     private String avatar = "";
-    private boolean enabled = true;
+    private boolean enabled = false;
 
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinTable(name = "user_role"
@@ -69,11 +69,11 @@ public class User {
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt = Instant.now();
+    private Instant createdAt ;
 
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt = Instant.now();
+    private Instant updatedAt ;
 
     public User(String email, String password, String username, String avatar, boolean enabled, List<Role> role) {
         this.email = email;
@@ -86,6 +86,5 @@ public class User {
     }
 
 }
-
 
 

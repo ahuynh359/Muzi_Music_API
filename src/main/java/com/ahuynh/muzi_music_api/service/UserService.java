@@ -2,10 +2,13 @@ package com.ahuynh.muzi_music_api.service;
 
 import com.ahuynh.muzi_music_api.model.User;
 import com.ahuynh.muzi_music_api.model.VerificationToken;
+import com.ahuynh.muzi_music_api.payload.response.UserInfo;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
 import com.ahuynh.muzi_music_api.repository.VerificationTokenRepository;
+import com.ahuynh.muzi_music_api.security.CustomUserDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,6 +35,7 @@ public class UserService {
     public User save(User user) {
         return userRepository.save(user);
     }
+
 
 
 }
