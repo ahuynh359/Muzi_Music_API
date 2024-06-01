@@ -5,12 +5,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.http.HttpStatus;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
-@AllArgsConstructor
-public class CustomException extends RuntimeException{
+public class CustomException extends RuntimeException {
     private HttpStatus status;
     private String message;
+
+    public CustomException(HttpStatus status, String message) {
+        super(message);
+    }
 
 
 }

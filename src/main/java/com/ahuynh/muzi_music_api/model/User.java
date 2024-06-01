@@ -54,14 +54,14 @@ public class User {
     private String password;
 
     @NotBlank
-    @Size(min = 5, max = 50)
+    @Size(max = 50)
     @Column(nullable = false, unique = true)
     private String username;
 
     private String avatar = "";
     private boolean enabled = true;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinTable(name = "user_role"
             , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))

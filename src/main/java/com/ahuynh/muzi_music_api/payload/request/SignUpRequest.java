@@ -25,6 +25,6 @@ public class SignUpRequest {
 
     @NotBlank
     @Column(nullable = false, unique = true)
-    @Size(min = 5, max = 50)
+    @Size(max = 50)
     private String username;
 }

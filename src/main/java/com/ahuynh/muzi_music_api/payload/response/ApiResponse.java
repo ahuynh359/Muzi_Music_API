@@ -11,8 +11,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class ApiResponse implements Serializable {
 
-    private Boolean success;
+    private HttpStatus status;
     private String message;
+
 
 
 }
