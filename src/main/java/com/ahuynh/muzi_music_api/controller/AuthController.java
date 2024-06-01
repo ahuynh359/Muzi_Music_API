@@ -100,8 +100,8 @@ public class AuthController {
         return ResponseEntity.created(location).body(new ApiResponse(HttpStatus.CREATED, "Success, please check your email"));
     }
 
-    @GetMapping("/verifyEmail")
-    public ResponseEntity<?> verifyEmail(@RequestParam("token") String token) {
+    @GetMapping("/verifyEmail/{token}")
+    public ResponseEntity<?> verifyEmail(@PathVariable("token") String token) {
         VerificationToken verificationToken = verificationTokenService.findByToken(token);
         if(verificationToken == null){
             return ResponseEntity.badRequest().body(new ApiResponse(HttpStatus.BAD_REQUEST, "Invalid verification token"));
