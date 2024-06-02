@@ -3,6 +3,7 @@ package com.ahuynh.muzi_music_api.controller;
 import com.ahuynh.muzi_music_api.model.Album;
 import com.ahuynh.muzi_music_api.payload.request.AlbumRequest;
 import com.ahuynh.muzi_music_api.service.AlbumService;
+import com.ahuynh.muzi_music_api.service.ImageService;
 import com.ahuynh.muzi_music_api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,12 +18,15 @@ public class AlbumController {
 
     @Autowired
     private AlbumService albumService;
+    @Autowired
+    private ImageService imageService;
 
     @PostMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')" )
-    public ResponseEntity<?> addAlbum(@RequestParam("image") MultipartFile image) {
-        AlbumRequest albumRequest = new AlbumRequest("ACB","ADD","ABC");
-//        albumService.save(albumRequest);
+    public ResponseEntity<?> addAlbum(@RequestParam("image") MultipartFile image,@RequestParam("name") String name, @RequestParam("description") String description ) {
+        String url = imageService.upload(image);
+        AlbumRequest albumRequest = new AlbumRequest(name,description,url);
+        albumService.save(albumRequest);
         return new ResponseEntity<>(albumRequest, HttpStatus.OK);
     }
 
@@ -38,6 +42,12 @@ public class AlbumController {
          albumService.deleteAlbum(id);
         return new ResponseEntity<>("Ok", HttpStatus.OK);
     }
+    @PutMapping("{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> updateAlbum(@PathVariable(name = "id") Long id,@RequestBody AlbumRequest newAlbum){
+        return  albumService.updateAlbum(id , newAlbum);
+    }
+
 
 
 

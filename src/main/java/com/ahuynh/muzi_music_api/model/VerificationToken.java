@@ -8,20 +8,18 @@ import java.sql.Date;
 import java.time.Instant;
 import java.util.Calendar;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Table(name = "verification_token")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class VerificationToken {
+public class VerificationToken extends UserDateAudit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String token;
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt = Instant.now();
 
     @Column(name = "expiration_time", nullable = false, updatable = false)
     private Instant expiryTime = Instant.now().plusSeconds(3600 * 2);

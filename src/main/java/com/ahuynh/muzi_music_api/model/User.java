@@ -24,18 +24,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "user")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-@JsonIgnoreProperties(
-        value = {"created_at", "updated_at"},
-        allowGetters = true
-
-)
-public class User {
+public class User extends UserDateAudit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -61,26 +55,17 @@ public class User {
     private String avatar = "";
     private boolean enabled = false;
 
-    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_role"
             , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private List<Role> role = new ArrayList<>();
 
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt ;
 
-    @LastModifiedDate
-    @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt ;
-
-    public User(String email, String password, String username, String avatar, boolean enabled, List<Role> role) {
+    public User(String email, String password, String username, List<Role> role) {
         this.email = email;
         this.password = password;
         this.username = username;
-        this.avatar = avatar;
-        this.enabled = enabled;
         this.role = role;
 
     }

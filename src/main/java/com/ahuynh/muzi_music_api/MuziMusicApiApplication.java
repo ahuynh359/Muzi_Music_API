@@ -2,6 +2,7 @@ package com.ahuynh.muzi_music_api;
 
 import com.ahuynh.muzi_music_api.controller.AuthController;
 import com.ahuynh.muzi_music_api.security.JwtAuthenticationFilter;
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -18,6 +19,11 @@ public class MuziMusicApiApplication {
 
 		SpringApplication.run(MuziMusicApiApplication.class, args);
 
+	}
+
+	@Bean
+	public ModelMapper modelMapper(){
+		return new ModelMapper();
 	}
 
 
