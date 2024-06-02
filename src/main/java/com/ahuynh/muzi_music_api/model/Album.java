@@ -45,6 +45,8 @@ public class Album {
     @Size(max = 50)
     private String description;
 
+    private String avatar;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

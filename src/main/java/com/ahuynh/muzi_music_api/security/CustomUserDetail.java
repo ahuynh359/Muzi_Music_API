@@ -4,22 +4,23 @@ import com.ahuynh.muzi_music_api.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
+@Slf4j
 public class CustomUserDetail implements UserDetails {
     private Long id;
     private String email;
-    @JsonIgnore
     private String password;
-    @JsonIgnore
     private String username;
     private Collection<? extends GrantedAuthority> authorities;
 
@@ -37,7 +38,9 @@ public class CustomUserDetail implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        log.info(authorities.toString());
+        return authorities == null ? null : new ArrayList<>(authorities);
+
     }
 
     @Override

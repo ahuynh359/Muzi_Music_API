@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,22 +29,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,@NonNull  FilterChain filterChain) throws ServletException, IOException {
         try {
             String jwt = getJwtFromRequest(request);
 
-            if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
+            if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt) ) {
                 Long userId = jwtTokenProvider.getUserIdFromJWT(jwt);
+                log.info(userId.toString());
                 CustomUserDetail userDetail = customUserDetailService.loadUserById(userId);
+                log.info(userDetail.toString());
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetail, null, userDetail.getAuthorities());
-                System.out.println("Is user authenticated? " + authenticationToken.isAuthenticated());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                log.info("Authenticated user 1: {}{}", userDetail.getUsername(),userDetail.getAuthorities());
+                log.info("Authenticated user 2: {}{}", userDetail.getPassword(),userDetail.getEmail());
+                log.info("Authenticated user 3: {}", userDetail.getId());
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                log.info("Authenticated user 4: {}", userDetail.getId());
             }
         } catch (Exception e) {
             log.error("Cannot set user auth {}", e.getMessage());
         }
         filterChain.doFilter(request, response);
+        log.info("Authenticated user 5: {}", "ABC");
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {

@@ -76,7 +76,7 @@ public class AuthController {
         String encodedPassword = passwordEncoder.encode(signUpRequest.getPassword());
         List<Role> roles = new ArrayList<>();
         if (userService.countUser() == 0) {
-            roles.add(roleRepository.findByName(RoleName.ROLE_USER)
+            roles.add(roleRepository.findByName(RoleName.ROLE_ADMIN)
                     .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, "There is no role in db")));
             roles.add(roleRepository.findByName(RoleName.ROLE_USER)
                     .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, "There is no role in db")));

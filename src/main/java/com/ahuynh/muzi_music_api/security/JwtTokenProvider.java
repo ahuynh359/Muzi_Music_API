@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.function.Function;
 
 //Tạo jwt
 @Component
@@ -42,19 +43,27 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public Claims parseToken(String token) {
-        return Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(token).getPayload();
+
+    private Claims getAllClaimsFromToken(String token) {
+        return Jwts.parser()
+                .verifyWith(getSignInKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
+
+
     public Long getUserIdFromJWT(String token) {
-        Claims claims = parseToken(token);
-        return Long.valueOf(claims.getId());
+        Claims claims = getAllClaimsFromToken(token);
+
+        return Long.parseLong(claims.getSubject());
     }
 
     public boolean validateToken(String token) {
         try {
-            Claims claims = parseToken(token);
-            return claims != null && !claims.isEmpty();
+            Claims claims = getAllClaimsFromToken(token);
+            return claims != null;
 
         } catch (MalformedJwtException e) {
             log.error("Invalid JWT token format: {}", e.getMessage());
