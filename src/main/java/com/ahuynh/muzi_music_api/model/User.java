@@ -61,6 +61,17 @@ public class User extends UserDateAudit {
             , inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private List<Role> role = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_type"
+            , joinColumns = @JoinColumn(name = "type_id", referencedColumnName = "id")
+            , inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
+    private List<Type> type = new ArrayList<>();
+
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Playlist> playlist = new ArrayList<>();
+
 
     public User(String email, String password, String username, List<Role> role) {
         this.email = email;

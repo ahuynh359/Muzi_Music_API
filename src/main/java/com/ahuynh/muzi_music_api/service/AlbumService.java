@@ -25,6 +25,7 @@ public class AlbumService {
     }
 
     public void deleteAlbum(Long id) {
+      albumRepository.findAlbumById(id).orElseThrow(() -> new ResourceNotFoundException("Album not exits id =" + id.toString()));
         albumRepository.deleteById(id);
     }
 

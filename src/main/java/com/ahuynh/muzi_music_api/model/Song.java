@@ -15,6 +15,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "song")
@@ -44,6 +46,21 @@ public class Song  {
     @JoinColumn(name = "album_id")
     private Album album;
     private Long listen = 0L;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "song_playlist"
+            , joinColumns = @JoinColumn(name = "playlist_id", referencedColumnName = "id")
+            , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
+    private List<Playlist> playlists = new ArrayList<>();
+
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_favorites",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
+    private List<Song> favoriteSongs = new ArrayList<>();
+
+
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -4,6 +4,7 @@ import com.ahuynh.muzi_music_api.model.Album;
 import com.ahuynh.muzi_music_api.model.Song;
 import com.ahuynh.muzi_music_api.payload.request.AlbumRequest;
 import com.ahuynh.muzi_music_api.payload.request.SongRequest;
+import com.ahuynh.muzi_music_api.payload.request.UpdateSongRequest;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
 import com.ahuynh.muzi_music_api.service.AlbumService;
 import com.ahuynh.muzi_music_api.service.SongService;
@@ -53,7 +54,7 @@ public class SongController {
 
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> updateSong(@PathVariable(name = "id") Long id, @RequestBody SongRequest newSong) {
+    public ResponseEntity<?> updateSong(@PathVariable(name = "id") Long id, @RequestBody UpdateSongRequest newSong) {
         Song song = songService.updateSong(id, newSong);
         return new ResponseEntity<>(new ApiResponse(true, "Update song Successfully",
                 objectMapper.convertValue(song, Song.class)), HttpStatus.OK);

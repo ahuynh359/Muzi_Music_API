@@ -5,6 +5,7 @@ import com.ahuynh.muzi_music_api.exception.ResourceNotFoundException;
 import com.ahuynh.muzi_music_api.model.Album;
 import com.ahuynh.muzi_music_api.model.Song;
 import com.ahuynh.muzi_music_api.payload.request.SongRequest;
+import com.ahuynh.muzi_music_api.payload.request.UpdateSongRequest;
 import com.ahuynh.muzi_music_api.repository.AlbumRepository;
 import com.ahuynh.muzi_music_api.repository.SongRepository;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -41,7 +42,7 @@ public class SongService {
         songRepository.deleteById(id);
     }
 
-    public Song updateSong(Long id, SongRequest newSong) {
+    public Song updateSong(Long id, UpdateSongRequest newSong) {
         Song updatedSong = songRepository.findSongById(id).orElseThrow(()
                 -> new ResourceNotFoundException("Song not exits id =" + id.toString()));
 
@@ -53,6 +54,9 @@ public class SongService {
         }
         if (newSong.getAlbumId() != null) {
             updatedSong.setAlbum(updatedAlbum);
+        }
+        if (newSong.getLyrics() != null) {
+            updatedSong.setLyrics(newSong.getLyrics());
         }
 
         return songRepository.save(updatedSong);

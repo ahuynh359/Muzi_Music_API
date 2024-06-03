@@ -1,25 +1,20 @@
 package com.ahuynh.muzi_music_api.model;
 
-import com.ahuynh.muzi_music_api.model.role.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-import org.hibernate.annotations.NaturalId;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "album")
+@Table(name = "playlist")
 @Data
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(
@@ -28,7 +23,7 @@ import java.util.List;
 )
 @NoArgsConstructor
 @AllArgsConstructor
-public class Album {
+public class Playlist  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -40,26 +35,19 @@ public class Album {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Size(max = 50)
-    private String description;
 
-    private String avatar;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "album", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "song_playlist"
+            , joinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id")
+            , inverseJoinColumns = @JoinColumn(name = "playlist_id", referencedColumnName = "id"))
     private List<Song> songs = new ArrayList<>();
 
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false, name = "created_at")
-    private Instant createdAt;
-
-    public Album(String name, String description, String avatar) {
+    public Playlist(String name) {
         this.name = name;
-        this.description = description;
-        this.avatar = avatar;
-
     }
-
-
 }
