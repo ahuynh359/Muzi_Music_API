@@ -17,17 +17,6 @@ public class AlbumService {
     private final ModelMapper modelMapper;
     private final FirebaseService firebaseService;
 
-    public Album save(AlbumRequest albumRequest, MultipartFile image) {
-        if(albumRepository.existsByName(albumRequest.getName())){
-            throw new DuplicateException("Album with name " + albumRequest.getName() + " already exists");
-        }
-        Album album = new Album();
-
-        modelMapper.map(albumRequest, album);
-         return albumRepository.save(album);
-    }
-
-
 
 
     public Album getAlbum(Long id) {
@@ -56,13 +45,14 @@ public class AlbumService {
     }
 
 
-    public Album save(MultipartFile image, String name, String description) {
+    public Album save(MultipartFile avatar, String name, String description) {
         if(albumRepository.existsByName(name)){
             throw new DuplicateException("Album with name " + name + " already exists");
         }
-        String url = firebaseService.upload(image,"image/png");
+        String url = firebaseService.upload(avatar,"image/png");
         Album album = new Album(name,description,url);
 
         return albumRepository.save(album);
     }
+
 }

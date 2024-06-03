@@ -26,9 +26,13 @@ public class SongController {
 
     @PostMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> addSong(@Valid @RequestBody SongRequest songRequest) {
+    public ResponseEntity<?> addSong(@RequestParam("name") String name,
+                                     @RequestParam("avatar") MultipartFile avatar,
+                                     @RequestParam("file") MultipartFile file,
+                                     @RequestParam("lyrics") String lyrics,
+                                     @RequestParam("albumId") Long albumId) {
 
-        Song song = songService.save(songRequest);
+        Song song = songService.save(name,avatar,file,lyrics,albumId);
         return new ResponseEntity<>(new ApiResponse(true, "Create Song Successfully",
                 objectMapper.convertValue(song, Song.class)), HttpStatus.CREATED);
     }

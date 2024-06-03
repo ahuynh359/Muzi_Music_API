@@ -34,7 +34,7 @@ public class Song  {
 
     @NotBlank
     @Size(max = 50)
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
     private String avatar;
     private String file;
@@ -48,6 +48,16 @@ public class Song  {
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
+
+    public Song(String name, String avatar, String file , String lyrics, Album album){
+        this.name = name;
+        this.avatar = avatar;
+        this.file = file;
+        this.lyrics = lyrics;
+        this.album = album;
+
+
+    }
 
 
 }

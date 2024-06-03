@@ -23,11 +23,11 @@ public class AlbumController {
 
     @PostMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> addAlbum(@RequestParam("image") MultipartFile image,
-                                      @RequestParam("name") String name,
+    public ResponseEntity<?> addAlbum(@RequestParam("avatar") MultipartFile avatar,
+                                      @RequestParam("avatar") String name,
                                       @RequestParam("description") String description) {
 
-        Album albumResponse = albumService.save(image , name, description);
+        Album albumResponse = albumService.save(avatar, name, description);
         return new ResponseEntity<>(new ApiResponse(true, "Create Album Successfully", objectMapper.convertValue(albumResponse, Album.class)), HttpStatus.CREATED);
     }
 
