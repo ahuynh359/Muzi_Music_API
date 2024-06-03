@@ -16,6 +16,6 @@ public class FirebaseController {
 
     @PostMapping
     public String upload(@RequestParam("file") MultipartFile multipartFile) {
-        return firebaseService.upload(multipartFile);
+        return firebaseService.upload(multipartFile,"image/png");
     }
 }
