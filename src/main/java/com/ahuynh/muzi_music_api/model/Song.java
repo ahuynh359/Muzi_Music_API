@@ -12,16 +12,21 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "song")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Song extends UserDateAudit {
+@EntityListeners(AuditingEntityListener.class)
+@JsonIgnoreProperties(
+        value = {"created_at"},
+        allowGetters = true
+)
+public class Song  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

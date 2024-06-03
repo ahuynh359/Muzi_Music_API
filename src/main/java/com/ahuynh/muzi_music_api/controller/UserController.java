@@ -18,7 +18,7 @@ import static org.springframework.security.authorization.AuthorityAuthorizationM
 
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired

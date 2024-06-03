@@ -7,10 +7,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.NaturalId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -20,13 +17,17 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "album")
 @Data
-@AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
+@JsonIgnoreProperties(
+        value = {"created_at"},
+        allowGetters = true
+)
 @NoArgsConstructor
-public class Album extends UserDateAudit {
+@AllArgsConstructor
+public class Album  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -46,6 +47,17 @@ public class Album extends UserDateAudit {
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Song> songs = new ArrayList<>();
 
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false, name = "created_at")
+    private Instant createdAt;
+
+    public Album(String name , String description, String avatar){
+        this.name = name;
+        this.description = description;
+        this.avatar = avatar;
+
+    }
 
 
 }

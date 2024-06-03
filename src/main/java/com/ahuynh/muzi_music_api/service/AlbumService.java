@@ -1,62 +1,68 @@
 package com.ahuynh.muzi_music_api.service;
 
+import com.ahuynh.muzi_music_api.exception.DuplicateException;
 import com.ahuynh.muzi_music_api.exception.ResourceNotFoundException;
 import com.ahuynh.muzi_music_api.model.Album;
-import com.ahuynh.muzi_music_api.model.role.RoleName;
 import com.ahuynh.muzi_music_api.payload.request.AlbumRequest;
-import com.ahuynh.muzi_music_api.payload.response.AlbumResponse;
 import com.ahuynh.muzi_music_api.repository.AlbumRepository;
-import com.ahuynh.muzi_music_api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.modelmapper.ModelMapper;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
 public class AlbumService {
-    @Autowired
-    private AlbumRepository albumRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private ModelMapper modelMapper;
+    private final AlbumRepository albumRepository;
+    private final ModelMapper modelMapper;
+    private final FirebaseService firebaseService;
 
-    public void save(AlbumRequest albumRequest) {
-        Album album = convertAlbum(albumRequest);
-        albumRepository.save(album);
-    }
-
-    private Album convertAlbum(AlbumRequest albumRequest) {
+    public Album save(AlbumRequest albumRequest, MultipartFile image) {
+        if(albumRepository.existsByName(albumRequest.getName())){
+            throw new DuplicateException("Album with name " + albumRequest.getName() + " already exists");
+        }
         Album album = new Album();
-        album.setAvatar(albumRequest.getAvatar());
-        album.setName(albumRequest.getName());
-        album.setDescription(albumRequest.getDescription());
-        return album;
+
+        modelMapper.map(albumRequest, album);
+         return albumRepository.save(album);
     }
+
+
 
 
     public Album getAlbum(Long id) {
-        return albumRepository.findById(id).orElse(null);
+        return albumRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Album with id " + id + " not found"));
     }
 
     public void deleteAlbum(Long id) {
         albumRepository.deleteById(id);
     }
 
-    public ResponseEntity<AlbumResponse> updateAlbum(Long iid, AlbumRequest newAlbum) {
-        Album album = albumRepository.findAlbumById(iid).orElseThrow(() -> new ResourceNotFoundException(iid.toString()));
-        album.setName(newAlbum.getName());
-        Album updatedAlbum = albumRepository.save(album);
-        AlbumResponse albumResponse = new AlbumResponse();
+    public Album updateAlbum(Long iid, AlbumRequest newAlbum) {
+        Album updatedAlbum = albumRepository.findAlbumById(iid).orElseThrow(() -> new ResourceNotFoundException("Album not exits id =" + iid.toString()));
+        if(albumRepository.existsByName(newAlbum.getName())){
+            throw new DuplicateException("Album with name " + newAlbum.getName() + " already exists");
+        }
 
-        modelMapper.map(updatedAlbum, albumResponse);
+        if(newAlbum.getName() != null){
+            updatedAlbum.setName(newAlbum.getName());
+        }
+        if(newAlbum.getDescription() != null){
+            updatedAlbum.setDescription(newAlbum.getDescription());
+        }
 
-        return new ResponseEntity<>(albumResponse, HttpStatus.OK);
+        return albumRepository.save(updatedAlbum);
     }
 
 
+    public Album save(MultipartFile image, String name, String description) {
+        if(albumRepository.existsByName(name)){
+            throw new DuplicateException("Album with name " + name + " already exists");
+        }
+        String url = firebaseService.upload(image,"image/png");
+        Album album = new Album(name,description,url);
+
+        return albumRepository.save(album);
+    }
 }

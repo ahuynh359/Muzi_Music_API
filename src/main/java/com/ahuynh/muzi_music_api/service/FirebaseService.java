@@ -18,20 +18,11 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-public class ImageService {
+public class FirebaseService {
 
-    private String uploadFile(File file, String fileName) throws IOException {
-        fileName  = "app/" + fileName;
-        BlobId blobId = BlobId.of("muzimusic-c2598.appspot.com", fileName); // Replace with your bucker name
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
-        InputStream inputStream = ImageService.class.getClassLoader().getResourceAsStream("firebase.json"); // change the file name with your one
-        Credentials credentials = GoogleCredentials.fromStream(inputStream);
-        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-        storage.create(blobInfo, Files.readAllBytes(file.toPath()));
-        return "";
-    }
 
-    private String uploadFileImage(File file, String fileName) throws IOException {
+
+    private String uploadFileImage(File file, String fileName,String type) throws IOException {
         fileName = "app/" + fileName;
         BlobId blobId = BlobId.of("muzimusic-c2598.appspot.com", fileName); // Replace with your bucket name
 
@@ -42,12 +33,12 @@ public class ImageService {
 
         // Build BlobInfo with metadata
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
-                .setContentType("image/png")
+                .setContentType(type)
                 .setMetadata(metadata)
                 .build();
 
         // Load credentials and initialize the Storage service
-        InputStream inputStream = ImageService.class.getClassLoader().getResourceAsStream("firebase.json"); // change the file name with your one
+        InputStream inputStream = FirebaseService.class.getClassLoader().getResourceAsStream("firebase.json"); // change the file name with your one
         GoogleCredentials credentials = GoogleCredentials.fromStream(inputStream);
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
 
@@ -79,13 +70,13 @@ public class ImageService {
     }
 
 
-    public String upload(MultipartFile multipartFile) {
+    public String upload(MultipartFile multipartFile, String type) {
         try {
             String fileName = multipartFile.getOriginalFilename();                        // to get original file name
             fileName = UUID.randomUUID().toString().concat(this.getExtension(fileName));  // to generated random string values for file name.
 
             File file = this.convertToFile(multipartFile, fileName);                      // to convert multipartFile to File
-            String URL = this.uploadFileImage(file, fileName);                                   // to get uploaded file link
+            String URL = this.uploadFileImage(file, fileName, type);                                   // to get uploaded file link
             file.delete();
             return URL;
         } catch (Exception e) {
@@ -93,5 +84,8 @@ public class ImageService {
             return "Image couldn't upload, Something went wrong";
         }
     }
+
+
+
 
 }

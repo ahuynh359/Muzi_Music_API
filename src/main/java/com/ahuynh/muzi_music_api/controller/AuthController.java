@@ -19,6 +19,7 @@ import com.ahuynh.muzi_music_api.service.VerificationTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
@@ -41,21 +42,15 @@ import java.util.Locale;
 
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
-    @Autowired
-    private VerificationTokenService verificationTokenService;
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-    @Autowired
-    private ObjectMapper objectMapper;
-
+    private final UserService userService;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final VerificationTokenService verificationTokenService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final ObjectMapper objectMapper;
 
 
     @PostMapping("/signup")
@@ -67,7 +62,8 @@ public class AuthController {
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(location);
         applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, getCurrentUrl(request)));
-
+        objectMapper.convertValue(user, User.class);
+        System.out.println(user);
         return new ResponseEntity<>(new ApiResponse(true, "Create User Successfully", objectMapper.convertValue(user, User.class)), headers, HttpStatus.OK);
     }
 

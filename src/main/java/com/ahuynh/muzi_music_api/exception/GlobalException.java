@@ -17,4 +17,21 @@ public class GlobalException {
         ApiResponse apiResponse = new ApiResponse(false, ex.getMessage(), null);
         return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseBody
+    public ResponseEntity<ApiResponse> handleResourcesNotFound(ResourceNotFoundException ex) {
+        ApiResponse apiResponse = new ApiResponse(false, ex.getMessage(), null);
+        return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+    }
+
+
+    @ExceptionHandler(DuplicateException.class)
+    @ResponseBody
+    public ResponseEntity<ApiResponse> handleDuplicate(DuplicateException ex) {
+        ApiResponse apiResponse = new ApiResponse(false, ex.getMessage(), null);
+        return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+    }
+
+
 }
