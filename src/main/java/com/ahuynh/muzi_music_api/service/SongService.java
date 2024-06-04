@@ -14,6 +14,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class SongService {
@@ -60,5 +62,12 @@ public class SongService {
         }
 
         return songRepository.save(updatedSong);
+    }
+
+    public List<Song> getAllSong(){
+        if(songRepository.count() == 0){
+            throw new ResourceNotFoundException("There is no song");
+        }
+        return songRepository.findAll();
     }
 }

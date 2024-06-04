@@ -1,6 +1,7 @@
 package com.ahuynh.muzi_music_api.model;
 
 import com.ahuynh.muzi_music_api.model.role.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -25,7 +26,7 @@ import java.util.List;
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(
-        value = {"created_at"},
+        value = {"created_at","hibernateLazyInitializer", "handler"},
         allowGetters = true
 )
 public class Song  {
@@ -47,14 +48,15 @@ public class Song  {
     private Album album;
     private Long listen = 0L;
 
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "song_playlist"
             , joinColumns = @JoinColumn(name = "playlist_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
     private List<Playlist> playlists = new ArrayList<>();
 
-
-    @ManyToMany(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "user_favorites",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))

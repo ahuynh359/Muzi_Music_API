@@ -23,7 +23,7 @@ import java.util.List;
 @Data
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(
-        value = {"created_at"},
+        value = {"createdAt"},
         allowGetters = true
 )
 @NoArgsConstructor
@@ -46,7 +46,8 @@ public class Album {
     private String avatar;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "album", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "album", fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Song> songs = new ArrayList<>();
 
 

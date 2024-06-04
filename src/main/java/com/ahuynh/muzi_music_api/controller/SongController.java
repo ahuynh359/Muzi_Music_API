@@ -17,6 +17,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/song")
 @RequiredArgsConstructor
@@ -44,6 +46,14 @@ public class SongController {
         Song song = songService.getSong(id);
         return new ResponseEntity<>(new ApiResponse(true, "Successfully", objectMapper.convertValue(song, Song.class)), HttpStatus.OK);
     }
+
+    @GetMapping()
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getAllSong() {
+        List<Song> songs = songService.getAllSong();
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", songs), HttpStatus.OK);
+    }
+
 
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")

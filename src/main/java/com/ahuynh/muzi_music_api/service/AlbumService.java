@@ -3,12 +3,17 @@ package com.ahuynh.muzi_music_api.service;
 import com.ahuynh.muzi_music_api.exception.DuplicateException;
 import com.ahuynh.muzi_music_api.exception.ResourceNotFoundException;
 import com.ahuynh.muzi_music_api.model.Album;
+import com.ahuynh.muzi_music_api.model.Song;
 import com.ahuynh.muzi_music_api.payload.request.AlbumRequest;
 import com.ahuynh.muzi_music_api.repository.AlbumRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.modelmapper.ModelMapper;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +27,20 @@ public class AlbumService {
     public Album getAlbum(Long id) {
         return albumRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Album with id " + id + " not found"));
+    }
+    public List<Album> getAlbum(){
+        if(albumRepository.count() == 0){
+            throw new ResourceNotFoundException("There is no album");
+        }
+        return albumRepository.findAll();
+    }
+
+    public List<Song> getSongFromAlbum(Long id){
+        if(albumRepository.count() == 0){
+            throw new ResourceNotFoundException("There is no album");
+        }
+        albumRepository.findAlbumById(id).orElseThrow(() -> new ResourceNotFoundException("Album not exits id =" + id.toString()));
+        return albumRepository.findSongById(id);
     }
 
     public void deleteAlbum(Long id) {
