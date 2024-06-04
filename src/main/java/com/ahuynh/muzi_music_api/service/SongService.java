@@ -4,10 +4,13 @@ import com.ahuynh.muzi_music_api.exception.DuplicateException;
 import com.ahuynh.muzi_music_api.exception.ResourceNotFoundException;
 import com.ahuynh.muzi_music_api.model.Album;
 import com.ahuynh.muzi_music_api.model.Song;
+import com.ahuynh.muzi_music_api.model.Type;
+import com.ahuynh.muzi_music_api.model.User;
 import com.ahuynh.muzi_music_api.payload.request.SongRequest;
 import com.ahuynh.muzi_music_api.payload.request.UpdateSongRequest;
 import com.ahuynh.muzi_music_api.repository.AlbumRepository;
 import com.ahuynh.muzi_music_api.repository.SongRepository;
+import com.ahuynh.muzi_music_api.repository.UserRepository;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -20,15 +23,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SongService {
     private final SongRepository songRepository;
+    private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final AlbumRepository albumRepository;
     private final FirebaseService firebaseService;
 
-    public Song save( String name,MultipartFile avatar,MultipartFile file,String lyrics, Long albumIb) {
+    public Song save(String name, MultipartFile avatar, MultipartFile file, String lyrics, Long albumIb) {
         Album album = albumRepository.findById(albumIb).orElseThrow(() -> new ResourceNotFoundException("No Album with " + albumIb));
-        String urlAvatar = firebaseService.upload(avatar,"image/png");
-        String urlFile = firebaseService.upload(file,"audio/mpeg");
-        Song s = new Song(name,urlAvatar,urlFile,lyrics,album);
+        String urlAvatar = firebaseService.upload(avatar, "image/png");
+        String urlFile = firebaseService.upload(file, "audio/mpeg");
+        Song s = new Song(name, urlAvatar, urlFile, lyrics, album);
 
         return songRepository.save(s);
     }
@@ -64,10 +68,38 @@ public class SongService {
         return songRepository.save(updatedSong);
     }
 
-    public List<Song> getAllSong(){
-        if(songRepository.count() == 0){
+    public List<Song> getAllSong() {
+        if (songRepository.count() == 0) {
             throw new ResourceNotFoundException("There is no song");
         }
         return songRepository.findAll();
+    }
+
+    public List<User> getSingerOfSong(Long id) {
+        songRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Song with id " + id + " not found"));
+        return songRepository.findAllSingerById(id).orElseThrow(()
+                -> new ResourceNotFoundException("There is no singer in song " + id.toString()));
+    }
+
+    public Song updateSongLove(Long userId, Long songId, int love) {
+        Song updateSong = songRepository.findById(songId).orElseThrow(() ->
+                new ResourceNotFoundException("Song with id " + songId + " not found"));
+        User updateUser = userRepository.findById(userId).orElseThrow(() ->
+                new ResourceNotFoundException("User with id " + userId + " not found"));
+
+        if (love == 1)
+            updateUser.addLovedSong(updateSong);
+        else updateUser.removeLovedSong(updateSong);
+        return songRepository.save(updateSong);
+
+
+    }
+
+    public List<Type> getTypeOfSong(Long id) {
+        songRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Song with id " + id + " not found"));
+        return songRepository.findAllTypeById(id).orElseThrow(()
+                -> new ResourceNotFoundException("There is no type in this song " + id.toString()));
     }
 }

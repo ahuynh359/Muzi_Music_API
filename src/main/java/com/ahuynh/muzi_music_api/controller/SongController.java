@@ -2,6 +2,8 @@ package com.ahuynh.muzi_music_api.controller;
 
 import com.ahuynh.muzi_music_api.model.Album;
 import com.ahuynh.muzi_music_api.model.Song;
+import com.ahuynh.muzi_music_api.model.Type;
+import com.ahuynh.muzi_music_api.model.User;
 import com.ahuynh.muzi_music_api.payload.request.AlbumRequest;
 import com.ahuynh.muzi_music_api.payload.request.SongRequest;
 import com.ahuynh.muzi_music_api.payload.request.UpdateSongRequest;
@@ -54,6 +56,21 @@ public class SongController {
         return new ResponseEntity<>(new ApiResponse(true, "Successfully", songs), HttpStatus.OK);
     }
 
+    @GetMapping("/singer/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getSingerOfSong(@PathVariable(name = "id") Long id) {
+        List<User> singer = songService.getSingerOfSong(id);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", singer), HttpStatus.OK);
+    }
+
+    @GetMapping("/type/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getTypeOfSong(@PathVariable(name = "id") Long id) {
+        List<Type> type = songService.getTypeOfSong(id);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", type), HttpStatus.OK);
+    }
+
+
 
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -68,6 +85,16 @@ public class SongController {
         Song song = songService.updateSong(id, newSong);
         return new ResponseEntity<>(new ApiResponse(true, "Update song Successfully",
                 objectMapper.convertValue(song, Song.class)), HttpStatus.OK);
+    }
+
+    @PutMapping()
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> updateSongLove(@RequestParam(name = "user") Long user,
+                                            @RequestParam(name = "song") Long song,
+                                            @RequestParam(name = "love") int love) {
+        songService.updateSongLove(user, song,love);
+        return new ResponseEntity<>(new ApiResponse(true, " Successfully",
+                null), HttpStatus.OK);
     }
 
 

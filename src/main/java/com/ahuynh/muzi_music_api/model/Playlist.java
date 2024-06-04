@@ -43,11 +43,12 @@ public class Playlist  {
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "song_playlist"
-            , joinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id")
-            , inverseJoinColumns = @JoinColumn(name = "playlist_id", referencedColumnName = "id"))
+            , joinColumns = @JoinColumn(name = "playlist_id", referencedColumnName = "id")
+            , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
     private List<Song> songs = new ArrayList<>();
 
-    public Playlist(String name) {
+    public Playlist(String name, User user) {
         this.name = name;
+        this.user = user;
     }
 }

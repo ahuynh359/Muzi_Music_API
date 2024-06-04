@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 public class PlaylistRequest {
     @NotBlank
     private String name;
+    private Long id;
 
 
 

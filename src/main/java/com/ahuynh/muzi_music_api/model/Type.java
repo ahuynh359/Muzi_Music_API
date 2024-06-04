@@ -43,10 +43,10 @@ public class Type  {
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_type"
-            , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
-            , inverseJoinColumns = @JoinColumn(name = "type_id", referencedColumnName = "id"))
-    private List<User> users = new ArrayList<>();
+    @JoinTable(name = "song_type"
+            , joinColumns = @JoinColumn(name = "type_id", referencedColumnName = "id")
+            , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
+    private List<Song> songs = new ArrayList<>();
 
 
 

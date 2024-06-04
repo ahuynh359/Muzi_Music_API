@@ -51,18 +51,30 @@ public class Song  {
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "song_playlist"
-            , joinColumns = @JoinColumn(name = "playlist_id", referencedColumnName = "id")
-            , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
+            , joinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id")
+            , inverseJoinColumns = @JoinColumn(name = "playlist_id", referencedColumnName = "id"))
     private List<Playlist> playlists = new ArrayList<>();
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_favorites",
-            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
-    private List<Song> favoriteSongs = new ArrayList<>();
+    @JoinTable(name = "user_love"
+            , joinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id")
+            , inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
+    private List<User> userLove = new ArrayList<>();
 
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_song"
+            , joinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id")
+            , inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
+    private List<User> singers = new ArrayList<>();
 
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "song_type"
+            , joinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id")
+            , inverseJoinColumns = @JoinColumn(name = "type_id", referencedColumnName = "id"))
+    private List<Type> types = new ArrayList<>();
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

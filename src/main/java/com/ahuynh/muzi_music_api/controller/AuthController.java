@@ -58,7 +58,8 @@ public class AuthController {
         User user = userService.saveNewUser(signUpRequest);
 
         String basePath = "/ap1/v1";
-        URI location = ServletUriComponentsBuilder.fromUriString(basePath).path("/users/{userId}").buildAndExpand(user.getId()).toUri();
+        URI location = ServletUriComponentsBuilder.fromUriString(basePath).path("/users/{userId}").
+                buildAndExpand(user.getId()).toUri();
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(location);
         applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, getCurrentUrl(request)));

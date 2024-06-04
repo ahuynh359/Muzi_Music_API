@@ -16,6 +16,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/playlist")
 @RequiredArgsConstructor
@@ -36,6 +38,13 @@ public class PlaylistController {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getPlaylist(@PathVariable(name = "id") Long id) {
         Playlist playlist = playlistService.getPlaylist(id);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", objectMapper.convertValue(playlist, Playlist.class)), HttpStatus.OK);
+    }
+
+    @GetMapping()
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getAllPlaylist() {
+        List<Playlist> playlist = playlistService.getAllPlaylist();
         return new ResponseEntity<>(new ApiResponse(true, "Successfully", objectMapper.convertValue(playlist, Playlist.class)), HttpStatus.OK);
     }
 

@@ -17,6 +17,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/type")
 @RequiredArgsConstructor
@@ -55,6 +57,21 @@ public class TypeController {
         return new ResponseEntity<>(new ApiResponse(true, "Update  Successfully",
                 objectMapper.convertValue(type, Type.class)), HttpStatus.OK);
     }
+    @GetMapping()
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getAllType() {
+        List<Type> type = typeService.getAllType();
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", type), HttpStatus.OK);
+    }
+
+
+    @GetMapping("/songs/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getSongFromType(@PathVariable(name = "id") Long id) {
+        List<Song> songs = typeService.getSongFromType(id);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", songs), HttpStatus.OK);
+    }
+
 
 
 }

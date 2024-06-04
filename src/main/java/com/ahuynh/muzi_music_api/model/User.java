@@ -61,11 +61,25 @@ public class User extends UserDateAudit {
             , inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private List<Role> role = new ArrayList<>();
 
+
+
+
+    //Bài hát do ai đó thể hiện
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_type"
-            , joinColumns = @JoinColumn(name = "type_id", referencedColumnName = "id")
-            , inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
-    private List<Type> type = new ArrayList<>();
+    @JoinTable(name = "user_song"
+            , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
+            , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
+    private List<Song> songs = new ArrayList<>();
+
+    //Bài hát yeeu thisch
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_love"
+            , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
+            , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
+    private List<Song> loveSongs = new ArrayList<>();
+
 
 
     @JsonIgnore
@@ -79,6 +93,14 @@ public class User extends UserDateAudit {
         this.username = username;
         this.role = role;
 
+    }
+
+    public void addLovedSong(Song song) {
+        loveSongs.add(song);
+    }
+
+    public void removeLovedSong(Song song) {
+        loveSongs.remove(song);
     }
 
 }

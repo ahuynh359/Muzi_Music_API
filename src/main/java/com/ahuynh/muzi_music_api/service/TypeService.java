@@ -2,12 +2,15 @@ package com.ahuynh.muzi_music_api.service;
 
 import com.ahuynh.muzi_music_api.exception.DuplicateException;
 import com.ahuynh.muzi_music_api.exception.ResourceNotFoundException;
+import com.ahuynh.muzi_music_api.model.Song;
 import com.ahuynh.muzi_music_api.model.Type;
 import com.ahuynh.muzi_music_api.payload.request.TypeRequest;
 import com.ahuynh.muzi_music_api.repository.TypeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -48,5 +51,18 @@ public class TypeService {
 
 
         return typeRepository.save(updateType);
+    }
+
+    public List<Type> getAllType() {
+        return typeRepository.findAll();
+    }
+
+    public List<Song> getSongFromType(Long id) {
+        if(typeRepository.count() == 0){
+            throw new ResourceNotFoundException("There is no type");
+        }
+        typeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Type not exits id =" + id.toString()));
+        return typeRepository.findSongById(id);
+
     }
 }
