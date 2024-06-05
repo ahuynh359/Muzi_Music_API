@@ -28,11 +28,11 @@ public class SongService {
     private final AlbumRepository albumRepository;
     private final FirebaseService firebaseService;
 
-    public Song save(String name, MultipartFile avatar, MultipartFile file, String lyrics, Long albumIb) {
+    public Song save(String name, MultipartFile avatar, MultipartFile file, String lyrics, Long albumIb, String singer) {
         Album album = albumRepository.findById(albumIb).orElseThrow(() -> new ResourceNotFoundException("No Album with " + albumIb));
         String urlAvatar = firebaseService.upload(avatar, "image/png");
         String urlFile = firebaseService.upload(file, "audio/mpeg");
-        Song s = new Song(name, urlAvatar, urlFile, lyrics, album);
+        Song s = new Song(name, urlAvatar, urlFile, lyrics, album,singer);
 
         return songRepository.save(s);
     }
@@ -64,6 +64,9 @@ public class SongService {
         if (newSong.getLyrics() != null) {
             updatedSong.setLyrics(newSong.getLyrics());
         }
+        if (newSong.getSinger() != null) {
+            updatedSong.setLyrics(newSong.getSinger());
+        }
 
         return songRepository.save(updatedSong);
     }
@@ -75,12 +78,6 @@ public class SongService {
         return songRepository.findAll();
     }
 
-    public List<User> getSingerOfSong(Long id) {
-        songRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Song with id " + id + " not found"));
-        return songRepository.findAllSingerById(id).orElseThrow(()
-                -> new ResourceNotFoundException("There is no singer in song " + id.toString()));
-    }
 
     public Song updateSongLove(Long userId, Long songId, int love) {
         Song updateSong = songRepository.findById(songId).orElseThrow(() ->

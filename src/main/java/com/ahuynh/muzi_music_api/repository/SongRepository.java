@@ -16,8 +16,6 @@ public interface SongRepository extends JpaRepository<Song, Long> {
 
     Optional<Song> findSongById(Long id);
 
-    @Query(value = "SELECT song.singers FROM Song song where song.id = :id")
-    Optional<List<User>> findAllSingerById(Long id);
 
     @Query(value = "SELECT song.types FROM Song song where song.id = :id")
     Optional<List<Type>> findAllTypeById(Long id);

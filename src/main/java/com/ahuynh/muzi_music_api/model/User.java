@@ -24,19 +24,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "user")
 @Data
 @NoArgsConstructor
-public class User extends UserDateAudit {
+@EntityListeners(AuditingEntityListener.class)
+@JsonIgnoreProperties(
+        value = {"created_at"},
+        allowGetters = true
+)
+public class User  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
     @Email
-    @NaturalId
     @NotBlank
     @Size(max = 50)
     @Column(nullable = false, unique = true)
@@ -55,22 +58,18 @@ public class User extends UserDateAudit {
     private String avatar = "";
     private boolean enabled = false;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    //Role 1 user co nhieu role
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(name = "user_role"
             , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private List<Role> role = new ArrayList<>();
 
+    @CreatedDate
+    @Column(nullable = false, updatable = false, name = "created_at")
+    private Instant createdAt;
 
 
-
-    //Bài hát do ai đó thể hiện
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_song"
-            , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
-            , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
-    private List<Song> songs = new ArrayList<>();
 
     //Bài hát yeeu thisch
     @JsonIgnore
@@ -80,11 +79,34 @@ public class User extends UserDateAudit {
             , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
     private List<Song> loveSongs = new ArrayList<>();
 
-
-
+    //1 User co nhieu playlist
     @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Playlist> playlist = new ArrayList<>();
+
+    //User follow lan nhau
+    @ManyToMany
+    @JoinTable(
+            name = "user_follow",
+            joinColumns = @JoinColumn(name = "follower_id"),
+            inverseJoinColumns = @JoinColumn(name = "followed_id")
+    )
+    private Set<User> following = new HashSet<>();
+
+    @ManyToMany(mappedBy = "following")
+    private Set<User> followers = new HashSet<>();
+
+
+    public User(String email, String password, String username, List<Role> role, String avatar, boolean enabled) {
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.role = role;
+        this.avatar = avatar;
+        this.enabled = enabled;
+
+
+    }
 
 
     public User(String email, String password, String username, List<Role> role) {
@@ -92,6 +114,7 @@ public class User extends UserDateAudit {
         this.password = password;
         this.username = username;
         this.role = role;
+
 
     }
 
@@ -101,6 +124,14 @@ public class User extends UserDateAudit {
 
     public void removeLovedSong(Song song) {
         loveSongs.remove(song);
+    }
+
+    public void addRole(Role role) {
+        this.role.add(role);
+    }
+
+    public void removeRole(Role role) {
+        this.role.remove(role);
     }
 
 }

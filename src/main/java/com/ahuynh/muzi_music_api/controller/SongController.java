@@ -35,9 +35,10 @@ public class SongController {
                                      @RequestParam("avatar") MultipartFile avatar,
                                      @RequestParam("file") MultipartFile file,
                                      @RequestParam("lyrics") String lyrics,
-                                     @RequestParam("albumId") Long albumId) {
+                                     @RequestParam("albumId") Long albumId,
+                                     @RequestParam("singer") String singer) {
 
-        Song song = songService.save(name,avatar,file,lyrics,albumId);
+        Song song = songService.save(name,avatar,file,lyrics,albumId,singer);
         return new ResponseEntity<>(new ApiResponse(true, "Create Song Successfully",
                 objectMapper.convertValue(song, Song.class)), HttpStatus.CREATED);
     }
@@ -56,12 +57,6 @@ public class SongController {
         return new ResponseEntity<>(new ApiResponse(true, "Successfully", songs), HttpStatus.OK);
     }
 
-    @GetMapping("/singer/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getSingerOfSong(@PathVariable(name = "id") Long id) {
-        List<User> singer = songService.getSingerOfSong(id);
-        return new ResponseEntity<>(new ApiResponse(true, "Successfully", singer), HttpStatus.OK);
-    }
 
     @GetMapping("/type/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")

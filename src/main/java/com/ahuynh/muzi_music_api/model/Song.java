@@ -41,12 +41,19 @@ public class Song  {
     private String name;
     private String avatar;
     private String file;
+    @Column(columnDefinition = "TEXT")
     private String lyrics;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "album_id")
     private Album album;
     private Long listen = 0L;
+
+    //Bài hát do ai đó thể hiện
+    @NotBlank
+    @Size(max = 50)
+    @Column(nullable = false)
+    private String singer;
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -62,12 +69,6 @@ public class Song  {
             , inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
     private List<User> userLove = new ArrayList<>();
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_song"
-            , joinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id")
-            , inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
-    private List<User> singers = new ArrayList<>();
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -80,12 +81,13 @@ public class Song  {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    public Song(String name, String avatar, String file , String lyrics, Album album){
+    public Song(String name, String avatar, String file , String lyrics, Album album, String singer){
         this.name = name;
         this.avatar = avatar;
         this.file = file;
         this.lyrics = lyrics;
         this.album = album;
+        this.singer = singer;
 
 
     }

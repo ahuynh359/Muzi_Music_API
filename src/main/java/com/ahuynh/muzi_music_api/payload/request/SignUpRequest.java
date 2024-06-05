@@ -27,4 +27,6 @@ public class SignUpRequest {
     @Column(nullable = false, unique = true)
     @Size(max = 50)
     private String username;
+
+
 }

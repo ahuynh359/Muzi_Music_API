@@ -11,4 +11,6 @@ public class UpdateSongRequest {
     private String name;
     private Long albumId;
     private String lyrics;
+    private String singer;
+
 }
