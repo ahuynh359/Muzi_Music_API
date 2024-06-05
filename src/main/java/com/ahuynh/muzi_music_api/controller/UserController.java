@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
 
 
 @RestController
@@ -29,6 +30,10 @@ public class UserController {
     private final UserService userService;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Thêm người dùng
+     * ADMIN
+     */
     @PostMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> addUser(@RequestParam("email") String email,
@@ -36,11 +41,15 @@ public class UserController {
                                      @RequestParam("username") String username,
                                      @RequestParam("avatar") MultipartFile avatar) {
 
-       User user = userService.save(email ,password , username,avatar);
+        User user = userService.save(email, password, username, avatar);
         return new ResponseEntity<>(new ApiResponse(true, "Create Successfully",
                 objectMapper.convertValue(user, User.class)), HttpStatus.CREATED);
     }
 
+    /**
+     * Xóa người dùng
+     * ADMIN
+     */
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable(name = "id") Long id) {
@@ -48,30 +57,45 @@ public class UserController {
         return new ResponseEntity<>(new ApiResponse(true, "Delete Successfully", null), HttpStatus.OK);
     }
 
+    /**
+     * Sửa người dùng - ko có avatar
+     * ADMIN, USER
+     */
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> updateUser(@PathVariable(name = "id") Long id,
                                         @RequestBody UserRequest userRequest) {
         User user = userService.updateUser(id, userRequest);
-        return new ResponseEntity<>(new ApiResponse(true, "Update Successfully",   objectMapper.convertValue(user, User.class)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(true, "Update Successfully", objectMapper.convertValue(user, User.class)), HttpStatus.OK);
     }
 
 
+    /**
+     * Mở khóa người dùng
+     * ADMIN
+     */
     @PutMapping("/enable/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') ")
     public ResponseEntity<?> unlock(@PathVariable(name = "id") Long id) {
-        User user = userService.updateEnable(id,true );
-        return new ResponseEntity<>(new ApiResponse(true, "Update Successfully",   objectMapper.convertValue(user, User.class)), HttpStatus.OK);
+        User user = userService.updateEnable(id, true);
+        return new ResponseEntity<>(new ApiResponse(true, "Update Successfully", objectMapper.convertValue(user, User.class)), HttpStatus.OK);
     }
 
+    /**
+     * Khóa người dùng
+     * ADMIN
+     */
     @PutMapping("/disable/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') ")
     public ResponseEntity<?> lock(@PathVariable(name = "id") Long id) {
-        User user = userService.updateEnable(id,false );
-        return new ResponseEntity<>(new ApiResponse(true, "Update Successfully",   objectMapper.convertValue(user, User.class)), HttpStatus.OK);
+        User user = userService.updateEnable(id, false);
+        return new ResponseEntity<>(new ApiResponse(true, "Update Successfully", objectMapper.convertValue(user, User.class)), HttpStatus.OK);
     }
 
-
+    /**
+     * Lấy thông tin tất cả người dùng
+     * ADMIN - USER
+     */
     @GetMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getAllUser() {
@@ -79,13 +103,62 @@ public class UserController {
         return new ResponseEntity<>(new ApiResponse(true, "Successfully", user), HttpStatus.OK);
     }
 
+    /**
+     * Lấy thông tin 1 người dùng
+     * ADMIN - USER
+     */
     @GetMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getUser(@PathVariable("id") Long id) {
         User user = userService.getUserById(id);
-        return new ResponseEntity<>(new ApiResponse(true, "Successfully",  objectMapper.convertValue(user, User.class)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", objectMapper.convertValue(user, User.class)), HttpStatus.OK);
     }
 
+    /**
+     * Người dùng follow người dùng
+     * USER
+     */
+    @PostMapping("/{followerId}/follow/{followedId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> followUser(@PathVariable Long followerId, @PathVariable Long followedId) {
+
+        userService.followUser(followerId, followedId);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", null), HttpStatus.OK);
+    }
+
+    /**
+     * Người dùng unfollow người dùng
+     * USER
+     */
+    @PostMapping("/{followerId}/unfollow/{followedId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> unfollowUser(@PathVariable Long followerId, @PathVariable Long followedId) {
+
+        userService.unfollowUser(followerId, followedId);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", null), HttpStatus.OK);
+    }
+
+    /**
+     * Lấy ds một người dùng đang theo dõi ai
+     * USER
+     */
+    @GetMapping("/{id}/following")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> getFollowing(@PathVariable Long id) {
+        Set<User> following = userService.getFollowing(id);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", following), HttpStatus.OK);
+    }
+
+    /**
+     * Lấy ds một người đang có ai theo dõi
+     * USER
+     */
+    @GetMapping("/{id}/follower")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> getFollower(@PathVariable Long id) {
+        Set<User> following = userService.getFollower(id);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", following), HttpStatus.OK);
+    }
 
 
 

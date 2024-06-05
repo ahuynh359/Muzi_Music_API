@@ -8,10 +8,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.NaturalId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -26,7 +23,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "user")
-@Data
+@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(
@@ -85,6 +84,7 @@ public class User  {
     private List<Playlist> playlist = new ArrayList<>();
 
     //User follow lan nhau
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "user_follow",
@@ -93,6 +93,7 @@ public class User  {
     )
     private Set<User> following = new HashSet<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "following")
     private Set<User> followers = new HashSet<>();
 
@@ -132,6 +133,15 @@ public class User  {
 
     public void removeRole(Role role) {
         this.role.remove(role);
+    }
+
+    public void follow(User user) {
+        following.add(user);
+    }
+
+    public void unfollow(User user) {
+        following.remove(user);
+
     }
 
 }

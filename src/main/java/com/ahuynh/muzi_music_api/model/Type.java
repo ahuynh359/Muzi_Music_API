@@ -6,9 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -18,7 +16,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "type")
-@Data
+@Getter
+@Setter
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(
         value = {"created_at"},

@@ -13,6 +13,7 @@ import com.ahuynh.muzi_music_api.payload.request.UserRequest;
 import com.ahuynh.muzi_music_api.repository.RoleRepository;
 import com.ahuynh.muzi_music_api.repository.SongRepository;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -130,5 +132,39 @@ public class UserService {
     public User getUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("User not exits id =" + id));
+    }
+    @Transactional
+    public void followUser(Long followerId, Long followedId) {
+        User follower = userRepository.findById(followerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Follower not found"));
+        User followed = userRepository.findById(followedId)
+                .orElseThrow(() -> new ResourceNotFoundException("Followed user not found"));
+        follower.follow(followed);
+        userRepository.save(follower);
+    }
+
+    @Transactional
+    public void unfollowUser(Long followerId, Long followedId) {
+        User follower = userRepository.findById(followerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Follower not found"));
+        User followed = userRepository.findById(followedId)
+                .orElseThrow(() -> new ResourceNotFoundException("Followed user not found"));
+        follower.unfollow(followed);
+        userRepository.save(follower);
+    }
+    @Transactional
+    public Set<User> getFollowing(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found " + userId));
+        System.out.println(user.getFollowing());
+        return userRepository.findFollowingById(userId);
+    }
+
+    @Transactional
+    public Set<User> getFollower(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found " + userId));
+        System.out.println(user.getFollowing());
+        return userRepository.findFollowerById(userId);
     }
 }

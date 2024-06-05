@@ -20,7 +20,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "album")
-@Data
+@Getter
+@Setter
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(
         value = {"createdAt"},

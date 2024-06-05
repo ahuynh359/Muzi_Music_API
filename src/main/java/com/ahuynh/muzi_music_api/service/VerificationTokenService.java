@@ -14,11 +14,11 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class VerificationTokenService {
 
-    @Autowired
-    private VerificationTokenRepository verificationTokenRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final VerificationTokenRepository verificationTokenRepository;
+
+
+    private final UserRepository userRepository;
 
 
     public void saveVerificationToken(User user, String token) {

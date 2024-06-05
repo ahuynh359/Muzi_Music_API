@@ -10,16 +10,18 @@ import java.sql.Date;
 import java.time.Instant;
 import java.util.Calendar;
 
-@Data
-@Table(name = "verification_token")
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
+@Table(name = "verification_token")
+
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(
         value = {"created_at"},
         allowGetters = true
 )
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class VerificationToken {
 
     @Id
