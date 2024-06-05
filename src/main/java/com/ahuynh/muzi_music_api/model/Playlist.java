@@ -30,7 +30,6 @@ public class Playlist  {
 
 
     @NotBlank
-    @Size(max = 50)
     @Column(nullable = false, unique = true)
     private String name;
 
@@ -39,8 +38,7 @@ public class Playlist  {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "song_playlist"
             , joinColumns = @JoinColumn(name = "playlist_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))

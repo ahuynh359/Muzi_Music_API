@@ -1,9 +1,7 @@
 package com.ahuynh.muzi_music_api.model;
 
 import com.ahuynh.muzi_music_api.model.role.Role;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -14,71 +12,60 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "song")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(
-        value = {"created_at","hibernateLazyInitializer", "handler"},
+        value = {"created_at", "hibernateLazyInitializer", "handler"},
         allowGetters = true
 )
-public class Song  {
+public class Song {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
     @NotBlank
-    @Size(max = 50)
-    @Column(nullable = false)
     private String name;
     private String avatar;
     private String file;
+
     @Column(columnDefinition = "TEXT")
     private String lyrics;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "album_id")
     private Album album;
+
     private Long listen = 0L;
 
-    //Bài hát do ai đó thể hiện
     @NotBlank
-    @Size(max = 50)
-    @Column(nullable = false)
     private String singer;
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "song_playlist"
-            , joinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id")
-            , inverseJoinColumns = @JoinColumn(name = "playlist_id", referencedColumnName = "id"))
+
+    @ManyToMany(mappedBy = "songs")
     private List<Playlist> playlists = new ArrayList<>();
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_love"
-            , joinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id")
-            , inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
-    private List<User> userLove = new ArrayList<>();
+    @ManyToMany(mappedBy = "loveSongs")
+    private Set<User> userLove = new HashSet<>();
 
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "song_type"
-            , joinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id")
-            , inverseJoinColumns = @JoinColumn(name = "type_id", referencedColumnName = "id"))
-    private List<Type> types = new ArrayList<>();
+    @ManyToMany(mappedBy = "songs")
+    private Set<Type> types = new HashSet<>();
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    public Song(String name, String avatar, String file , String lyrics, Album album, String singer){
+    public Song(String name, String avatar, String file, String lyrics, Album album, String singer) {
         this.name = name;
         this.avatar = avatar;
         this.file = file;

@@ -3,6 +3,7 @@ package com.ahuynh.muzi_music_api.model;
 import com.ahuynh.muzi_music_api.model.role.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -32,7 +33,7 @@ import java.util.Set;
         value = {"created_at"},
         allowGetters = true
 )
-public class User  {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -40,7 +41,6 @@ public class User  {
 
     @Email
     @NotBlank
-    @Size(max = 50)
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -50,7 +50,6 @@ public class User  {
     private String password;
 
     @NotBlank
-    @Size(max = 50)
     @Column(nullable = false, unique = true)
     private String username;
 
@@ -58,33 +57,27 @@ public class User  {
     private boolean enabled = false;
 
     //Role 1 user co nhieu role
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_role"
             , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-    private List<Role> role = new ArrayList<>();
+    private Set<Role> role = new HashSet<>();
 
     @CreatedDate
     @Column(nullable = false, updatable = false, name = "created_at")
     private Instant createdAt;
 
-
-
-    //Bài hát yeeu thisch
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_love"
             , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
-    private List<Song> loveSongs = new ArrayList<>();
+    private Set<Song> loveSongs = new HashSet<>();
 
-    //1 User co nhieu playlist
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private List<Playlist> playlist = new ArrayList<>();
 
-    //User follow lan nhau
-    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "user_follow",
@@ -93,12 +86,11 @@ public class User  {
     )
     private Set<User> following = new HashSet<>();
 
-    @JsonIgnore
     @ManyToMany(mappedBy = "following")
     private Set<User> followers = new HashSet<>();
 
 
-    public User(String email, String password, String username, List<Role> role, String avatar, boolean enabled) {
+    public User(String email, String password, String username, Set<Role> role, String avatar, boolean enabled) {
         this.email = email;
         this.password = password;
         this.username = username;
@@ -110,7 +102,7 @@ public class User  {
     }
 
 
-    public User(String email, String password, String username, List<Role> role) {
+    public User(String email, String password, String username, Set<Role> role) {
         this.email = email;
         this.password = password;
         this.username = username;

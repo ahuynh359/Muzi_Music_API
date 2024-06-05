@@ -1,8 +1,10 @@
 package com.ahuynh.muzi_music_api.model;
 
 import com.ahuynh.muzi_music_api.model.role.Role;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -12,7 +14,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "type")
@@ -25,7 +29,7 @@ import java.util.List;
 )
 @NoArgsConstructor
 @AllArgsConstructor
-public class Type  {
+public class Type {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -33,27 +37,16 @@ public class Type  {
 
 
     @NotBlank
-    @Size(max = 50)
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Size(max = 50)
     private String description;
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "song_type"
             , joinColumns = @JoinColumn(name = "type_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
-    private List<Song> songs = new ArrayList<>();
-
-
-
-    public Type(String name , String description){
-        this.name = name;
-        this.description = description;
-
-    }
+    private Set<Song> songs = new HashSet<>();
 
 
 }

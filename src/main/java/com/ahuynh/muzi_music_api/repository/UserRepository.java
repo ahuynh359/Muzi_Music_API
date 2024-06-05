@@ -1,5 +1,6 @@
 package com.ahuynh.muzi_music_api.repository;
 
+import com.ahuynh.muzi_music_api.model.Song;
 import com.ahuynh.muzi_music_api.model.User;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +22,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "SELECT user.followers FROM User user where user.id = :id")
     Set<User> findFollowerById(Long id);
+
+    @Query(value = "SELECT user.loveSongs FROM User user where user.id = :id")
+    Set<Song> findLoveSongById(Long id);
 }

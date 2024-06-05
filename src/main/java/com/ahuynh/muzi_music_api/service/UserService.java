@@ -1,13 +1,11 @@
 package com.ahuynh.muzi_music_api.service;
 
 import com.ahuynh.muzi_music_api.exception.CustomException;
-import com.ahuynh.muzi_music_api.exception.DuplicateException;
 import com.ahuynh.muzi_music_api.exception.ResourceNotFoundException;
-import com.ahuynh.muzi_music_api.model.Album;
+import com.ahuynh.muzi_music_api.model.Song;
 import com.ahuynh.muzi_music_api.model.User;
 import com.ahuynh.muzi_music_api.model.role.Role;
 import com.ahuynh.muzi_music_api.model.role.RoleName;
-import com.ahuynh.muzi_music_api.payload.request.AlbumRequest;
 import com.ahuynh.muzi_music_api.payload.request.SignUpRequest;
 import com.ahuynh.muzi_music_api.payload.request.UserRequest;
 import com.ahuynh.muzi_music_api.repository.RoleRepository;
@@ -18,9 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -33,6 +31,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final FirebaseService firebaseService;
+    private final SongRepository songRepository;
 
 
     public User saveNewUser(SignUpRequest signUpRequest) {
@@ -46,7 +45,7 @@ public class UserService {
 
         //Lưu user vào db
         String encodedPassword = passwordEncoder.encode(signUpRequest.getPassword());
-        List<Role> roles = new ArrayList<>();
+        Set<Role> roles = new HashSet<>();
         if (userRepository.count() == 0) {
             roles.add(roleRepository.findByName(RoleName.ROLE_ADMIN)
                     .orElseThrow(() -> new CustomException("There is no role in db")));
@@ -73,7 +72,7 @@ public class UserService {
 
         //Lưu user vào db
         String encodedPassword = passwordEncoder.encode(password);
-        List<Role> roles = new ArrayList<>();
+        Set<Role> roles = new HashSet<>();
         if (userRepository.count() == 0) {
             roles.add(roleRepository.findByName(RoleName.ROLE_ADMIN)
                     .orElseThrow(() -> new CustomException("There is no role in db")));
@@ -133,6 +132,7 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("User not exits id =" + id));
     }
+
     @Transactional
     public void followUser(Long followerId, Long followedId) {
         User follower = userRepository.findById(followerId)
@@ -152,6 +152,7 @@ public class UserService {
         follower.unfollow(followed);
         userRepository.save(follower);
     }
+
     @Transactional
     public Set<User> getFollowing(Long userId) {
         User user = userRepository.findById(userId)
@@ -166,5 +167,39 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found " + userId));
         System.out.println(user.getFollowing());
         return userRepository.findFollowerById(userId);
+    }
+
+    public void loveSong(Long userId, Long songId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found " + userId));
+        Song song = songRepository.findById(songId)
+                .orElseThrow(() -> new ResourceNotFoundException("Song not found " + songId));
+        user.addLovedSong(song);
+        userRepository.save(user);
+    }
+
+    public void unloveSong(Long userId, Long songId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found " + userId));
+        Song song = songRepository.findById(songId)
+                .orElseThrow(() -> new ResourceNotFoundException("Song not found " + songId));
+        user.removeLovedSong(song);
+        userRepository.save(user);
+    }
+
+    public Set<Song> getLoveSong(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found " + id));
+        return user.getLoveSongs();
+
+    }
+
+    public boolean isLoveSong(Long id, Long songId) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found " + id));
+        Song song = songRepository.findById(songId)
+                .orElseThrow(() -> new ResourceNotFoundException("Song not found " + songId));
+        return user.getLoveSongs().contains(song);
+
     }
 }

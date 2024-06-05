@@ -1,16 +1,11 @@
 package com.ahuynh.muzi_music_api.controller;
 
-import com.ahuynh.muzi_music_api.model.Album;
 import com.ahuynh.muzi_music_api.model.Song;
 import com.ahuynh.muzi_music_api.model.User;
-import com.ahuynh.muzi_music_api.payload.request.AlbumRequest;
 import com.ahuynh.muzi_music_api.payload.request.UserRequest;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
-import com.ahuynh.muzi_music_api.payload.response.UserResponse;
-import com.ahuynh.muzi_music_api.service.FirebaseService;
 import com.ahuynh.muzi_music_api.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -119,7 +114,7 @@ public class UserController {
      * USER
      */
     @PostMapping("/{followerId}/follow/{followedId}")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> followUser(@PathVariable Long followerId, @PathVariable Long followedId) {
 
         userService.followUser(followerId, followedId);
@@ -131,7 +126,7 @@ public class UserController {
      * USER
      */
     @PostMapping("/{followerId}/unfollow/{followedId}")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> unfollowUser(@PathVariable Long followerId, @PathVariable Long followedId) {
 
         userService.unfollowUser(followerId, followedId);
@@ -143,7 +138,7 @@ public class UserController {
      * USER
      */
     @GetMapping("/{id}/following")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getFollowing(@PathVariable Long id) {
         Set<User> following = userService.getFollowing(id);
         return new ResponseEntity<>(new ApiResponse(true, "Successfully", following), HttpStatus.OK);
@@ -154,11 +149,56 @@ public class UserController {
      * USER
      */
     @GetMapping("/{id}/follower")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getFollower(@PathVariable Long id) {
         Set<User> following = userService.getFollower(id);
         return new ResponseEntity<>(new ApiResponse(true, "Successfully", following), HttpStatus.OK);
     }
+
+    /**
+     * Nguoi dung yeu thich bai hat
+     * USER
+     */
+    @PutMapping("/{userId}/love/{songId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> loveUser(@PathVariable Long userId, @PathVariable Long songId) {
+        userService.loveSong(userId,songId);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", null), HttpStatus.OK);
+    }
+
+    /**
+     * Nguoi dung bo yeu thich bai hat
+     * USER
+     */
+    @PutMapping("/{userId}/unlove/{songId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> unloveSong(@PathVariable Long userId, @PathVariable Long songId) {
+        userService.unloveSong(userId,songId);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", null), HttpStatus.OK);
+    }
+
+    /**
+     * Lấy ds love song cua nguoi udng
+     * USER
+     */
+    @GetMapping("/{id}/loveSong")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getLoveSong(@PathVariable Long id) {
+        Set<Song> songs = userService.getLoveSong(id);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", songs), HttpStatus.OK);
+    }
+
+    /**
+     * Lấy ds love song cua nguoi udng
+     * USER
+     */
+    @GetMapping("/{id}/isLoveSong/{songId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> isLoveSong(@PathVariable Long id,@PathVariable Long songId) {
+        boolean b = userService.isLoveSong(id,songId);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", b), HttpStatus.OK);
+    }
+
 
 
 

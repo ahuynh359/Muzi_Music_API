@@ -35,20 +35,16 @@ public class Album {
     @Column(name = "id")
     private Long id;
 
-
     @NotBlank
-    @Size(max = 50)
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Size(max = 50)
-    private String description;
 
+    private String description;
     private String avatar;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "album", fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL, orphanRemoval = true)
+            cascade = CascadeType.ALL)
     private List<Song> songs = new ArrayList<>();
 
 

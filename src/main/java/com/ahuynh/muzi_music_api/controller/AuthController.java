@@ -72,19 +72,19 @@ public class AuthController {
     public ResponseEntity<?> verifyEmail(@PathVariable("token") String token) {
         VerificationToken verificationToken = verificationTokenService.findByToken(token);
         if (verificationToken == null) {
-            return new ResponseEntity<>(new ApiResponse(false, "Invalid Verification Token", null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ApiResponse(false, "Invalid Verification Token", ""), HttpStatus.BAD_REQUEST);
         }
         if (verificationToken.getUser().isEnabled()) {
-            return new ResponseEntity<>(new ApiResponse(false, "This account has already been verified", null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ApiResponse(false, "This account has already been verified", ""), HttpStatus.BAD_REQUEST);
 
         }
         String verificationResult = verificationTokenService.validateToken(token);
         if (verificationResult.equalsIgnoreCase("Valid")) {
             verificationTokenService.deleteToken(verificationToken);
-            return new ResponseEntity<>(new ApiResponse(true, "Verified successfully", null), HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse(true, "Verified successfully", ""), HttpStatus.OK);
 
         }
-        return new ResponseEntity<>(new ApiResponse(false, "Invalid verification token", null), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ApiResponse(false, "Invalid verification token", ""), HttpStatus.BAD_REQUEST);
     }
 
     public String getCurrentUrl(HttpServletRequest request) {
@@ -100,7 +100,7 @@ public class AuthController {
             String jwt = jwtTokenProvider.generateToken(authentication);
             return new ResponseEntity<>(new ApiResponse(true, "Verified successfully", jwt), HttpStatus.OK);
         } catch (AuthenticationException e) {
-            return new ResponseEntity<>(new ApiResponse(false, "Invalid username or password", null), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new ApiResponse(false, "Invalid username or password", ""), HttpStatus.UNAUTHORIZED);
         }
     }
 
