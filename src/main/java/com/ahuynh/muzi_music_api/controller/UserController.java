@@ -29,7 +29,7 @@ public class UserController {
     private final ObjectMapper objectMapper;
 
     /**
-     * Thêm người dùng
+     * Thêm người dùng chua lam xac thuc otp cho nay
      * ADMIN
      */
     @PostMapping()

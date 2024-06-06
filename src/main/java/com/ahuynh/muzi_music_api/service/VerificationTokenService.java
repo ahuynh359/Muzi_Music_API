@@ -49,4 +49,8 @@ public class VerificationTokenService {
     public void deleteToken(VerificationToken verificationToken) {
         verificationTokenRepository.delete(verificationToken);
     }
+
+    public VerificationToken findByUser(User user) {
+        return verificationTokenRepository.findByUser(user);
+    }
 }

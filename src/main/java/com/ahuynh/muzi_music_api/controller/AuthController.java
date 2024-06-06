@@ -7,12 +7,13 @@ import com.ahuynh.muzi_music_api.model.VerificationToken;
 import com.ahuynh.muzi_music_api.model.role.Role;
 import com.ahuynh.muzi_music_api.model.role.RoleName;
 import com.ahuynh.muzi_music_api.payload.request.LoginRequest;
+import com.ahuynh.muzi_music_api.payload.request.ResendOtpRequest;
 import com.ahuynh.muzi_music_api.payload.request.SignUpRequest;
-import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
-import com.ahuynh.muzi_music_api.payload.response.MessageErrorResponse;
+import com.ahuynh.muzi_music_api.payload.response.*;
 import com.ahuynh.muzi_music_api.repository.RoleRepository;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
 import com.ahuynh.muzi_music_api.repository.VerificationTokenRepository;
+import com.ahuynh.muzi_music_api.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.security.JwtTokenProvider;
 import com.ahuynh.muzi_music_api.service.UserService;
 import com.ahuynh.muzi_music_api.service.VerificationTokenService;
@@ -52,9 +53,14 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
 
-
+    /**
+     * Đăng kí
+     * Ai cũng được
+     * Trả về SignUpResponse
+     */
     @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequest signUpRequest, final HttpServletRequest request) {
+    public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequest signUpRequest,
+                                    final HttpServletRequest request) {
         User user = userService.saveNewUser(signUpRequest);
 
         String basePath = "/ap1/v1";
@@ -63,11 +69,37 @@ public class AuthController {
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(location);
         applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, getCurrentUrl(request)));
-        objectMapper.convertValue(user, User.class);
-        System.out.println(user);
-        return new ResponseEntity<>(new ApiResponse(true, "Create User Successfully", objectMapper.convertValue(user, User.class)), headers, HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(true, "Create User Successfully",
+                objectMapper.convertValue(user, SignUpResponse.class)), headers, HttpStatus.OK);
     }
 
+    /**
+     * Resend otp
+     * Ai cũng được
+     */
+    @PostMapping("/resend-otp/{email}")
+    public ResponseEntity<?> resendOtp(@PathVariable String email,
+                                       final HttpServletRequest request) {
+        User user = userService.findByEmail(email);
+        VerificationToken verificationToken = verificationTokenService.findByUser(user);
+        if (verificationToken != null) {
+            verificationTokenService.deleteToken(verificationToken);
+        }
+        if (user.isEnabled()) {
+            return new ResponseEntity<>(new ApiResponse(false, "User is active",
+                    ""), HttpStatus.OK);
+        }
+
+        applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, getCurrentUrl(request)));
+        return new ResponseEntity<>(new ApiResponse(true, "Resend Successfully",
+                ""), HttpStatus.OK);
+    }
+
+    /**
+     * Đăng kí xong thì verify Email
+     * Ai cũng được
+     * Ko trả về data
+     */
     @GetMapping("/verifyEmail/{token}")
     public ResponseEntity<?> verifyEmail(@PathVariable("token") String token) {
         VerificationToken verificationToken = verificationTokenService.findByToken(token);
@@ -91,6 +123,11 @@ public class AuthController {
         return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
     }
 
+    /**
+     * Đăng nhập
+     * Ai cũng được
+     * Trả về LoginResponse
+     */
     @PostMapping("/login")
     public ResponseEntity<?> signIn(@Valid @RequestBody LoginRequest loginRequest) {
         try {
@@ -98,7 +135,13 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(loginRequest.getUserNameOrEmail(), loginRequest.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = jwtTokenProvider.generateToken(authentication);
-            return new ResponseEntity<>(new ApiResponse(true, "Verified successfully", jwt), HttpStatus.OK);
+            CustomUserDetail userDetails = (CustomUserDetail) authentication.getPrincipal();
+            User user = userService.getUserByUserName(loginRequest.getUserNameOrEmail());
+            if (!user.isEnabled()) {
+                return new ResponseEntity<>(new ApiResponse(false, "Account is not verify", ""), HttpStatus.BAD_REQUEST);
+            }
+            LoginResponse loginResponse = new LoginResponse(userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), jwt);
+            return new ResponseEntity<>(new ApiResponse(true, "Verified successfully", loginResponse), HttpStatus.OK);
         } catch (AuthenticationException e) {
             return new ResponseEntity<>(new ApiResponse(false, "Invalid username or password", ""), HttpStatus.UNAUTHORIZED);
         }

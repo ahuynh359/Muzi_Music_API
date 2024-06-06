@@ -44,6 +44,7 @@ public class User {
 
     @NotBlank
     @Size(min = 6, max = 120, message = "Password has at least 6 characters")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @NotBlank
