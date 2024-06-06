@@ -24,9 +24,10 @@ import java.util.Set;
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(
-        value = {"created_at", "hibernateLazyInitializer", "handler"},
+        value = {"created_at"},
         allowGetters = true
 )
+@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@songId")
 public class Song {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,13 +1,17 @@
 package com.ahuynh.muzi_music_api.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +26,7 @@ import java.util.List;
 )
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(generator= ObjectIdGenerators.IntSequenceGenerator.class, property="@playlistId")
 public class Playlist  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +48,11 @@ public class Playlist  {
             , joinColumns = @JoinColumn(name = "playlist_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
     private List<Song> songs = new ArrayList<>();
+
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false, name = "created_at")
+    private Instant createdAt;
 
     public Playlist(String name, User user) {
         this.name = name;

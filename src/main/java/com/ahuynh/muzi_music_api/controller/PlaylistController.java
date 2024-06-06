@@ -42,10 +42,10 @@ public class PlaylistController {
     }
 
     @GetMapping()
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getAllPlaylist() {
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> getAllPlaylistByUserId() {
         List<Playlist> playlist = playlistService.getAllPlaylist();
-        return new ResponseEntity<>(new ApiResponse(true, "Successfully", objectMapper.convertValue(playlist, Playlist.class)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", playlist), HttpStatus.OK);
     }
 
     @DeleteMapping("{id}")

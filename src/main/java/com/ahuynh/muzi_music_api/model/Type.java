@@ -1,10 +1,7 @@
 package com.ahuynh.muzi_music_api.model;
 
 import com.ahuynh.muzi_music_api.model.role.Role;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -29,6 +26,7 @@ import java.util.Set;
 )
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@typeId")
 public class Type {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,6 +45,11 @@ public class Type {
             , joinColumns = @JoinColumn(name = "type_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
     private Set<Song> songs = new HashSet<>();
+
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false, name = "created_at")
+    private Instant createdAt;
 
 
 }

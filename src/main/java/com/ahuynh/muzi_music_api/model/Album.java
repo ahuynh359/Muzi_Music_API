@@ -1,9 +1,7 @@
 package com.ahuynh.muzi_music_api.model;
 
 import com.ahuynh.muzi_music_api.model.role.Role;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -29,6 +27,7 @@ import java.util.List;
 )
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(generator= ObjectIdGenerators.IntSequenceGenerator.class, property="@albumId")
 public class Album {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

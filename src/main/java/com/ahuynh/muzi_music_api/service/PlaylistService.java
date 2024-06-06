@@ -55,8 +55,8 @@ public class PlaylistService {
         if (PlaylistRepository.existsByName(playlistRequest.getName())) {
             throw new DuplicateException("Playlist with name " + playlistRequest.getName() + " already exists");
         }
-        User user = userRepository.findById(playlistRequest.getId()).orElseThrow(() ->
-                new ResourceNotFoundException("User with id " + playlistRequest.getId() + " not found"));
+        User user = userRepository.findById(playlistRequest.getUserId()).orElseThrow(() ->
+                new ResourceNotFoundException("User with id " + playlistRequest.getUserId() + " not found"));
 
         Playlist Playlist = new Playlist(playlistRequest.getName(), user);
 
@@ -66,4 +66,6 @@ public class PlaylistService {
     public List<Playlist> getAllPlaylist() {
         return playlistRepository.findAll();
     }
+
+
 }

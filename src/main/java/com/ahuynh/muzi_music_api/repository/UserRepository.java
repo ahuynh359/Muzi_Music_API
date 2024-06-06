@@ -1,5 +1,6 @@
 package com.ahuynh.muzi_music_api.repository;
 
+import com.ahuynh.muzi_music_api.model.Playlist;
 import com.ahuynh.muzi_music_api.model.Song;
 import com.ahuynh.muzi_music_api.model.User;
 import jakarta.validation.constraints.NotBlank;
@@ -18,11 +19,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
    Boolean existsByEmail(@NotBlank String email);
 
     @Query(value = "SELECT user.following FROM User user where user.id = :id")
-    Set<User> findFollowingById(Long id);
+    List<User> findFollowingById(Long id);
 
     @Query(value = "SELECT user.followers FROM User user where user.id = :id")
-    Set<User> findFollowerById(Long id);
+    List<User> findFollowerById(Long id);
 
     @Query(value = "SELECT user.loveSongs FROM User user where user.id = :id")
-    Set<Song> findLoveSongById(Long id);
+    List<Song> findLoveSongById(Long id);
+
+    @Query(value = "SELECT user.playlist FROM User user where user.id = :id")
+    List<Playlist> findPlaylistById(Long id);
 }

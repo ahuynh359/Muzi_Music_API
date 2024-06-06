@@ -1,6 +1,5 @@
 package com.ahuynh.muzi_music_api.controller;
 
-import com.ahuynh.muzi_music_api.model.Album;
 import com.ahuynh.muzi_music_api.model.Song;
 import com.ahuynh.muzi_music_api.model.Type;
 import com.ahuynh.muzi_music_api.model.User;
@@ -39,16 +38,26 @@ public class SongController {
                                      @RequestParam("singer") String singer) {
 
         Song song = songService.save(name,avatar,file,lyrics,albumId,singer);
+
         return new ResponseEntity<>(new ApiResponse(true, "Create Song Successfully",
                 objectMapper.convertValue(song, Song.class)), HttpStatus.CREATED);
     }
+    /**
+     * Lấy song by id
+     * USER - ADMIN
+     */
 
     @GetMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getSong(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<?> getSongById(@PathVariable(name = "id") Long id) {
         Song song = songService.getSong(id);
-        return new ResponseEntity<>(new ApiResponse(true, "Successfully", objectMapper.convertValue(song, Song.class)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", song), HttpStatus.OK);
     }
+
+    /**
+     * Lấy het song
+     * USER - ADMIN
+     */
 
     @GetMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")

@@ -1,9 +1,11 @@
 package com.ahuynh.muzi_music_api.controller;
 
+import com.ahuynh.muzi_music_api.model.Playlist;
 import com.ahuynh.muzi_music_api.model.Song;
 import com.ahuynh.muzi_music_api.model.User;
 import com.ahuynh.muzi_music_api.payload.request.UserRequest;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
+import com.ahuynh.muzi_music_api.payload.response.UserResponse;
 import com.ahuynh.muzi_music_api.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Set;
+
 
 
 @RestController
@@ -34,11 +37,12 @@ public class UserController {
     public ResponseEntity<?> addUser(@RequestParam("email") String email,
                                      @RequestParam("password") String password,
                                      @RequestParam("username") String username,
-                                     @RequestParam("avatar") MultipartFile avatar) {
+                                     @RequestParam("avatar") MultipartFile avatar,
+                                     @RequestParam("enable") boolean enable) {
 
-        User user = userService.save(email, password, username, avatar);
+        User user = userService.save(email, password, username, avatar, enable);
         return new ResponseEntity<>(new ApiResponse(true, "Create Successfully",
-                objectMapper.convertValue(user, User.class)), HttpStatus.CREATED);
+                user), HttpStatus.CREATED);
     }
 
     /**
@@ -49,7 +53,8 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable(name = "id") Long id) {
         userService.deleteUser(id);
-        return new ResponseEntity<>(new ApiResponse(true, "Delete Successfully", null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(true, "Delete Successfully",
+                ""), HttpStatus.OK);
     }
 
     /**
@@ -61,7 +66,8 @@ public class UserController {
     public ResponseEntity<?> updateUser(@PathVariable(name = "id") Long id,
                                         @RequestBody UserRequest userRequest) {
         User user = userService.updateUser(id, userRequest);
-        return new ResponseEntity<>(new ApiResponse(true, "Update Successfully", objectMapper.convertValue(user, User.class)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(true, "Update Successfully",
+                user), HttpStatus.OK);
     }
 
 
@@ -84,7 +90,8 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_ADMIN') ")
     public ResponseEntity<?> lock(@PathVariable(name = "id") Long id) {
         User user = userService.updateEnable(id, false);
-        return new ResponseEntity<>(new ApiResponse(true, "Update Successfully", objectMapper.convertValue(user, User.class)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(true, "Update Successfully",
+                user), HttpStatus.OK);
     }
 
     /**
@@ -95,7 +102,8 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getAllUser() {
         List<User> user = userService.getAllUser();
-        return new ResponseEntity<>(new ApiResponse(true, "Successfully", user), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", user),
+                HttpStatus.OK);
     }
 
     /**
@@ -106,7 +114,21 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getUser(@PathVariable("id") Long id) {
         User user = userService.getUserById(id);
-        return new ResponseEntity<>(new ApiResponse(true, "Successfully", objectMapper.convertValue(user, User.class)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully",
+                user), HttpStatus.OK);
+    }
+
+
+    /**
+     * Lấy thông tin 1 người dùng theo username
+     * ADMIN - USER
+     */
+    @GetMapping("/byUserName/{username}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getUserByUserName(@PathVariable String username) {
+        User user = userService.getUserByUserName(username);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully",
+                user), HttpStatus.OK);
     }
 
     /**
@@ -118,7 +140,8 @@ public class UserController {
     public ResponseEntity<?> followUser(@PathVariable Long followerId, @PathVariable Long followedId) {
 
         userService.followUser(followerId, followedId);
-        return new ResponseEntity<>(new ApiResponse(true, "Successfully", null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", ""),
+                HttpStatus.OK);
     }
 
     /**
@@ -130,7 +153,8 @@ public class UserController {
     public ResponseEntity<?> unfollowUser(@PathVariable Long followerId, @PathVariable Long followedId) {
 
         userService.unfollowUser(followerId, followedId);
-        return new ResponseEntity<>(new ApiResponse(true, "Successfully", null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", ""),
+                HttpStatus.OK);
     }
 
     /**
@@ -140,8 +164,9 @@ public class UserController {
     @GetMapping("/{id}/following")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getFollowing(@PathVariable Long id) {
-        Set<User> following = userService.getFollowing(id);
-        return new ResponseEntity<>(new ApiResponse(true, "Successfully", following), HttpStatus.OK);
+        List<User> following = userService.getFollowing(id);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully",
+                following), HttpStatus.OK);
     }
 
     /**
@@ -151,8 +176,8 @@ public class UserController {
     @GetMapping("/{id}/follower")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getFollower(@PathVariable Long id) {
-        Set<User> following = userService.getFollower(id);
-        return new ResponseEntity<>(new ApiResponse(true, "Successfully", following), HttpStatus.OK);
+        List<User> follower = userService.getFollower(id);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", follower), HttpStatus.OK);
     }
 
     /**
@@ -162,8 +187,8 @@ public class UserController {
     @PutMapping("/{userId}/love/{songId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> loveUser(@PathVariable Long userId, @PathVariable Long songId) {
-        userService.loveSong(userId,songId);
-        return new ResponseEntity<>(new ApiResponse(true, "Successfully", null), HttpStatus.OK);
+        userService.loveSong(userId, songId);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", ""), HttpStatus.OK);
     }
 
     /**
@@ -173,8 +198,9 @@ public class UserController {
     @PutMapping("/{userId}/unlove/{songId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> unloveSong(@PathVariable Long userId, @PathVariable Long songId) {
-        userService.unloveSong(userId,songId);
-        return new ResponseEntity<>(new ApiResponse(true, "Successfully", null), HttpStatus.OK);
+        userService.unloveSong(userId, songId);
+
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", ""), HttpStatus.OK);
     }
 
     /**
@@ -194,13 +220,34 @@ public class UserController {
      */
     @GetMapping("/{id}/isLoveSong/{songId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> isLoveSong(@PathVariable Long id,@PathVariable Long songId) {
-        boolean b = userService.isLoveSong(id,songId);
+    public ResponseEntity<?> isLoveSong(@PathVariable Long id, @PathVariable Long songId) {
+        boolean b = userService.isLoveSong(id, songId);
         return new ResponseEntity<>(new ApiResponse(true, "Successfully", b), HttpStatus.OK);
     }
 
+    /**
+     * Edit avatar
+     * USER - ADMIN
+     */
+    @PostMapping("/{id}/editAvatar")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> editAvatar(@PathVariable Long id, @RequestParam("avatar") MultipartFile avatar) {
 
+        User user = userService.editAvatar(id , avatar);
+        return new ResponseEntity<>(new ApiResponse(true, "Edit Successfully",
+                user), HttpStatus.CREATED);
+    }
 
+    /**
+     * Lấy ds love song cua nguoi udng
+     * USER
+     */
+    @GetMapping("/{id}/playlist")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getAllPlaylistById(@PathVariable Long id) {
+        List<Playlist> playlist = userService.getAllPlaylistById(id);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", playlist), HttpStatus.OK);
+    }
 
 
 

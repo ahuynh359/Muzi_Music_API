@@ -60,14 +60,14 @@ public class AlbumController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteAlbum(@PathVariable(name = "id") Long id) {
         albumService.deleteAlbum(id);
-        return new ResponseEntity<>(new ApiResponse(true, "Delete album Successfully", null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(true, "Delete Successfully", ""), HttpStatus.OK);
     }
 
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateAlbum(@PathVariable(name = "id") Long id, @RequestBody AlbumRequest newAlbum) {
         Album album = albumService.updateAlbum(id, newAlbum);
-        return new ResponseEntity<>(new ApiResponse(true, "Update album Successfully", album), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(true, "Update Successfully", album), HttpStatus.OK);
     }
 
 

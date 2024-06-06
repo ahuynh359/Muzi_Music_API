@@ -2,6 +2,7 @@ package com.ahuynh.muzi_music_api.service;
 
 import com.ahuynh.muzi_music_api.exception.CustomException;
 import com.ahuynh.muzi_music_api.exception.ResourceNotFoundException;
+import com.ahuynh.muzi_music_api.model.Playlist;
 import com.ahuynh.muzi_music_api.model.Song;
 import com.ahuynh.muzi_music_api.model.User;
 import com.ahuynh.muzi_music_api.model.role.Role;
@@ -61,7 +62,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User save(String email, String password, String username, MultipartFile avatar) {
+    public User save(String email, String password, String username, MultipartFile avatar, boolean enable) {
         if (userRepository.existsByEmail(email)) {
             throw new CustomException("Email already exists");
         }
@@ -84,7 +85,7 @@ public class UserService {
                     .orElseThrow(() -> new CustomException("There is no role in db")));
         }
         String url = firebaseService.upload(avatar, "image/png");
-        User user = new User(email, encodedPassword, username, roles, url, true);
+        User user = new User(email, encodedPassword, username, roles, url, enable);
 
         return userRepository.save(user);
     }
@@ -153,19 +154,16 @@ public class UserService {
         userRepository.save(follower);
     }
 
-    @Transactional
-    public Set<User> getFollowing(Long userId) {
+    public List<User> getFollowing(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found " + userId));
         System.out.println(user.getFollowing());
         return userRepository.findFollowingById(userId);
     }
 
-    @Transactional
-    public Set<User> getFollower(Long userId) {
+    public List<User> getFollower(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found " + userId));
-        System.out.println(user.getFollowing());
         return userRepository.findFollowerById(userId);
     }
 
@@ -201,5 +199,24 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Song not found " + songId));
         return user.getLoveSongs().contains(song);
 
+    }
+
+    public User editAvatar(Long id, MultipartFile avatar) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found " + id));
+        String url = firebaseService.upload(avatar, "image/png");
+        user.setAvatar(url);
+        return userRepository.save(user);
+    }
+
+    public List<Playlist> getAllPlaylistById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found " + id));
+        return userRepository.findPlaylistById(id);
+    }
+
+    public User getUserByUserName(String username) {
+        return userRepository.findByUsernameOrEmail(username, username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found " + username));
     }
 }
