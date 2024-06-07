@@ -51,14 +51,6 @@ public class Song {
     @NotBlank
     private String singer;
 
-
-    @ManyToMany(mappedBy = "songs")
-    private List<Playlist> playlists = new ArrayList<>();
-
-    @ManyToMany(mappedBy = "loveSongs")
-    private Set<User> userLove = new HashSet<>();
-
-
     @ManyToMany(mappedBy = "songs")
     private Set<Type> types = new HashSet<>();
 

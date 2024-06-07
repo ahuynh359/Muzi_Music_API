@@ -53,7 +53,7 @@ public class SongService {
                 -> new ResourceNotFoundException("Song not exits id =" + id.toString()));
 
         Album updatedAlbum =
-                albumRepository.findAlbumById(newSong.getAlbumId()).orElseThrow(() -> new ResourceNotFoundException("Album not exits id =" + newSong.getAlbumId().toString()));
+                albumRepository.findById(newSong.getAlbumId()).orElseThrow(() -> new ResourceNotFoundException("Album not exits id =" + newSong.getAlbumId().toString()));
 
         if (newSong.getName() != null) {
             updatedSong.setName(newSong.getName());
@@ -99,4 +99,6 @@ public class SongService {
         return songRepository.findAllTypeById(id).orElseThrow(()
                 -> new ResourceNotFoundException("There is no type in this song " + id.toString()));
     }
+
+
 }

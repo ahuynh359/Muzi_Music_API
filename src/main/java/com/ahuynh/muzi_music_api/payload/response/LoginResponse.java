@@ -1,10 +1,11 @@
 package com.ahuynh.muzi_music_api.payload.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class LoginResponse {
     private Long id;
     private String username;

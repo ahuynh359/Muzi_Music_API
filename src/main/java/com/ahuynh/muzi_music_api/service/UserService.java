@@ -221,10 +221,19 @@ public class UserService {
     }
 
 
-
     public User findByEmail(String email) {
 
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found " + email));
+    }
+
+
+    public User editPassword(Long id, String password) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found " + id));
+
+        String encodedPassword = passwordEncoder.encode(password);
+        user.setPassword(encodedPassword);
+        return userRepository.save(user);
     }
 }
