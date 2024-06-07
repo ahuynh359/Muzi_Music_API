@@ -58,4 +58,11 @@ public class Playlist  {
         this.name = name;
         this.user = user;
     }
+
+    public void addSong(Song song) {
+        songs.add(song);
+    }
+    public void removeSong(Song song) {
+        songs.remove(song);
+    }
 }

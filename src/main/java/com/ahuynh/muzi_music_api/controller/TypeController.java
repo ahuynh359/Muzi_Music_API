@@ -5,6 +5,7 @@ import com.ahuynh.muzi_music_api.model.Type;
 import com.ahuynh.muzi_music_api.payload.request.TypeRequest;
 import com.ahuynh.muzi_music_api.payload.request.UpdateSongRequest;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
+import com.ahuynh.muzi_music_api.payload.response.TypeResponse;
 import com.ahuynh.muzi_music_api.service.SongService;
 import com.ahuynh.muzi_music_api.service.TypeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,35 +34,37 @@ public class TypeController {
 
         Type type = typeService.save(request);
         return new ResponseEntity<>(new ApiResponse(true, "Create Successfully",
-                objectMapper.convertValue(type, Type.class)), HttpStatus.CREATED);
+                objectMapper.convertValue(type, TypeResponse.class)), HttpStatus.CREATED);
     }
 
     @GetMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getType(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<?> getTypeById(@PathVariable(name = "id") Long id) {
         Type type = typeService.getType(id);
-        return new ResponseEntity<>(new ApiResponse(true, "Successfully", objectMapper.convertValue(type, Type.class)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", objectMapper.convertValue(type, TypeResponse.class)), HttpStatus.OK);
     }
 
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteType(@PathVariable(name = "id") Long id) {
         typeService.deleteType(id);
-        return new ResponseEntity<>(new ApiResponse(true, "Delete Successfully", null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(true, "Delete Successfully", ""), HttpStatus.OK);
     }
 
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> updateSong(@PathVariable(name = "id") Long id, @RequestBody TypeRequest request) {
+    public ResponseEntity<?> updateType(@PathVariable(name = "id") Long id, @RequestBody TypeRequest request) {
         Type type = typeService.updateType(id, request);
         return new ResponseEntity<>(new ApiResponse(true, "Update  Successfully",
-                objectMapper.convertValue(type, Type.class)), HttpStatus.OK);
+                objectMapper.convertValue(type, TypeResponse.class)), HttpStatus.OK);
     }
-    @GetMapping()
+
+    @GetMapping("/get-all")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getAllType() {
         List<Type> type = typeService.getAllType();
-        return new ResponseEntity<>(new ApiResponse(true, "Successfully", type), HttpStatus.OK);
+        List<TypeResponse> response = TypeResponse.toResponseList(type);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", response), HttpStatus.OK);
     }
 
 
@@ -71,6 +74,7 @@ public class TypeController {
         List<Song> songs = typeService.getSongFromType(id);
         return new ResponseEntity<>(new ApiResponse(true, "Successfully", songs), HttpStatus.OK);
     }
+
 
 
 

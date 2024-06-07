@@ -27,7 +27,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "SELECT user.loveSongs FROM User user where user.id = :id")
     List<Song> findLoveSongById(Long id);
 
-    @Query(value = "SELECT user.playlist FROM User user where user.id = :id")
+    @Query(value = "SELECT user.playlists FROM User user where user.id = :id")
     List<Playlist> findPlaylistById(Long id);
 
     Optional<User> findByEmail( String email);

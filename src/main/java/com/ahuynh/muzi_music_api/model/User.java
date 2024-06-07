@@ -72,9 +72,8 @@ public class User {
     private Set<Song> loveSongs = new HashSet<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
-    private List<Playlist> playlist = new ArrayList<>();
+            cascade = CascadeType.ALL)
+    private Set<Playlist> playlists = new HashSet<>();
 
     @ManyToMany
     @JoinTable(
@@ -134,6 +133,13 @@ public class User {
 
     }
 
+    public void addPlaylist(Playlist playlist) {
+        playlists.add(playlist);
+    }
+
+    public void removePlaylist(Playlist playlist) {
+        playlists.remove(playlist);
+    }
 }
 
 

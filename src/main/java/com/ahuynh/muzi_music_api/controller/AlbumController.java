@@ -26,6 +26,12 @@ public class AlbumController {
     private final AlbumService albumService;
     private final ObjectMapper objectMapper;
 
+    /**
+     *Thêm Album
+     * ADMIN
+     *AlbumResponse
+     */
+
     @PostMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> addAlbum(@RequestParam("avatar") MultipartFile avatar,
@@ -38,13 +44,23 @@ public class AlbumController {
                         objectMapper.convertValue(albumResponse, AlbumResponse.class)), HttpStatus.CREATED);
     }
 
-    @GetMapping("/getById/{id}")
+    /**
+     * Lấy album theo id
+     * ADMIN - USER
+     *AlbumResponse
+     */
+    @GetMapping("/get-by-id/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getAlbumById(@PathVariable Long id) {
         Album album = albumService.getAlbumById(id);
         return new ResponseEntity<>(objectMapper.convertValue(album, AlbumResponse.class), HttpStatus.OK);
     }
 
+    /**
+     * Lấy hết album
+     * ADMIN - USER
+     *AlbumResponse
+     */
     @GetMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getAllAlbum() {
@@ -53,14 +69,24 @@ public class AlbumController {
         return new ResponseEntity<>(new ApiResponse(true, "Successfully", responses), HttpStatus.OK);
     }
 
-    @GetMapping("/getByName")
+    /**
+     * Lấy album theo name
+     * ADMIN - USER
+     *AlbumResponse
+     */
+    @GetMapping("/get-by-name")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getAlbumByName(@RequestParam String name) {
         Album album = albumService.getAlbumByName(name);
         return new ResponseEntity<>(objectMapper.convertValue(album, AlbumResponse.class), HttpStatus.OK);
     }
 
-    @GetMapping("/getSongFromAlbum/{id}")
+    /**
+     * Lấy song từ album theo id
+     * ADMIN - USER
+     *AlbumResponse
+     */
+    @GetMapping("/get-song-from-album/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getSongFromAlbum(@PathVariable(name = "id") Long id) {
         List<Song> songs = albumService.getSongFromAlbum(id);
@@ -69,6 +95,11 @@ public class AlbumController {
                 responses), HttpStatus.OK);
     }
 
+    /**
+     * Delete Alum
+     * ADMIN
+     *
+     */
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteAlbum(@PathVariable(name = "id") Long id) {
@@ -76,6 +107,12 @@ public class AlbumController {
         return new ResponseEntity<>(new ApiResponse(true, "Delete Successfully", ""), HttpStatus.OK);
     }
 
+
+    /**
+     * Update Alum
+     * ADMIN
+     *
+     */
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateAlbum(@PathVariable(name = "id") Long id, @RequestBody AlbumRequest newAlbum) {
@@ -83,12 +120,31 @@ public class AlbumController {
         return new ResponseEntity<>(new ApiResponse(true, "Update Successfully", objectMapper.convertValue(album, AlbumResponse.class)), HttpStatus.OK);
     }
 
-    @PostMapping("/addSongToAlbum")
+    /**
+     * Thêm song to album
+     * ADMIN
+     *
+     */
+    @PostMapping("/add-song-to-album")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> addSongToAlbum(@RequestParam("songId") Long songId,
                                             @RequestParam("albumId") Long albumId
     ) {
         albumService.addSongToAlbum(songId, albumId);
+        return new ResponseEntity<>(new ApiResponse(true,
+                "Add Successfully", ""), HttpStatus.OK);
+    }
+    /**
+     * Delete song from album
+     * ADMIN
+     *
+     */
+    @PostMapping("/delete-song-from-album")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> deleteSongFromAlbum(@RequestParam("songId") Long songId,
+                                            @RequestParam("albumId") Long albumId
+    ) {
+        albumService.deleteSongFromAlbum(songId, albumId);
         return new ResponseEntity<>(new ApiResponse(true,
                 "Add Successfully", ""), HttpStatus.OK);
     }

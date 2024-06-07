@@ -90,4 +90,13 @@ public class AlbumService {
         album.addSong(song);
         albumRepository.save(album);
     }
+
+    public void deleteSongFromAlbum(Long songId, Long albumId) {
+        Album album = albumRepository.findById(albumId).orElseThrow(() ->
+                new ResourceNotFoundException("Album with id " + albumId + " not found"));
+        Song song = songRepository.findById(songId).orElseThrow(() ->
+                new ResourceNotFoundException("Song with id " + songId + " not found"));
+        album.removeSong(song);
+        albumRepository.save(album);
+    }
 }
