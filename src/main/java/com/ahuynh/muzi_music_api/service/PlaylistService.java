@@ -107,4 +107,10 @@ public class PlaylistService {
         songRepository.save(updateSong);
     }
 
+    public List<Song> getAllSongFromPlaylist(Long playlistId) {
+        Playlist updatedPlaylist = playlistRepository.findById(playlistId).orElseThrow(() ->
+                new ResourceNotFoundException("Playlist not exits id = " + playlistId));
+
+        return updatedPlaylist.getSongs();
+    }
 }

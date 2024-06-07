@@ -2,10 +2,12 @@ package com.ahuynh.muzi_music_api.controller;
 
 import com.ahuynh.muzi_music_api.model.Album;
 import com.ahuynh.muzi_music_api.model.Playlist;
+import com.ahuynh.muzi_music_api.model.Song;
 import com.ahuynh.muzi_music_api.payload.request.AlbumRequest;
 import com.ahuynh.muzi_music_api.payload.request.PlaylistRequest;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
 import com.ahuynh.muzi_music_api.payload.response.PlaylistResponse;
+import com.ahuynh.muzi_music_api.payload.response.SongResponse;
 import com.ahuynh.muzi_music_api.service.AlbumService;
 import com.ahuynh.muzi_music_api.service.PlaylistService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -92,5 +94,15 @@ public class PlaylistController {
         return new ResponseEntity<>(new ApiResponse(true, "  Successfully",
                 ""), HttpStatus.CREATED);
     }
+
+
+    @GetMapping("/get-all-song/{playlistId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getAllSongFromPlaylist(@PathVariable(name = "playlistId") Long playlistId) {
+        List<Song> song = playlistService.getAllSongFromPlaylist(playlistId);
+        List<SongResponse> responses = SongResponse.toResponseList(song);
+        return new ResponseEntity<>(new ApiResponse(true, "Successfully", responses), HttpStatus.OK);
+    }
+
 
 }
