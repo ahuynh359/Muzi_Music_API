@@ -1,9 +1,8 @@
 package com.ahuynh.muzi_music_api.controller;
 
-import com.ahuynh.muzi_music_api.model.Playlist;
 import com.ahuynh.muzi_music_api.model.Song;
 import com.ahuynh.muzi_music_api.model.User;
-import com.ahuynh.muzi_music_api.payload.request.UserRequest;
+import com.ahuynh.muzi_music_api.payload.request.UpdateUserRequest;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
 import com.ahuynh.muzi_music_api.payload.response.SongResponse;
 import com.ahuynh.muzi_music_api.payload.response.UserResponse;
@@ -64,8 +63,8 @@ public class UserController {
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> editUserWithoutAvatar(@PathVariable(name = "id") Long id,
-                                                   @RequestBody UserRequest userRequest) {
-        User user = userService.updateUser(id, userRequest);
+                                                   @RequestBody UpdateUserRequest updateUserRequest) {
+        User user = userService.updateUser(id, updateUserRequest);
         return new ResponseEntity<>(new ApiResponse(true, "Update Successfully",
                 objectMapper.convertValue(user, UserResponse.class)), HttpStatus.OK);
     }

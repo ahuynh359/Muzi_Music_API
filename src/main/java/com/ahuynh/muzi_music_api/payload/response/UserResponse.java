@@ -30,6 +30,7 @@ public class UserResponse {
     private String avatar;
     private boolean enabled;
     private Set<Role> role;
+    private Instant createdAt;
 
     public static UserResponse toUserResponse(User user) {
         UserResponse userResponse = new UserResponse();
@@ -39,6 +40,7 @@ public class UserResponse {
         userResponse.avatar = user.getAvatar();
         userResponse.enabled = user.isEnabled();
         userResponse.role = user.getRole();
+        userResponse.createdAt = user.getCreatedAt();
         return userResponse;
 
     }

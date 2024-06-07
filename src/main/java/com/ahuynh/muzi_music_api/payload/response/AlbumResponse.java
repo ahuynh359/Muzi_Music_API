@@ -21,11 +21,15 @@ import java.util.stream.Collectors;
 public class AlbumResponse {
     private Long id;
     private String name;
+    private String description;
+    private String avatar;
     private Instant createdAt;
 
     public static AlbumResponse toResponse(Album album) {
         AlbumResponse response = new AlbumResponse();
         response.id = album.getId();
+        response.description = album.getDescription();
+        response.avatar = album.getAvatar();
         response.name = album.getName();
         response.createdAt = album.getCreatedAt();
         return response;

@@ -8,7 +8,7 @@ import com.ahuynh.muzi_music_api.model.User;
 import com.ahuynh.muzi_music_api.model.role.Role;
 import com.ahuynh.muzi_music_api.model.role.RoleName;
 import com.ahuynh.muzi_music_api.payload.request.SignUpRequest;
-import com.ahuynh.muzi_music_api.payload.request.UserRequest;
+import com.ahuynh.muzi_music_api.payload.request.UpdateUserRequest;
 import com.ahuynh.muzi_music_api.repository.RoleRepository;
 import com.ahuynh.muzi_music_api.repository.SongRepository;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
@@ -18,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -95,21 +94,21 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public User updateUser(Long iid, UserRequest userRequest) {
+    public User updateUser(Long iid, UpdateUserRequest updateUserRequest) {
         User updateUser = userRepository.findById(iid).orElseThrow(() ->
                 new ResourceNotFoundException("User not exits id =" + iid));
 
-        if (userRequest.getEmail() != null) {
+        if (updateUserRequest.getEmail() != null) {
 
-            updateUser.setEmail(userRequest.getEmail());
+            updateUser.setEmail(updateUserRequest.getEmail());
         }
-        if (userRequest.getUsername() != null) {
+        if (updateUserRequest.getUsername() != null) {
 
-            updateUser.setUsername(userRequest.getUsername());
+            updateUser.setUsername(updateUserRequest.getUsername());
         }
 
-        if (userRequest.getPassword() != null) {
-            String encodedPassword = passwordEncoder.encode(userRequest.getPassword());
+        if (updateUserRequest.getPassword() != null) {
+            String encodedPassword = passwordEncoder.encode(updateUserRequest.getPassword());
 
             updateUser.setPassword(encodedPassword);
         }

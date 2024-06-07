@@ -14,9 +14,10 @@ import java.util.stream.Collectors;
 public class TypeResponse {
     private Long id;
     private String name;
+    private String description;
 
     public static TypeResponse toResponse(Type type) {
-        return new TypeResponse(type.getId(), type.getName());
+        return new TypeResponse(type.getId(), type.getName(), type.getDescription());
 
     }
 
