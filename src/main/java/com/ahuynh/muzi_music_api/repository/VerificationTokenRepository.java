@@ -1,13 +1,15 @@
 package com.ahuynh.muzi_music_api.repository;
 
-import com.ahuynh.muzi_music_api.model.User;
-import com.ahuynh.muzi_music_api.model.VerificationToken;
+import com.ahuynh.muzi_music_api.model.entity.User;
+import com.ahuynh.muzi_music_api.model.entity.verification.VerificationToken;
+import com.ahuynh.muzi_music_api.model.entity.verification.VerificationType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.javapoet.TypeName;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VerificationTokenRepository extends JpaRepository<VerificationToken, Long> {
-    VerificationToken findByToken(String token);
+    VerificationToken findByTokenAndType(String token, VerificationType type);
 
-    VerificationToken findByUser(User user);
+    VerificationToken findByUserAndType(User user, VerificationType type);
 }

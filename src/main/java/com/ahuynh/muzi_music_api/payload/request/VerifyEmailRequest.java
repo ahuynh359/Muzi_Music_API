@@ -1,7 +1,5 @@
 package com.ahuynh.muzi_music_api.payload.request;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,9 +9,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
-public class ResendOtpRequest implements Serializable {
-    @Email
-    @NotBlank
-    private String email;
-
+public class VerifyEmailRequest implements Serializable {
+    private String token;
+    private String oldPassword;
+    private String newPassword;
 }

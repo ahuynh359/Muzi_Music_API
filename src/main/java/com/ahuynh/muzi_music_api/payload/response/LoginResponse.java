@@ -1,12 +1,13 @@
 package com.ahuynh.muzi_music_api.payload.response;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-@Getter
-@Setter
+import java.io.Serializable;
+
+@Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class LoginResponse {
+public class LoginResponse implements Serializable {
     private Long id;
     private String username;
     private String email;

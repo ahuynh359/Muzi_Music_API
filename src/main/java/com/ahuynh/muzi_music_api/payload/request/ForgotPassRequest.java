@@ -11,9 +11,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
-public class ResendOtpRequest implements Serializable {
+public class ForgotPassRequest implements Serializable {
     @Email
     @NotBlank
     private String email;
-
 }

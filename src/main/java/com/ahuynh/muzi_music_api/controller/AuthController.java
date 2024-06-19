@@ -1,150 +1,123 @@
 package com.ahuynh.muzi_music_api.controller;
 
 import com.ahuynh.muzi_music_api.email.OnRegistrationCompleteEvent;
-import com.ahuynh.muzi_music_api.exception.CustomException;
-import com.ahuynh.muzi_music_api.model.User;
-import com.ahuynh.muzi_music_api.model.VerificationToken;
-import com.ahuynh.muzi_music_api.model.role.Role;
-import com.ahuynh.muzi_music_api.model.role.RoleName;
-import com.ahuynh.muzi_music_api.payload.request.LoginRequest;
-import com.ahuynh.muzi_music_api.payload.request.ResendOtpRequest;
-import com.ahuynh.muzi_music_api.payload.request.SignUpRequest;
-import com.ahuynh.muzi_music_api.payload.response.*;
-import com.ahuynh.muzi_music_api.repository.RoleRepository;
-import com.ahuynh.muzi_music_api.repository.UserRepository;
-import com.ahuynh.muzi_music_api.repository.VerificationTokenRepository;
-import com.ahuynh.muzi_music_api.security.CustomUserDetail;
-import com.ahuynh.muzi_music_api.security.JwtTokenProvider;
-import com.ahuynh.muzi_music_api.service.UserService;
+import com.ahuynh.muzi_music_api.model.entity.User;
+import com.ahuynh.muzi_music_api.model.entity.verification.VerificationType;
+import com.ahuynh.muzi_music_api.payload.request.*;
+import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
+import com.ahuynh.muzi_music_api.payload.response.MessageResponse;
+import com.ahuynh.muzi_music_api.service.AuthService;
 import com.ahuynh.muzi_music_api.service.VerificationTokenService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UserService userService;
+    private final AuthService authService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final VerificationTokenService verificationTokenService;
-    private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final ObjectMapper objectMapper;
-
-    /**
-     * Đăng kí
-     * Ai cũng được
-     * Trả về SignUpResponse
-     */
-    @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequest signUpRequest,
-                                    final HttpServletRequest request) {
-        User user = userService.saveNewUser(signUpRequest);
-
-        String basePath = "/ap1/v1";
-        URI location = ServletUriComponentsBuilder.fromUriString(basePath).path("/users/{userId}").
-                buildAndExpand(user.getId()).toUri();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(location);
-        applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, getCurrentUrl(request)));
-        return new ResponseEntity<>(new ApiResponse(true, "Create User Successfully",
-                objectMapper.convertValue(user, SignUpResponse.class)), headers, HttpStatus.OK);
-    }
-
-    /**
-     * Resend otp
-     * Ai cũng được
-     */
-    @PostMapping("/resend-otp/{email}")
-    public ResponseEntity<?> resendOtp(@PathVariable String email,
-                                       final HttpServletRequest request) {
-        User user = userService.findByEmail(email);
-        VerificationToken verificationToken = verificationTokenService.findByUser(user);
-        if (verificationToken != null) {
-            verificationTokenService.deleteToken(verificationToken);
-        }
-        if (user.isEnabled()) {
-            return new ResponseEntity<>(new ApiResponse(false, "User is active",
-                    ""), HttpStatus.OK);
-        }
-
-        applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, getCurrentUrl(request)));
-        return new ResponseEntity<>(new ApiResponse(true, "Resend Successfully",
-                ""), HttpStatus.OK);
-    }
-
-    /**
-     * Đăng kí xong thì verify Email
-     * Ai cũng được
-     * Ko trả về data
-     */
-    @GetMapping("/verifyEmail/{token}")
-    public ResponseEntity<?> verifyEmail(@PathVariable("token") String token) {
-        VerificationToken verificationToken = verificationTokenService.findByToken(token);
-        if (verificationToken == null) {
-            return new ResponseEntity<>(new ApiResponse(false, "Invalid Verification Token", ""), HttpStatus.BAD_REQUEST);
-        }
-        if (verificationToken.getUser().isEnabled()) {
-            return new ResponseEntity<>(new ApiResponse(false, "This account has already been verified", ""), HttpStatus.BAD_REQUEST);
-
-        }
-        String verificationResult = verificationTokenService.validateToken(token);
-        if (verificationResult.equalsIgnoreCase("Valid")) {
-            verificationTokenService.deleteToken(verificationToken);
-            return new ResponseEntity<>(new ApiResponse(true, "Verified successfully", ""), HttpStatus.OK);
-
-        }
-        return new ResponseEntity<>(new ApiResponse(false, "Invalid verification token", ""), HttpStatus.BAD_REQUEST);
-    }
 
     public String getCurrentUrl(HttpServletRequest request) {
         return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
     }
 
+    @GetMapping()
+    public String test() {
+        return "Hello World";
+    }
+
+    /**
+     * Đăng kí - Gửi mã otp đến mail
+     * Ai cũng được
+     * Trả về message success
+     */
+    @PostMapping("/signup")
+    public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequest request, final HttpServletRequest httpServletRequest) {
+        User user = authService.createUser(request);
+        applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, getCurrentUrl(httpServletRequest), VerificationType.SIGN_IN));
+        return new ResponseEntity<>(new MessageResponse("Sign in success please check email"), HttpStatus.OK);
+    }
+
+    /**
+     * Xác thực email với otp sau khi đăng nhập
+     * Ai cũng được
+     * Trả về message success
+     */
+    @PostMapping("/verify/{token}")
+    public ResponseEntity<?> verifyEmail(@PathVariable("token") String token) {
+        verificationTokenService.verifyEmail(token);
+        return
+                new ResponseEntity<>(new MessageResponse
+                        ("Verify email successfully"), HttpStatus.OK);
+    }
+
     /**
      * Đăng nhập
      * Ai cũng được
-     * Trả về LoginResponse
+     * Trả về user đăng nhập
      */
     @PostMapping("/login")
-    public ResponseEntity<?> signIn(@Valid @RequestBody LoginRequest loginRequest) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUserNameOrEmail(), loginRequest.getPassword()));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = jwtTokenProvider.generateToken(authentication);
-            CustomUserDetail userDetails = (CustomUserDetail) authentication.getPrincipal();
-            User user = userService.getUserByUserName(loginRequest.getUserNameOrEmail());
-            if (!user.isEnabled()) {
-                return new ResponseEntity<>(new ApiResponse(false, "Account is not verify", ""), HttpStatus.BAD_REQUEST);
-            }
-            LoginResponse loginResponse = new LoginResponse(userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), jwt);
-            return new ResponseEntity<>(new ApiResponse(true, "Verified successfully", loginResponse), HttpStatus.OK);
-        } catch (AuthenticationException e) {
-            return new ResponseEntity<>(new ApiResponse(false, "Invalid username or password", ""), HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        return
+                new ResponseEntity<>(new ApiResponse
+                        ("Login successfully", authService.login(request)), HttpStatus.OK);
+    }
+
+
+    /**
+     * Resend otp khi dang nhap
+     * Ai cũng được
+     * Tra ve message success
+     */
+    @PostMapping("/resend")
+    public ResponseEntity<?> resendOtp(@Valid @RequestBody ResendOtpRequest request,
+                                       final HttpServletRequest httpServletRequest) {
+        User user = authService.resendOtp(request);
+        applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent
+                (user, getCurrentUrl(httpServletRequest), VerificationType.SIGN_IN));
+        return new ResponseEntity<>(
+                new MessageResponse(
+                        "Resent otp successfully"), HttpStatus.OK);
+    }
+
+    /**
+     * Forgotpass -> gui email
+     * Ai cũng được
+     * Tra ve message success
+     */
+    @PostMapping("/forgot")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPassRequest request,
+                                            final HttpServletRequest httpServletRequest) {
+        User user = authService.forgotPassword(request);
+        applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent
+                (user, getCurrentUrl(httpServletRequest), VerificationType.FORGOT_PASSWORD));
+        return new ResponseEntity<>(
+                new MessageResponse(
+                        "Resent otp successfully"), HttpStatus.OK);
+    }
+
+    /**
+     * Reset new password
+     * Ai cũng được
+     * Tra ve message success
+     */
+    @PostMapping("/reset")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody NewPasswordRequest request
+    ) {
+        verificationTokenService.resetPassword(request);
+        return
+                new ResponseEntity<>(new MessageResponse
+                        ("Change password successfully"), HttpStatus.OK);
     }
 
 

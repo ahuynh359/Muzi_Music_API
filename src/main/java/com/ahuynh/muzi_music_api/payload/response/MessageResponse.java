@@ -7,11 +7,6 @@ import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
-public class ApiResponse implements Serializable {
-
+public class MessageResponse implements Serializable {
     private String message;
-    private Object data;
-
-
-
 }

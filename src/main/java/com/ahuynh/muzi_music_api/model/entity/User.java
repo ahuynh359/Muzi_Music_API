@@ -1,0 +1,130 @@
+package com.ahuynh.muzi_music_api.model.entity;
+
+import com.ahuynh.muzi_music_api.model.entity.role.Role;
+import com.fasterxml.jackson.annotation.*;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
+
+@EqualsAndHashCode(callSuper = true)
+@Entity
+@Table(name = "user")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class User extends DateAudit {
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Email
+    @NotBlank
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @NotBlank
+    @Column(name = "hash_password")
+    @Size(min = 6, message = "Password has at least 6 characters")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String hashPassword;
+
+    @NotBlank
+    @Column(nullable = false, unique = true)
+    private String username;
+
+    private String avatar = "https://firebasestorage.googleapis.com/v0/b/muzimusic-c2598.appspot.com/o/avatar%2Favatar.png?alt=media&token=0f4445e9-50a5-4425-9f7c-6c3012b0bcee";
+    private boolean enabled = false;
+
+    private boolean locked = false;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Playlist> playlists = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Comment> comments;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Listen> listens;
+
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_role"
+            , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
+            , inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    private Set<Role> roles = new HashSet<>();
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(name = "user_love_song"
+            , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
+            , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
+    private Set<Song> loveSongs = new HashSet<>();
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(name = "user_love_singer"
+            , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
+            , inverseJoinColumns = @JoinColumn(name = "singer_id", referencedColumnName = "id"))
+    private Set<Singer> loveSingers = new HashSet<>();
+
+
+
+
+
+    public User(String email, String hashPassword, String username, Set<Role> roles, String avatar, boolean enabled) {
+        this.email = email;
+        this.hashPassword = hashPassword;
+        this.username = username;
+        this.roles = roles;
+        this.avatar = avatar;
+        this.enabled = enabled;
+
+
+    }
+
+
+    public User(String email, String hashPassword, String username, Set<Role> role) {
+        this.email = email;
+        this.hashPassword = hashPassword;
+        this.username = username;
+        this.roles = role;
+
+
+    }
+
+    public void addLovedSong(Song song) {
+        loveSongs.add(song);
+    }
+
+    public void removeLovedSong(Song song) {
+        loveSongs.remove(song);
+    }
+
+    public void addRole(Role role) {
+        this.roles.add(role);
+    }
+
+    public void removeRole(Role role) {
+        this.roles.remove(role);
+    }
+
+    public void addPlaylist(Playlist playlist) {
+        playlists.add(playlist);
+    }
+
+    public void removePlaylist(Playlist playlist) {
+        playlists.remove(playlist);
+    }
+}
+
+

@@ -1,8 +1,7 @@
 package com.ahuynh.muzi_music_api.repository;
 
-import com.ahuynh.muzi_music_api.model.Song;
-import com.ahuynh.muzi_music_api.model.Type;
-import com.ahuynh.muzi_music_api.model.User;
+import com.ahuynh.muzi_music_api.model.entity.Song;
+import com.ahuynh.muzi_music_api.model.entity.Type;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
