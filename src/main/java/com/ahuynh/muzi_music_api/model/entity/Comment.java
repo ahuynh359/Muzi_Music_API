@@ -35,5 +35,19 @@ public class Comment extends DateAudit {
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> replies;
+
+    public Comment(User user, Song song, String content) {
+        this.user = user;
+        this.song = song;
+        this.content = content;
+
+    }
+    public Comment(User user, Song song, String content,Comment parent) {
+        this.user = user;
+        this.song = song;
+        this.content = content;
+        this.parent = parent;
+
+    }
 }
 

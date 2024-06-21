@@ -33,5 +33,9 @@ public class Type extends DateAudit {
             , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
     private Set<Song> songs = new HashSet<>();
 
+    public Type(String name){
+        this.name = name;
+    }
+
 
 }

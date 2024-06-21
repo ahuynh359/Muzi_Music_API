@@ -35,6 +35,10 @@ public class Singer extends DateAudit {
             , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
     private Set<Song> songs = new HashSet<>();
 
+    public Singer(String name , String avatar) {
+        this.name = name;
+        this.avatar = avatar;
+    }
 
     public void addSong(Song song) {
         songs.add(song);

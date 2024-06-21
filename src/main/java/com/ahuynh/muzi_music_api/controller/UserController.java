@@ -34,7 +34,7 @@ public class UserController {
                                         @RequestParam("avatar") MultipartFile avatar,
                                         @RequestParam("enable") boolean enable) {
 
-        return new ResponseEntity<>(new ApiResponse("Create Successfully",
+        return new ResponseEntity<>(new ApiResponse("Create Success",
                 userService.createUser(email, password, username, avatar, enable)), HttpStatus.CREATED);
     }
 
@@ -47,7 +47,7 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable(name = "id") Long id) {
         userService.deleteUser(id);
-        return new ResponseEntity<>(new MessageResponse("Delete Successfully"), HttpStatus.OK);
+        return new ResponseEntity<>(new MessageResponse("Delete Success"), HttpStatus.OK);
     }
 
     /**
@@ -59,7 +59,7 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateUserForAdmin(
             @RequestBody UpdateUserForAdmin request) {
-        return new ResponseEntity<>(new ApiResponse("Update Successfully",
+        return new ResponseEntity<>(new ApiResponse("Update Success",
                 userService.updateUserForAdmin(request)), HttpStatus.OK);
     }
 
@@ -72,7 +72,7 @@ public class UserController {
     @PostMapping("/unlock/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') ")
     public ResponseEntity<?> unlock(@PathVariable(name = "id") Long id) {
-        return new ResponseEntity<>(new ApiResponse("Unlock Successfully", userService.unlock(id)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse("Unlock Success", userService.unlock(id)), HttpStatus.OK);
     }
 
     /**
@@ -83,7 +83,7 @@ public class UserController {
     @PostMapping("/lock/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') ")
     public ResponseEntity<?> lock(@PathVariable(name = "id") Long id) {
-        return new ResponseEntity<>(new ApiResponse("Lock Successfully", userService.lock(id)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse("Lock Success", userService.lock(id)), HttpStatus.OK);
     }
 
     /**
@@ -94,7 +94,7 @@ public class UserController {
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getAllUser() {
-        return new ResponseEntity<>(new ApiResponse("Successfully", userService.getAllUser()),
+        return new ResponseEntity<>(new ApiResponse("Success", userService.getAllUser()),
                 HttpStatus.OK);
     }
 
@@ -106,7 +106,7 @@ public class UserController {
     @GetMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getUserById(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(new ApiResponse("Successfully",
+        return new ResponseEntity<>(new ApiResponse("Success",
                 userService.getUserById(id)), HttpStatus.OK);
     }
 
@@ -122,7 +122,7 @@ public class UserController {
     public ResponseEntity<?> updateAvatar(@RequestParam("id") Long id,
                                         @RequestParam("avatar") MultipartFile avatar) {
 
-        return new ResponseEntity<>(new ApiResponse( "Edit Successfully",
+        return new ResponseEntity<>(new ApiResponse( "Edit Success",
                 userService.updateAvatar(id, avatar)), HttpStatus.OK);
     }
 
@@ -134,7 +134,7 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> updatePassword(@Valid @RequestBody UpdatePasswordRequest request ) {
 
-        return new ResponseEntity<>(new ApiResponse("Edit Successfully",
+        return new ResponseEntity<>(new ApiResponse("Edit Success",
                 userService.updatePassword(request)), HttpStatus.OK);
     }
 
@@ -147,7 +147,7 @@ public class UserController {
 //    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
 //    public ResponseEntity<?> loveUser(@RequestParam("userId") Long userId, @RequestParam("songId") Long songId) {
 //        userService.loveSong(userId, songId);
-//        return new ResponseEntity<>(new ApiResponse(true, "Successfully", ""), HttpStatus.OK);
+//        return new ResponseEntity<>(new ApiResponse(true, "Success", ""), HttpStatus.OK);
 //    }
 //
 //    /**
@@ -159,7 +159,7 @@ public class UserController {
 //    public ResponseEntity<?> unloveSong(@RequestParam("userId") Long userId, @RequestParam("songId") Long songId) {
 //        userService.unloveSong(userId, songId);
 //
-//        return new ResponseEntity<>(new ApiResponse(true, "Successfully", ""), HttpStatus.OK);
+//        return new ResponseEntity<>(new ApiResponse(true, "Success", ""), HttpStatus.OK);
 //    }
 //
 //    /**
@@ -171,7 +171,7 @@ public class UserController {
 //    public ResponseEntity<?> getLoveSong(@PathVariable Long id) {
 //        Set<Song> songs = userService.getLoveSong(id);
 //        Set<SongResponse> responses = SongResponse.toResponseSet(songs);
-//        return new ResponseEntity<>(new ApiResponse(true, "Successfully", responses), HttpStatus.OK);
+//        return new ResponseEntity<>(new ApiResponse(true, "Success", responses), HttpStatus.OK);
 //    }
 //
 //    /**
@@ -182,7 +182,7 @@ public class UserController {
 //    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
 //    public ResponseEntity<?> isLoveSong(@PathVariable Long id, @PathVariable Long songId) {
 //        boolean b = userService.isLoveSong(id, songId);
-//        return new ResponseEntity<>(new ApiResponse(true, "Successfully", b), HttpStatus.OK);
+//        return new ResponseEntity<>(new ApiResponse(true, "Success", b), HttpStatus.OK);
 //    }
 
 }

@@ -30,8 +30,6 @@ public class Song extends DateAudit {
     @Column(columnDefinition = "TEXT")
     private String lyrics;
 
-    private Long listen = 0L;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "album_id", nullable = false)
     private Album album;
@@ -66,5 +64,12 @@ public class Song extends DateAudit {
         singers.remove(singer);
     }
 
+    public void addType(Type type) {
+        types.add(type);
+    }
+
+    public void removeType(Type type) {
+        types.remove(type);
+    }
 
 }

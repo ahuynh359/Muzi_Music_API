@@ -58,7 +58,7 @@ public class AuthController {
         verificationTokenService.verifyEmail(token);
         return
                 new ResponseEntity<>(new MessageResponse
-                        ("Verify email successfully"), HttpStatus.OK);
+                        ("Verify email Success"), HttpStatus.OK);
     }
 
     /**
@@ -70,7 +70,7 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         return
                 new ResponseEntity<>(new ApiResponse
-                        ("Login successfully", authService.login(request)), HttpStatus.OK);
+                        ("Login Success", authService.login(request)), HttpStatus.OK);
     }
 
 
@@ -87,7 +87,7 @@ public class AuthController {
                 (user, getCurrentUrl(httpServletRequest), VerificationType.SIGN_IN));
         return new ResponseEntity<>(
                 new MessageResponse(
-                        "Resent otp successfully"), HttpStatus.OK);
+                        "Resent otp Success"), HttpStatus.OK);
     }
 
     /**
@@ -103,7 +103,7 @@ public class AuthController {
                 (user, getCurrentUrl(httpServletRequest), VerificationType.FORGOT_PASSWORD));
         return new ResponseEntity<>(
                 new MessageResponse(
-                        "Resent otp successfully"), HttpStatus.OK);
+                        "Resent otp Success"), HttpStatus.OK);
     }
 
     /**
@@ -117,7 +117,7 @@ public class AuthController {
         verificationTokenService.resetPassword(request);
         return
                 new ResponseEntity<>(new MessageResponse
-                        ("Change password successfully"), HttpStatus.OK);
+                        ("Change password Success"), HttpStatus.OK);
     }
 
 
