@@ -27,45 +27,24 @@ public class CommentController {
      * List<CommentDto>
      */
     @GetMapping("/song/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') ")
     public ResponseEntity<?> getAllCommentBySongId(@PathVariable Long id) {
 
         return new ResponseEntity<>(new ApiResponse("Success",
                 commentService.getAllCommentBySongId(id)), HttpStatus.CREATED);
     }
 
-    /**
-     * Lay comment cha va cac comment con
-     * ADMIN - USER
-     * commentDto
-     */
-    @GetMapping("{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getCommentParentAndChildren(@PathVariable(name = "id") Long id) {
-        return new ResponseEntity<>(new ApiResponse("Success", commentService.getCommentParentAndChildren(id)), HttpStatus.OK);
-    }
+
 
     /**
      * Them comment vao bai hat
-     * ADMIN - EMPLOYEE
+     * ADMIN
      * CommentDto
      */
     @PostMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
     public ResponseEntity<?> addComment(@RequestBody CommentRequest request) {
         return new ResponseEntity<>(new ApiResponse("Success", commentService.addComment(request)), HttpStatus.OK);
-    }
-
-    /**
-     * Phan hoi binh luan
-     * ADMIN - USER
-     * CommentDto
-     */
-    @PostMapping("/ans")
-    @PreAuthorize("hasRole('ROLE_ADMIN')  or hasRole('ROLE_USER')")
-    public ResponseEntity<?> ansComment(@RequestBody AnsCommentRequest request) {
-        return new ResponseEntity<>(new ApiResponse(" Success",
-                commentService.ansComment(request)), HttpStatus.OK);
     }
 
     /**

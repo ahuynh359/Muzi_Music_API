@@ -23,7 +23,7 @@ public class SingerController {
      * SingerDto
      */
     @PostMapping("/create")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> addSinger  (String name, MultipartFile avatar) {
 
         return new ResponseEntity<>(new ApiResponse("Success",
@@ -32,18 +32,18 @@ public class SingerController {
 
     /**
      * Lay singer theo id
-     * ADMIN - USER - EMPLOYEE
+     * ADMIN - USER
      * SingerDto
      */
     @GetMapping("{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') or hasRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
     public ResponseEntity<?> getSingerById(@PathVariable(name = "id") Long id) {
         return new ResponseEntity<>(new ApiResponse("Success", singerService.getSingerById(id)), HttpStatus.OK);
     }
 
     /**
      * Xoa singer
-     * ADMIN - EMPLOYEE
+     * ADMIN
      * Message
      */
     @DeleteMapping("{id}")
@@ -59,7 +59,7 @@ public class SingerController {
      * SingerDto
      */
     @PutMapping()
-    @PreAuthorize("hasRole('ROLE_ADMIN')  or hasRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')  ")
     public ResponseEntity<?> updateSinger(@RequestParam Long id, @RequestParam String name, @RequestParam MultipartFile avatar) {
         return new ResponseEntity<>(new ApiResponse(" Success",
                 singerService.updateSinger(id, name, avatar)), HttpStatus.OK);
@@ -67,22 +67,22 @@ public class SingerController {
 
     /**
      * Lay all singer
-     * ADMIN - USER - EMPLOYEE
+     * ADMIN - USER
      * List<SingerDto>
      */
     @GetMapping("/all")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') or hasRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
     public ResponseEntity<?> getAllSinger() {
         return new ResponseEntity<>(new ApiResponse("Success", singerService.getAllSinger()), HttpStatus.OK);
     }
 
     /**
      * Lay tat ca song cua singer
-     * ADMIN - USER - EMPLOYEE
+     * ADMIN - USER
      * List<SingerDto>
      */
     @GetMapping("/{id}/songs")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') or hasRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
     public ResponseEntity<?> getSongFromSinger(@PathVariable(name = "id") Long id) {
         return new ResponseEntity<>(new ApiResponse("Success", singerService.getSongFromSinger(id)), HttpStatus.OK);
     }

@@ -27,7 +27,7 @@ public class SongController {
     private final SongService songService;
 
     @PostMapping("/create")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') ")
     public ResponseEntity<?> addSong(@RequestParam("name") String name,
                                      @RequestParam("avatar") MultipartFile avatar,
                                      @RequestParam("file") MultipartFile file,
@@ -41,18 +41,18 @@ public class SongController {
 
     /**
      * Lấy song by id
-     * USER - ADMIN - EMPLOYEE
+     * USER - ADMIN
      */
 
     @GetMapping("{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') or hasRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
     public ResponseEntity<?> getSongById(@PathVariable(name = "id") Long id) {
         return new ResponseEntity<>(new ApiResponse("Successfully", songService.getSongById(id)), HttpStatus.OK);
     }
 
     /**
      * Lấy het song
-     * USER - ADMIN - EMPLOYEE
+     * USER - ADMIN
      * List<SongDto>
      */
 
@@ -65,12 +65,12 @@ public class SongController {
 
     /**
      * delete song
-     * ADMIN - EMPLOYEE
+     * ADMIN
      * MessageResponse
      */
 
-    @GetMapping("{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
+    @DeleteMapping("{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') ")
     public ResponseEntity<?> deleteSong(@PathVariable Long id) {
         songService.deleteSong(id);
         return new ResponseEntity<>(new MessageResponse("Successfully"), HttpStatus.OK);

@@ -21,10 +21,7 @@ public class MuziMusicApiApplication {
 
 	}
 
-//	@Bean
-//	public ModelMapper modelMapper(){
-//		return new ModelMapper();
-//	}
+
 
 
 }

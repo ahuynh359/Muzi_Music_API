@@ -37,11 +37,7 @@ public class CommentService {
         return commentMapper.convertToDtoList(song.getComments());
     }
 
-    public CommentParentAndChildrenResponse getCommentParentAndChildren(Long id) {
-        Comment comment = commentRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No comment found"));
 
-        return new CommentParentAndChildrenResponse(commentMapper.convertToDto(comment.getParent()), commentMapper.convertToDtoList(comment.getReplies()));
-    }
 
     public CommentDto addComment(CommentRequest request) {
         Song song = songRepository.findById(request.getSongId()).orElseThrow(() -> new EntityNotFoundException("No song found"));
@@ -51,14 +47,7 @@ public class CommentService {
 
     }
 
-    public CommentDto ansComment(AnsCommentRequest request) {
-        Song song = songRepository.findById(request.getSongId()).orElseThrow(() -> new EntityNotFoundException("No song found"));
-        User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new EntityNotFoundException("No user found"));
-        Comment commentParent = commentRepository.findById(request.getCommentParentId()).orElseThrow(() -> new EntityNotFoundException("No comment found"));
-        Comment comment = new Comment(user, song, request.getContent(), commentParent);
 
-        return commentMapper.convertToDto(commentRepository.save(comment));
-    }
 
     public CommentDto editComment(EditCommentRequest request) {
         Song song = songRepository.findById(request.getSongId()).orElseThrow(() -> new EntityNotFoundException("No song found"));
