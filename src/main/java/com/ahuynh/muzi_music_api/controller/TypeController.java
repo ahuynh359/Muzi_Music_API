@@ -1,16 +1,14 @@
 package com.ahuynh.muzi_music_api.controller;
 
-import com.ahuynh.muzi_music_api.payload.request.TypeRequest;
-import com.ahuynh.muzi_music_api.payload.request.UpdateTypeRequest;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
 import com.ahuynh.muzi_music_api.payload.response.MessageResponse;
 import com.ahuynh.muzi_music_api.service.TypeService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/type")
@@ -26,10 +24,10 @@ public class TypeController {
      */
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> addType(@Valid @RequestBody TypeRequest request) {
+    public ResponseEntity<?> addType(@RequestParam  String name, @RequestParam MultipartFile avatar) {
 
         return new ResponseEntity<>(new ApiResponse("Success",
-                typeService.createType(request)), HttpStatus.CREATED);
+                typeService.createType(name,avatar)), HttpStatus.CREATED);
     }
 
     /**
@@ -62,9 +60,9 @@ public class TypeController {
      */
     @PutMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> updateType(@RequestBody UpdateTypeRequest request) {
+    public ResponseEntity<?> updateType(@RequestParam Long id, @RequestParam  String name, @RequestParam MultipartFile avatar) {
         return new ResponseEntity<>(new ApiResponse(" Success",
-                typeService.updateType(request)), HttpStatus.OK);
+                typeService.updateType(id,name,avatar)), HttpStatus.OK);
     }
 
     /**

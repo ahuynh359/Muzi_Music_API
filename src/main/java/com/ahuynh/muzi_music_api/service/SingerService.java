@@ -1,19 +1,12 @@
 package com.ahuynh.muzi_music_api.service;
 
-import com.ahuynh.muzi_music_api.exception.DuplicateException;
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.model.dto.SingerDto;
 import com.ahuynh.muzi_music_api.model.dto.SongDto;
-import com.ahuynh.muzi_music_api.model.dto.TypeDto;
 import com.ahuynh.muzi_music_api.model.entity.Singer;
-import com.ahuynh.muzi_music_api.model.entity.Type;
 import com.ahuynh.muzi_music_api.model.mapper.SingerMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
-import com.ahuynh.muzi_music_api.model.mapper.TypeMapper;
-import com.ahuynh.muzi_music_api.payload.request.TypeRequest;
-import com.ahuynh.muzi_music_api.payload.request.UpdateTypeRequest;
 import com.ahuynh.muzi_music_api.repository.SingerRepository;
-import com.ahuynh.muzi_music_api.repository.TypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

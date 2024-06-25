@@ -44,11 +44,11 @@ public class Song extends DateAudit {
             inverseJoinColumns = {@JoinColumn(name = "singer_id")})
     private Set<Singer> singers = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL)
-    @JoinTable(name = "song_type",
-            joinColumns = {@JoinColumn(name = "song_id")},
-            inverseJoinColumns = {@JoinColumn(name = "type_id")})
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "song_type"
+            , joinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id")
+            , inverseJoinColumns = @JoinColumn(name = "type_id", referencedColumnName = "id"))
     private Set<Type> types = new HashSet<>();
 
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)

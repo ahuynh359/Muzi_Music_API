@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
+
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "type")
@@ -25,14 +26,15 @@ public class Type extends DateAudit {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade=  CascadeType.ALL,
-            mappedBy = "types")
-    @JsonIgnore
+    private String avatar = "https://firebasestorage.googleapis.com/v0/b/muzimusic-c2598.appspot.com/o/app%2Falbum_2.png?alt=media&token=e1ac5e9f-f581-427d-9da2-9a40d31b9dda";
+
+
+    @ManyToMany(mappedBy = "types", fetch = FetchType.LAZY)
     private Set<Song> songs = new HashSet<>();
 
-    public Type(String name){
+    public Type(String name, String avatar) {
         this.name = name;
+        this.avatar = avatar;
     }
 
 
