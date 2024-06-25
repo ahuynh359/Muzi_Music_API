@@ -28,7 +28,7 @@ public class SongController {
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_ADMIN') ")
-    public ResponseEntity<?> addSong(@RequestParam("name") String name,
+    public ResponseEntity<?> createSong(@RequestParam("name") String name,
                                      @RequestParam("avatar") MultipartFile avatar,
                                      @RequestParam("file") MultipartFile file,
                                      @RequestParam("lyrics") String lyrics,
@@ -58,9 +58,22 @@ public class SongController {
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getAllSong() {
+    public ResponseEntity<?> getAllSongs() {
         return new ResponseEntity<>(new ApiResponse("Successfully", songService.getAllSong()), HttpStatus.OK);
     }
+
+    /**
+     * Lấy new song
+     * USER - ADMIN
+     * List<SongDto>
+     */
+
+    @GetMapping("/new")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getNewSongs() {
+        return new ResponseEntity<>(new ApiResponse("Successfully", songService.getNewSongs()), HttpStatus.OK);
+    }
+
 
 
     /**

@@ -24,9 +24,7 @@ import java.util.UUID;
 @Service
 public class FirebaseService {
 
-
-
-    private String uploadFileImage(File file, String fileName,String type) throws IOException {
+    private String uploadFileImage(File file, String fileName, String type) throws IOException {
         fileName = "app/" + fileName;
         BlobId blobId = BlobId.of("muzimusic-c2598.appspot.com", fileName); // Replace with your bucket name
 
@@ -64,7 +62,6 @@ public class FirebaseService {
         File tempFile = new File(fileName);
         try (FileOutputStream fos = new FileOutputStream(tempFile)) {
             fos.write(multipartFile.getBytes());
-            fos.close();
         }
         return tempFile;
     }
@@ -73,14 +70,11 @@ public class FirebaseService {
         return fileName.substring(fileName.lastIndexOf("."));
     }
 
-
     public String upload(MultipartFile multipartFile, String type) {
         try {
-            String fileName = multipartFile.getOriginalFilename();                        // to get original file name
-            fileName = UUID.randomUUID().toString().concat(this.getExtension(fileName));  // to generated random string values for file name.
-
-            File file = this.convertToFile(multipartFile, fileName);                      // to convert multipartFile to File
-            String URL = this.uploadFileImage(file, fileName, type);                                   // to get uploaded file link
+            String originalFileName = Objects.requireNonNull(multipartFile.getOriginalFilename()); // Get the original file name
+            File file = this.convertToFile(multipartFile, originalFileName);                      // Convert multipartFile to File
+            String URL = this.uploadFileImage(file, originalFileName, type);                      // Get uploaded file link
             file.delete();
             return URL;
         } catch (Exception e) {
@@ -88,10 +82,4 @@ public class FirebaseService {
             return "Image couldn't upload, Something went wrong";
         }
     }
-
-
-
-
-
-
 }

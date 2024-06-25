@@ -61,6 +61,10 @@ public class SingerService {
         return singerMapper.convertToDtoList(singerRepository.findAll());
     }
 
+    public List<SingerDto> getNewSingers() {
+        return singerMapper.convertToDtoList(singerRepository.findTop10ByOrderByCreatedAtDesc());
+    }
+
     public List<SongDto> getSongFromSinger(Long id) {
 
         return songMapper.convertToDtoList(singerRepository.findSongById(id));

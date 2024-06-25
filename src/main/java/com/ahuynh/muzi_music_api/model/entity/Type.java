@@ -25,12 +25,10 @@ public class Type extends DateAudit {
     @Column(nullable = false, unique = true)
     private String name;
 
-
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade=  CascadeType.ALL,
+            mappedBy = "types")
     @JsonIgnore
-    @ManyToMany
-    @JoinTable(name = "type_song"
-            , joinColumns = @JoinColumn(name = "type_id", referencedColumnName = "id")
-            , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
     private Set<Song> songs = new HashSet<>();
 
     public Type(String name){

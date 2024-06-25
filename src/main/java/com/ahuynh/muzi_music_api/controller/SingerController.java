@@ -24,7 +24,7 @@ public class SingerController {
      */
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> addSinger  (String name, MultipartFile avatar) {
+    public ResponseEntity<?> createSinger  (@RequestParam  String name, @RequestParam  MultipartFile avatar) {
 
         return new ResponseEntity<>(new ApiResponse("Success",
                 singerService.createSinger(name, avatar)), HttpStatus.CREATED);
@@ -74,6 +74,17 @@ public class SingerController {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
     public ResponseEntity<?> getAllSinger() {
         return new ResponseEntity<>(new ApiResponse("Success", singerService.getAllSinger()), HttpStatus.OK);
+    }
+
+    /**
+     * Lay new singer
+     * ADMIN - USER
+     * List<SingerDto>
+     */
+    @GetMapping("/new")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
+    public ResponseEntity<?> getNewSingers() {
+        return new ResponseEntity<>(new ApiResponse("Success", singerService.getNewSingers()), HttpStatus.OK);
     }
 
     /**

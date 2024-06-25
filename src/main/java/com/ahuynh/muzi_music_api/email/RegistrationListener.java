@@ -28,7 +28,7 @@ public class RegistrationListener implements
     private void confirmRegistration(OnRegistrationCompleteEvent event) {
         User user = event.getUser();
         String token = getRandomNumberString();
-        verificationTokenService.saveVerificationToken(user, token, event.getType());
+        verificationTokenService.saveVerificationToken(user, token);
 
         String recipientAddress = user.getEmail();
         String subject = "Registration Confirmation";

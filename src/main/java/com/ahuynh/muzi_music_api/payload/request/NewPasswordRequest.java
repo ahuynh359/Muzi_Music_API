@@ -11,7 +11,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class NewPasswordRequest implements Serializable {
     private String otp;
-    private String oldPassword;
     private String newPassword;
     private String confirmPassword;
 }

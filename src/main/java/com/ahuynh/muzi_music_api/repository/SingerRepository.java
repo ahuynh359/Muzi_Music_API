@@ -13,4 +13,6 @@ import java.util.Collection;
 public interface SingerRepository extends JpaRepository<Singer, Long> {
     @Query("SELECT s.songs FROM Singer s WHERE s.id = :id ")
     Collection<Song> findSongById(Long id);
+
+    Collection<Singer> findTop10ByOrderByCreatedAtDesc();
 }

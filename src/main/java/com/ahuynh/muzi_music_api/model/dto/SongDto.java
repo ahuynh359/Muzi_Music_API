@@ -24,6 +24,4 @@ public class SongDto {
 
     private String lyrics;
     private AlbumDto album;
-    private Set<SingerDto> singers;
-    private Set<TypeDto> types;
 }

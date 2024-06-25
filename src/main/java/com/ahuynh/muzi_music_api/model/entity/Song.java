@@ -34,15 +34,21 @@ public class Song extends DateAudit {
     @JoinColumn(name = "album_id", nullable = false)
     private Album album;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments;
 
-    @JsonIgnore
-    @ManyToMany(mappedBy = "songs")
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
+    @JoinTable(name = "song_singer",
+            joinColumns = {@JoinColumn(name = "song_id")},
+            inverseJoinColumns = {@JoinColumn(name = "singer_id")})
     private Set<Singer> singers = new HashSet<>();
 
-    @ManyToMany(mappedBy = "songs")
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
+    @JoinTable(name = "song_type",
+            joinColumns = {@JoinColumn(name = "song_id")},
+            inverseJoinColumns = {@JoinColumn(name = "type_id")})
     private Set<Type> types = new HashSet<>();
 
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -56,20 +62,15 @@ public class Song extends DateAudit {
         this.album = album;
     }
 
-    public void addSinger(Singer singer) {
-        singers.add(singer);
+    public Song(String name, String avatar, String file, String lyrics, Album album, Set<Singer> singers, Set<Type> types) {
+        this.name = name;
+        this.avatar = avatar;
+        this.file = file;
+        this.lyrics = lyrics;
+        this.album = album;
+        this.singers = singers;
+        this.types = types;
     }
 
-    public void removeSinger(Singer singer) {
-        singers.remove(singer);
-    }
-
-    public void addType(Type type) {
-        types.add(type);
-    }
-
-    public void removeType(Type type) {
-        types.remove(type);
-    }
 
 }

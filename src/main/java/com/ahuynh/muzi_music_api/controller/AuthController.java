@@ -2,7 +2,6 @@ package com.ahuynh.muzi_music_api.controller;
 
 import com.ahuynh.muzi_music_api.email.OnRegistrationCompleteEvent;
 import com.ahuynh.muzi_music_api.model.entity.User;
-import com.ahuynh.muzi_music_api.model.entity.verification.VerificationType;
 import com.ahuynh.muzi_music_api.payload.request.*;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
 import com.ahuynh.muzi_music_api.payload.response.MessageResponse;
@@ -37,34 +36,21 @@ public class AuthController {
     }
 
     /**
-     * Đăng kí - Gửi mã otp đến mail
+     * Đăng kí
      * Ai cũng được
      * Trả về message success
      */
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequest request, final HttpServletRequest httpServletRequest) {
         User user = authService.createUser(request);
-        applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, getCurrentUrl(httpServletRequest), VerificationType.SIGN_IN));
         return new ResponseEntity<>(new MessageResponse("Sign in success please check email"), HttpStatus.OK);
     }
 
-    /**
-     * Xác thực email với otp sau khi đăng nhập
-     * Ai cũng được
-     * Trả về message success
-     */
-    @PostMapping("/verify/{token}")
-    public ResponseEntity<?> verifyEmail(@PathVariable("token") String token) {
-        verificationTokenService.verifyEmail(token);
-        return
-                new ResponseEntity<>(new MessageResponse
-                        ("Verify email Success"), HttpStatus.OK);
-    }
 
     /**
-     * Đăng nhập
-     * Ai cũng được
-     * Trả về user đăng nhập
+     * login
+     * Ai cung duoc
+     * Tra ve LoginResponse
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
@@ -73,22 +59,6 @@ public class AuthController {
                         ("Login Success", authService.login(request)), HttpStatus.OK);
     }
 
-
-    /**
-     * Resend otp khi dang nhap
-     * Ai cũng được
-     * Tra ve message success
-     */
-    @PostMapping("/resend")
-    public ResponseEntity<?> resendOtp(@Valid @RequestBody ResendOtpRequest request,
-                                       final HttpServletRequest httpServletRequest) {
-        User user = authService.resendOtp(request);
-        applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent
-                (user, getCurrentUrl(httpServletRequest), VerificationType.SIGN_IN));
-        return new ResponseEntity<>(
-                new MessageResponse(
-                        "Resent otp Success"), HttpStatus.OK);
-    }
 
     /**
      * Forgotpass -> gui email
@@ -100,7 +70,7 @@ public class AuthController {
                                             final HttpServletRequest httpServletRequest) {
         User user = authService.forgotPassword(request);
         applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent
-                (user, getCurrentUrl(httpServletRequest), VerificationType.FORGOT_PASSWORD));
+                (user, getCurrentUrl(httpServletRequest)));
         return new ResponseEntity<>(
                 new MessageResponse(
                         "Resent otp Success"), HttpStatus.OK);

@@ -4,8 +4,7 @@ import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.exception.InvalidTokenException;
 import com.ahuynh.muzi_music_api.exception.PasswordException;
 import com.ahuynh.muzi_music_api.model.entity.User;
-import com.ahuynh.muzi_music_api.model.entity.verification.VerificationToken;
-import com.ahuynh.muzi_music_api.model.entity.verification.VerificationType;
+import com.ahuynh.muzi_music_api.model.entity.VerificationToken;
 import com.ahuynh.muzi_music_api.payload.request.NewPasswordRequest;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
 import com.ahuynh.muzi_music_api.repository.VerificationTokenRepository;
@@ -26,30 +25,14 @@ public class VerificationTokenService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void saveVerificationToken(User user, String token, VerificationType type) {
+    public void saveVerificationToken(User user, String token) {
 
-        VerificationToken verificationToken = new VerificationToken(user, token, type);
+        VerificationToken verificationToken = new VerificationToken(user, token);
         verificationTokenRepository.save(verificationToken);
 
 
     }
 
-    public void verifyEmail(String token) {
-        VerificationToken verificationToken = verificationTokenRepository.findByTokenAndType(token, VerificationType.SIGN_IN);
-        if (verificationToken == null) {
-            throw new InvalidTokenException("Token is invalid");
-        }
-        if (verificationToken.getUser().isEnabled()) {
-            throw new InvalidTokenException("This account has been verified");
-        }
-
-        String verificationResult = validateToken(verificationToken);
-
-        if (verificationResult.equalsIgnoreCase("Valid")) {
-            return;
-        }
-        throw new InvalidTokenException("Invalid verification token");
-    }
 
     private String validateToken(VerificationToken verificationToken) {
         User user = verificationToken.getUser();
@@ -65,7 +48,7 @@ public class VerificationTokenService {
 
 
     public void resetPassword(NewPasswordRequest request) {
-        VerificationToken verificationToken = verificationTokenRepository.findByTokenAndType(request.getOtp(), VerificationType.FORGOT_PASSWORD);
+        VerificationToken verificationToken = verificationTokenRepository.findByToken(request.getOtp());
         if (verificationToken == null) {
             throw new InvalidTokenException("Token is invalid");
         }
@@ -81,9 +64,7 @@ public class VerificationTokenService {
                     new EntityNotFoundException("User not found with id: " + verificationToken.getUser().getId())
             );
 
-            if (!validatePassword(request.getOldPassword(), user.getHashPassword())) {
-                throw new PasswordException("Old password don't match");
-            }
+
             if (!(request.getNewPassword().equals(request.getConfirmPassword()))) {
                 throw new PasswordException("Password and confirm password don't match");
             }

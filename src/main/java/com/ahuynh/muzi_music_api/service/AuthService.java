@@ -6,10 +6,9 @@ import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.exception.InvalidUserException;
 import com.ahuynh.muzi_music_api.exception.UserAlreadyRegisteredException;
 import com.ahuynh.muzi_music_api.model.entity.User;
-import com.ahuynh.muzi_music_api.model.entity.verification.VerificationToken;
+import com.ahuynh.muzi_music_api.model.entity.VerificationToken;
 import com.ahuynh.muzi_music_api.model.entity.role.Role;
 import com.ahuynh.muzi_music_api.model.entity.role.RoleName;
-import com.ahuynh.muzi_music_api.model.entity.verification.VerificationType;
 import com.ahuynh.muzi_music_api.payload.request.ForgotPassRequest;
 import com.ahuynh.muzi_music_api.payload.request.LoginRequest;
 import com.ahuynh.muzi_music_api.payload.request.ResendOtpRequest;
@@ -29,6 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 @Service
@@ -50,6 +50,9 @@ public class AuthService {
         }
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new EntityNotFoundException("This username already registered. Please try other username.");
+        }
+        if(!request.getConfirmPassword().equals(request.getPassword())) {
+            throw new InvalidUserException("Passwords do not match.");
         }
 
         //Lưu user vào db
@@ -88,30 +91,13 @@ public class AuthService {
 
     }
 
-    public User resendOtp(ResendOtpRequest request) {
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() ->
-                new EntityNotFoundException("This user mail  is not in db " + request.getEmail()));
 
-        VerificationToken verificationToken = verificationTokenRepository.findByUserAndType(user, VerificationType.SIGN_IN);
-        if (verificationToken != null) {
-            verificationTokenRepository.delete(verificationToken);
-        }
-        if (user.isEnabled()) {
-            throw new UserAlreadyRegisteredException("User is registered");
-        }
-
-        if (user.isLocked()) {
-            throw new UserAlreadyRegisteredException("User is locked");
-        }
-        return user;
-
-    }
 
     public User forgotPassword(ForgotPassRequest request) {
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() ->
                 new EntityNotFoundException("This user mail  is not in db " + request.getEmail()));
 
-        VerificationToken verificationToken = verificationTokenRepository.findByUserAndType(user, VerificationType.FORGOT_PASSWORD);
+        VerificationToken verificationToken = verificationTokenRepository.findByUser(user);
         if (verificationToken != null) {
             verificationTokenRepository.delete(verificationToken);
         }

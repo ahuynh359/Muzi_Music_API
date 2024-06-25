@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -33,29 +34,31 @@ public class SongService {
         Album album = albumRepository.findById(albumIb).orElseThrow(() -> new EntityNotFoundException("No Album with " + albumIb));
         String urlAvatar = firebaseService.upload(avatar, "image/png");
         String urlFile = firebaseService.upload(file, "audio/mpeg");
-        Song s = new Song(name, urlAvatar, urlFile, lyrics, album);
+        Set<Singer> singers = new HashSet<>();
         for (Long id : singerId) {
             Singer singer = singerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Singer not found " + id));
-            s.addSinger(singer);
+            singers.add(singer);
         }
-
+        Set<Type> types = new HashSet<>();
         for (Long id : typeId) {
             Type type = typeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Type not found " + id));
-            s.addType(type);
+            types.add(type);
         }
+        Song s = new Song(name, urlAvatar, urlFile, lyrics, album, singers, types);
         return songMapper.convertToDto(songRepository.save(s));
     }
 
-    public Song getSongById(Long id) {
-        return songRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("Song with id " + id + " not found"));
+    public SongDto getSongById(Long id) {
+        return songMapper.convertToDto(songRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Song with id " + id + " not found")));
+
     }
 
     public void deleteSong(Long id) {
         songRepository.deleteById(id);
     }
 
-//    public Song updateSong(Long id, UpdateSongRequest newSong) {
+    //    public Song updateSong(Long id, UpdateSongRequest newSong) {
 //        Song updatedSong = songRepository.findSongById(id).orElseThrow(()
 //                -> new ResourceNotFoundException("Song not exits id =" + id.toString()));
 //
@@ -78,8 +81,12 @@ public class SongService {
 //        return songRepository.save(updatedSong);
 //    }
 //
-    public List<Song> getAllSong() {
-        return songRepository.findAll();
+    public List<SongDto> getAllSong() {
+        return songMapper.convertToDtoList(songRepository.findAll());
+    }
+
+    public List<SongDto> getNewSongs() {
+        return songMapper.convertToDtoList(songRepository.findTop10ByOrderByCreatedAtDesc());
     }
 
 //
