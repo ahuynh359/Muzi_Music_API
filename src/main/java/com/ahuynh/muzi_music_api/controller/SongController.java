@@ -74,6 +74,48 @@ public class SongController {
         return new ResponseEntity<>(new ApiResponse("Successfully", songService.getNewSongs()), HttpStatus.OK);
     }
 
+    /**
+     * Search song
+     * USER - ADMIN
+     * List<SongDto>
+     * List<AlbumDto>
+     * List<SingerDto>
+     */
+
+    @GetMapping("/search")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> search(@RequestParam(value = "query") String query) {
+        return new ResponseEntity<>(new ApiResponse("Successfully", songService.search(query)), HttpStatus.OK);
+    }
+
+    @PostMapping("/love/{userId}/{songId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> loveSong(@PathVariable(name = "userId") Long userId, @PathVariable(name = "songId") Long songId) {
+        songService.loveSong(userId, songId);
+        return new ResponseEntity<>(new MessageResponse("Successfully"), HttpStatus.OK);
+    }
+
+
+
+    @PostMapping("/unlove/{userId}/{songId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> unloveSong(@PathVariable(name = "userId") Long userId, @PathVariable(name = "songId") Long songId) {
+        songService.unloveSong(userId, songId);
+        return new ResponseEntity<>(new MessageResponse("Successfully"), HttpStatus.OK);
+    }
+
+    @GetMapping("/love/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getLoveSong(@PathVariable(name = "userId") Long userId) {
+        return new ResponseEntity<>(new ApiResponse("Successfully", songService.getLoveSongByUserId(userId)), HttpStatus.OK);
+    }
+
+    @GetMapping("/is-love-song/{userId}/{songId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> isUserLoveSong(@PathVariable(name = "userId") Long userId,@PathVariable Long songId) {
+        return new ResponseEntity<>(new ApiResponse("Successfully", songService.isUserLoveSong(userId,songId)), HttpStatus.OK);
+    }
+
 
 
     /**

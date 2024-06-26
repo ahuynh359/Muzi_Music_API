@@ -15,4 +15,6 @@ public interface SingerRepository extends JpaRepository<Singer, Long> {
     Collection<Song> findSongById(Long id);
 
     Collection<Singer> findTop10ByOrderByCreatedAtDesc();
+
+    Collection<Singer> findByNameContainingIgnoreCase(String query);
 }

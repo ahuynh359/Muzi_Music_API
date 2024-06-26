@@ -1,13 +1,15 @@
 package com.ahuynh.muzi_music_api.service;
 
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
+import com.ahuynh.muzi_music_api.model.dto.AlbumDto;
+import com.ahuynh.muzi_music_api.model.dto.SingerDto;
 import com.ahuynh.muzi_music_api.model.dto.SongDto;
-import com.ahuynh.muzi_music_api.model.entity.Album;
-import com.ahuynh.muzi_music_api.model.entity.Singer;
-import com.ahuynh.muzi_music_api.model.entity.Song;
-import com.ahuynh.muzi_music_api.model.entity.Type;
+import com.ahuynh.muzi_music_api.model.entity.*;
+import com.ahuynh.muzi_music_api.model.mapper.AlbumMapper;
+import com.ahuynh.muzi_music_api.model.mapper.SingerMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
 import com.ahuynh.muzi_music_api.payload.request.AddSongRequest;
+import com.ahuynh.muzi_music_api.payload.response.SearchResponse;
 import com.ahuynh.muzi_music_api.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,9 @@ public class SongService {
     private final SongMapper songMapper;
     private final SingerRepository singerRepository;
     private final TypeRepository typeRepository;
+    private final AlbumMapper albumMapper;
+    private final SingerMapper singerMapper;
+    private final UserRepository userRepository;
 
 
     public SongDto createSong(String name, MultipartFile avatar, MultipartFile file, String lyrics, Long albumIb, Set<Long> singerId, Set<Long> typeId) {
@@ -66,5 +71,38 @@ public class SongService {
     }
 
 
+    public SearchResponse search(String query) {
+        List<SongDto> songs = songMapper.convertToDtoList(songRepository.findByNameContainingIgnoreCase(query));
+        List<AlbumDto> albums = albumMapper.convertToDtoList(albumRepository.findByNameContainingIgnoreCase(query));
+        List<SingerDto> singers = singerMapper.convertToDtoList(singerRepository.findByNameContainingIgnoreCase(query));
+        return new SearchResponse(songs, albums, singers);
+    }
+
+    public void loveSong(Long userId, Long songId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found " + userId));
+        Song song = songRepository.findById(songId).orElseThrow(() -> new EntityNotFoundException("Song not found " + songId));
+        user.addLovedSong(song);
+        userRepository.save(user);
+    }
+
+    public void unloveSong(Long userId, Long songId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found " + userId));
+        Song song = songRepository.findById(songId).orElseThrow(() -> new EntityNotFoundException("Song not found " + songId));
+        user.removeLovedSong(song);
+        userRepository.save(user);
+    }
+
+    public Set<SongDto> getLoveSongByUserId(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found " + userId));
+        return songMapper.convertToDtoSet(user.getLoveSongs());
+
+    }
+
+    public boolean isUserLoveSong(Long userId, Long songId) {
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found " + userId));
+        Song song = songRepository.findById(songId).orElseThrow(() -> new EntityNotFoundException("Song not found " + songId));
+        return user.getLoveSongs().contains(song);
+    }
 }
 

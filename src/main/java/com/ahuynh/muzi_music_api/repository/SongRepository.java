@@ -2,10 +2,12 @@ package com.ahuynh.muzi_music_api.repository;
 
 import com.ahuynh.muzi_music_api.model.entity.Song;
 import com.ahuynh.muzi_music_api.model.entity.Type;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +22,6 @@ public interface SongRepository extends JpaRepository<Song, Long> {
     Optional<List<Type>> findAllTypeById(Long id);
 
     List<Song> findTop10ByOrderByCreatedAtDesc();
+
+    Collection<Song> findByNameContainingIgnoreCase(@NotBlank String name);
 }
