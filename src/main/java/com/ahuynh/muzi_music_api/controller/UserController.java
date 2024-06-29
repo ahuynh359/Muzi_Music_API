@@ -117,10 +117,10 @@ public class UserController {
      * USER - ADMIN
      * UserDto
      */
-    @PutMapping("/avatar")
+    @PostMapping("/avatar/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> updateAvatar(@RequestParam("id") Long id,
-                                        @RequestParam("avatar") MultipartFile avatar) {
+    public ResponseEntity<?> updateAvatar(@PathVariable Long id,
+                                        @RequestPart("avatar") MultipartFile avatar) {
 
         return new ResponseEntity<>(new ApiResponse( "Edit Success",
                 userService.updateAvatar(id, avatar)), HttpStatus.OK);
@@ -133,9 +133,8 @@ public class UserController {
     @PutMapping("/password")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> updatePassword(@Valid @RequestBody UpdatePasswordRequest request ) {
-
-        return new ResponseEntity<>(new ApiResponse("Edit Success",
-                userService.updatePassword(request)), HttpStatus.OK);
+        userService.updatePassword(request);
+        return new ResponseEntity<>(new MessageResponse("Edit Success"), HttpStatus.OK);
     }
 
 //

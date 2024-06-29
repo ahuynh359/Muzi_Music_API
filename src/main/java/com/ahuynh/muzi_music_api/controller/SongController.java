@@ -88,21 +88,14 @@ public class SongController {
         return new ResponseEntity<>(new ApiResponse("Successfully", songService.search(query)), HttpStatus.OK);
     }
 
-    @PostMapping("/love/{userId}/{songId}")
+    @PostMapping("/love-or-unlove/{userId}/{songId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> loveSong(@PathVariable(name = "userId") Long userId, @PathVariable(name = "songId") Long songId) {
-        songService.loveSong(userId, songId);
+    public ResponseEntity<?> loveOrUnloveSong(@PathVariable(name = "userId") Long userId, @PathVariable(name = "songId") Long songId) {
+        songService.loveOrUnloveSong(userId, songId);
         return new ResponseEntity<>(new MessageResponse("Successfully"), HttpStatus.OK);
     }
 
 
-
-    @PostMapping("/unlove/{userId}/{songId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> unloveSong(@PathVariable(name = "userId") Long userId, @PathVariable(name = "songId") Long songId) {
-        songService.unloveSong(userId, songId);
-        return new ResponseEntity<>(new MessageResponse("Successfully"), HttpStatus.OK);
-    }
 
     @GetMapping("/love/{userId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")

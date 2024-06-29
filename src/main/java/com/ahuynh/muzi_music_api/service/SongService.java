@@ -78,19 +78,15 @@ public class SongService {
         return new SearchResponse(songs, albums, singers);
     }
 
-    public void loveSong(Long userId, Long songId) {
+    public void loveOrUnloveSong(Long userId, Long songId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found " + userId));
         Song song = songRepository.findById(songId).orElseThrow(() -> new EntityNotFoundException("Song not found " + songId));
-        user.addLovedSong(song);
+        if (user.getLoveSongs().contains(song))
+            user.removeLovedSong(song);
+        else user.addLovedSong(song);
         userRepository.save(user);
     }
 
-    public void unloveSong(Long userId, Long songId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found " + userId));
-        Song song = songRepository.findById(songId).orElseThrow(() -> new EntityNotFoundException("Song not found " + songId));
-        user.removeLovedSong(song);
-        userRepository.save(user);
-    }
 
     public Set<SongDto> getLoveSongByUserId(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found " + userId));
