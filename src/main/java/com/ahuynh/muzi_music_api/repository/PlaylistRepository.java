@@ -24,4 +24,6 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
     List<Playlist> findAllByUserId(Long userId);
 
     void deleteByIdAndUserId(Long id, Long userId);
+
+    boolean existsByNameAndUserId(String name, Long id);
 }

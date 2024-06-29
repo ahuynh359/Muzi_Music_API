@@ -28,10 +28,10 @@ public class PlaylistController {
      */
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<?> createPlaylist( @RequestBody AddPlaylistRequest request) {
+    public ResponseEntity<?> createPlaylist( @RequestBody AddPlaylistRequest request,@CurrentUser CustomUserDetail currentUser) {
 
         return new ResponseEntity<>(new ApiResponse("Success",
-                playlistService.createPlaylist(request)), HttpStatus.CREATED);
+                playlistService.createPlaylist(request,currentUser)), HttpStatus.CREATED);
     }
 
 

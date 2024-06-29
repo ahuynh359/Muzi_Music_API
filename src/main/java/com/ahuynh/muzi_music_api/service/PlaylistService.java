@@ -10,6 +10,7 @@ import com.ahuynh.muzi_music_api.model.mapper.UserMapper;
 import com.ahuynh.muzi_music_api.payload.request.AddPlaylistRequest;
 import com.ahuynh.muzi_music_api.repository.PlaylistRepository;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
+import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +25,12 @@ public class PlaylistService {
     private final UserMapper userMapper;
     private final PlaylistMapper playlistMapper;
 
-    public PlaylistDto createPlaylist(AddPlaylistRequest request) {
-        User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found" + request.getUserId()));
+    public PlaylistDto createPlaylist(AddPlaylistRequest request, CustomUserDetail currentUser) {
+        User user = userRepository.getUser(currentUser);
         Playlist playlist = new Playlist(request.getName(), user);
+        if(playlistRepository.existsByNameAndUserId(request.getName(),user.getId())){
+            throw new EntityExistsException("Playlist with name " + request.getName() + " already exists");
+        }
         return playlistMapper.convertToDto(playlistRepository.save(playlist));
 
     }
