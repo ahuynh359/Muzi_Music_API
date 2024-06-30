@@ -37,58 +37,10 @@ public class UserService {
 
 
 
-    public UserDto createUser(String email, String password, String username, MultipartFile avatar) {
-        if (userRepository.existsByEmail(email)) {
-            throw new CustomException("Email already exists");
-        }
-
-        if (userRepository.existsByUsername(username)) {
-            throw new CustomException("Username already exists");
-        }
-
-        //Lưu user vào db
-        String encodedPassword = passwordEncoder.encode(password);
-        Set<Role> roles = new HashSet<>();
-        if (userRepository.count() == 0) {
-            roles.add(roleRepository.findByName(RoleName.ROLE_ADMIN)
-                    .orElseThrow(() -> new CustomException("There is no role in db")));
-            roles.add(roleRepository.findByName(RoleName.ROLE_USER)
-                    .orElseThrow(() -> new CustomException("There is no role in db")));
-
-        } else {
-            roles.add(roleRepository.findByName(RoleName.ROLE_USER)
-                    .orElseThrow(() -> new CustomException("There is no role in db")));
-        }
-        String url = firebaseService.upload(avatar, "image/png");
-        User user = userRepository.save(new User(email, encodedPassword, username, roles, url));
-        return userMapper.convertToDto(user);
-    }
-
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found " + id));
         userRepository.delete(user);
-    }
-
-    public UserDto updateUserForAdmin(UpdateUserForAdmin request) {
-        User updateUser = userRepository.findById(request.getId()).orElseThrow(() ->
-                new EntityNotFoundException("User not exits id =" + request.getId()));
-
-
-        if (request.getUsername() != null) {
-            updateUser.setUsername(request.getUsername());
-        }
-
-        if (request.getEmail() != null) {
-            updateUser.setEmail(request.getEmail());
-        }
-
-        if (request.getPassword() != null) {
-            updateUser.setHashPassword(passwordEncoder.encode(request.getPassword()));
-        }
-
-
-        return userMapper.convertToDto(userRepository.save(updateUser));
     }
 
     public UserDto unlock(Long id) {
@@ -107,11 +59,6 @@ public class UserService {
 
     public List<UserDto> getAllUser() {
         return userMapper.convertToDtoList(userRepository.findAll());
-    }
-
-    public UserDto getUserById(Long id) {
-        return userMapper.convertToDto(userRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("User not exits id =" + id)));
     }
 
 

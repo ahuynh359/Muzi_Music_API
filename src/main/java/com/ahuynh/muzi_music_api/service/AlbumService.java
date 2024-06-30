@@ -7,6 +7,7 @@ import com.ahuynh.muzi_music_api.model.dto.SongDto;
 import com.ahuynh.muzi_music_api.model.entity.Album;
 import com.ahuynh.muzi_music_api.model.mapper.AlbumMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
+import com.ahuynh.muzi_music_api.payload.request.AddAlbumRequest;
 import com.ahuynh.muzi_music_api.payload.request.UpdateAlbumRequest;
 import com.ahuynh.muzi_music_api.repository.AlbumRepository;
 import com.ahuynh.muzi_music_api.repository.SongRepository;
@@ -24,16 +25,17 @@ public class AlbumService {
     private final FirebaseService firebaseService;
     private final SongMapper songMapper;
 
-    public AlbumDto createAlbum(MultipartFile avatar, String name) {
-        if (albumRepository.existsByName(name)) {
-            throw new DuplicateException("Album with name " + name + " already exists");
+    public AlbumDto createAlbum(AddAlbumRequest addAlbumRequest) {
+        if (albumRepository.existsByName(addAlbumRequest.getName())) {
+            throw new DuplicateException("Album with name " + addAlbumRequest.getName() + " already exists");
         }
-        String url = firebaseService.upload(avatar, "image/png");
-        return albumMapper.convertToDto(albumRepository.save(new Album(name, url)));
+        return albumMapper.convertToDto(albumRepository.save(new Album(addAlbumRequest.getName())));
     }
 
     public void deleteAlbum(Long id) {
-        albumRepository.deleteById(id);
+        Album album = albumRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Album with id " + id + " not found"));
+        albumRepository.delete(album);
     }
 
 
@@ -42,14 +44,8 @@ public class AlbumService {
     }
 
 
-    public AlbumDto getAlbumById(Long id) {
-        return albumMapper.convertToDto(albumRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("Album with id " + id + " not found")));
-    }
-
-
     public List<SongDto> getSongsFromAlbum(Long id) {
-        albumRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Album not exits id =" + id));
+        albumRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Album not exits id " + id));
         return songMapper.convertToDtoList(albumRepository.findSongById(id));
     }
 

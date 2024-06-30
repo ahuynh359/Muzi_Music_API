@@ -32,9 +32,8 @@ public class Album extends DateAudit {
     private Set<Song> songs = new HashSet<>();
 
 
-    public Album(String name, String avatar) {
+    public Album(String name) {
         this.name = name;
-        this.avatar = avatar;
 
     }
 
