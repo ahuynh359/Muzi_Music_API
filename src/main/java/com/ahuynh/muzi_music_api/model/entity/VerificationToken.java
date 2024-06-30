@@ -32,11 +32,6 @@ public class VerificationToken extends DateAudit {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false, name = "created_at")
-    private Instant createdAt;
-
     public VerificationToken(User user, String token) {
         this.user = user;
         this.token = token;

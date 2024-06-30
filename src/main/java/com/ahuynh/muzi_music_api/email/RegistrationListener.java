@@ -32,15 +32,11 @@ public class RegistrationListener implements
 
         String recipientAddress = user.getEmail();
         String subject = "Registration Confirmation";
-        String confirmationUrl = token;
-//                = event.getAppUrl() + "/auth?token=" + token;
         String message = "Hi ," + user.getUsername() + " please verify opt";
         SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(recipientAddress);
         email.setSubject(subject);
-
-
-        email.setText(message + "\r\n" + confirmationUrl);
+        email.setText(message + "\r\n" + token);
         mailSender.send(email);
     }
 

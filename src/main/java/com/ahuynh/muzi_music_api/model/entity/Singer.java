@@ -39,12 +39,5 @@ public class Singer extends DateAudit {
         this.avatar = avatar;
     }
 
-    public void addSong(Song song) {
-        songs.add(song);
-    }
-
-    public void removeSong(Song song) {
-        songs.remove(song);
-    }
 }
 

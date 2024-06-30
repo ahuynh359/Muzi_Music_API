@@ -40,7 +40,6 @@ public class VerificationTokenService {
             verificationTokenRepository.delete(verificationToken);
             return "Token is expired";
         }
-        user.setEnabled(true);
         verificationTokenRepository.delete(verificationToken);
         userRepository.save(user);
         return "Valid";

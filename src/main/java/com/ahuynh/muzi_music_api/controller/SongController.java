@@ -29,8 +29,8 @@ public class SongController {
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_ADMIN') ")
     public ResponseEntity<?> createSong(@RequestParam("name") String name,
-                                     @RequestParam("avatar") MultipartFile avatar,
-                                     @RequestParam("file") MultipartFile file,
+                                     @RequestPart("avatar") MultipartFile avatar,
+                                     @RequestPart("file") MultipartFile file,
                                      @RequestParam("lyrics") String lyrics,
                                      @RequestParam("albumId") Long albumId,
                                      @RequestParam("singerId") Set<Long> singerId,

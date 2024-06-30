@@ -51,7 +51,7 @@ public class AuthService {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new EntityNotFoundException("This username already registered. Please try other username.");
         }
-        if(!request.getConfirmPassword().equals(request.getPassword())) {
+        if (!request.getConfirmPassword().equals(request.getPassword())) {
             throw new InvalidUserException("Passwords do not match.");
         }
 
@@ -76,11 +76,8 @@ public class AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = jwtTokenProvider.generateToken(authentication);
             CustomUserDetail userDetails = (CustomUserDetail) authentication.getPrincipal();
-            User user = userRepository.findUserByUsernameOrEmail(userDetails.getUsername(), userDetails.getEmail());
-            if (!user.isEnabled()) {
-                throw new InvalidUserException("User is not verified");
-            }
-
+            User user = userRepository.findUserByUsernameOrEmail(userDetails.getUsername(), userDetails.getEmail()).orElseThrow(() ->
+                    new InvalidUserException("Invalid username or password"));
             if (user.isLocked()) {
                 throw new InvalidUserException("User is locked");
             }
@@ -90,7 +87,6 @@ public class AuthService {
         }
 
     }
-
 
 
     public User forgotPassword(ForgotPassRequest request) {

@@ -41,7 +41,6 @@ public class User extends DateAudit {
     private String username;
 
     private String avatar = "https://firebasestorage.googleapis.com/v0/b/muzimusic-c2598.appspot.com/o/avatar%2Favatar.png?alt=media&token=0f4445e9-50a5-4425-9f7c-6c3012b0bcee";
-    private boolean enabled = false;
 
     private boolean locked = false;
 
@@ -81,13 +80,12 @@ public class User extends DateAudit {
 
 
 
-    public User(String email, String hashPassword, String username, Set<Role> roles, String avatar, boolean enabled) {
+    public User(String email, String hashPassword, String username, Set<Role> roles, String avatar) {
         this.email = email;
         this.hashPassword = hashPassword;
         this.username = username;
         this.roles = roles;
         this.avatar = avatar;
-        this.enabled = enabled;
 
 
     }
@@ -110,21 +108,6 @@ public class User extends DateAudit {
         loveSongs.remove(song);
     }
 
-    public void addRole(Role role) {
-        this.roles.add(role);
-    }
-
-    public void removeRole(Role role) {
-        this.roles.remove(role);
-    }
-
-    public void addPlaylist(Playlist playlist) {
-        playlists.add(playlist);
-    }
-
-    public void removePlaylist(Playlist playlist) {
-        playlists.remove(playlist);
-    }
 }
 
 

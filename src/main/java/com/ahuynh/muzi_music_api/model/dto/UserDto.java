@@ -20,7 +20,6 @@ public class UserDto {
     private String email;
     private String username;
     private String avatar;
-    private boolean enabled;
     private boolean locked;
     private Set<RoleDto> roles;
 

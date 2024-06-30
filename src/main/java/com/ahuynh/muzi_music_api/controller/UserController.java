@@ -1,5 +1,7 @@
 package com.ahuynh.muzi_music_api.controller;
 
+import com.ahuynh.muzi_music_api.config.security.CurrentUser;
+import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.model.entity.User;
 import com.ahuynh.muzi_music_api.payload.request.UpdatePasswordRequest;
 import com.ahuynh.muzi_music_api.payload.request.UpdateUserForAdmin;
@@ -21,167 +23,57 @@ public class UserController {
 
     private final UserService userService;
 
-    /**
-     * Thêm người dùng
-     * ADMIN
-     * UserDto
-     */
-    @PostMapping("/create")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> createUser(@RequestParam("email") String email,
-                                        @RequestParam("password") String password,
-                                        @RequestParam("username") String username,
-                                        @RequestParam("avatar") MultipartFile avatar,
-                                        @RequestParam("enable") boolean enable) {
-
-        return new ResponseEntity<>(new ApiResponse("Create Success",
-                userService.createUser(email, password, username, avatar, enable)), HttpStatus.CREATED);
-    }
-
-    /**
-     * Xóa người dùng
-     * ADMIN
-     * MessageResponse
-     */
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable(name = "id") Long id) {
         userService.deleteUser(id);
-        return new ResponseEntity<>(new MessageResponse("Delete Success"), HttpStatus.OK);
-    }
-
-    /**
-     * Sửa người dùng cho admin ko co avatar
-     * ADMIN
-     * UserDto
-     */
-    @PutMapping("/admin")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> updateUserForAdmin(
-            @RequestBody UpdateUserForAdmin request) {
-        return new ResponseEntity<>(new ApiResponse("Update Success",
-                userService.updateUserForAdmin(request)), HttpStatus.OK);
+        return new ResponseEntity<>(new MessageResponse("Delete User Successfully"), HttpStatus.OK);
     }
 
 
-    /**
-     * Mở khóa người dùng
-     * ADMIN
-     * UserDto
-     */
-    @PostMapping("/unlock/{id}")
+    @PutMapping("/unlock/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') ")
     public ResponseEntity<?> unlock(@PathVariable(name = "id") Long id) {
-        return new ResponseEntity<>(new ApiResponse("Unlock Success", userService.unlock(id)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse("Unlock Successfully", userService.unlock(id)), HttpStatus.OK);
     }
 
-    /**
-     * Khóa người dùng
-     * ADMIN
-     * UserDto
-     */
-    @PostMapping("/lock/{id}")
+    @PutMapping("/lock/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') ")
     public ResponseEntity<?> lock(@PathVariable(name = "id") Long id) {
-        return new ResponseEntity<>(new ApiResponse("Lock Success", userService.lock(id)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse("Lock Successfully", userService.lock(id)), HttpStatus.OK);
     }
 
-    /**
-     * Lấy thông tin tất cả người dùng
-     * ADMIN
-     * List<UserDto>
-     */
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getAllUser() {
-        return new ResponseEntity<>(new ApiResponse("Success", userService.getAllUser()),
+        return new ResponseEntity<>(new ApiResponse("Get All Users Successfully", userService.getAllUser()),
                 HttpStatus.OK);
     }
 
-    /**
-     * Lấy thông tin 1 người dùng by id
-     * ADMIN - USER
-     * UserDto
-     */
-    @GetMapping("{id}")
+    @GetMapping("/information")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getUserById(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getInformationOfUser(@CurrentUser CustomUserDetail currentUser) {
         return new ResponseEntity<>(new ApiResponse("Success",
-                userService.getUserById(id)), HttpStatus.OK);
+                userService.getInformationOfUser(currentUser)), HttpStatus.OK);
     }
 
 
-
-    /**
-     * Update avatar
-     * USER - ADMIN
-     * UserDto
-     */
-    @PostMapping("/avatar/{id}")
+    @PutMapping("/avatar")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> updateAvatar(@PathVariable Long id,
-                                        @RequestPart("avatar") MultipartFile avatar) {
+    public ResponseEntity<?> updateAvatar(@CurrentUser CustomUserDetail currentUser,
+                                          @RequestPart("avatar") MultipartFile avatar) {
 
-        return new ResponseEntity<>(new ApiResponse( "Edit Success",
-                userService.updateAvatar(id, avatar)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse("Change Avatar Successfully",
+                userService.updateAvatar(currentUser, avatar)), HttpStatus.OK);
     }
 
-    /**
-     * Update password
-     * USER - ADMIN
-     */
+
     @PutMapping("/password")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<?> updatePassword(@Valid @RequestBody UpdatePasswordRequest request ) {
-        userService.updatePassword(request);
-        return new ResponseEntity<>(new MessageResponse("Edit Success"), HttpStatus.OK);
+    public ResponseEntity<?> updatePassword(@Valid @RequestBody UpdatePasswordRequest request, @CurrentUser CustomUserDetail currentUser) {
+        userService.updatePassword(request, currentUser);
+        return new ResponseEntity<>(new MessageResponse("Change Password Successfully"), HttpStatus.OK);
     }
 
-//
-//    /**
-//     * Nguoi dung yeu thich bai hat
-//     * USER
-//     */
-//    @PutMapping("/love")
-//    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-//    public ResponseEntity<?> loveUser(@RequestParam("userId") Long userId, @RequestParam("songId") Long songId) {
-//        userService.loveSong(userId, songId);
-//        return new ResponseEntity<>(new ApiResponse(true, "Success", ""), HttpStatus.OK);
-//    }
-//
-//    /**
-//     * Nguoi dung bo yeu thich bai hat
-//     * USER
-//     */
-//    @PutMapping("/unlove")
-//    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-//    public ResponseEntity<?> unloveSong(@RequestParam("userId") Long userId, @RequestParam("songId") Long songId) {
-//        userService.unloveSong(userId, songId);
-//
-//        return new ResponseEntity<>(new ApiResponse(true, "Success", ""), HttpStatus.OK);
-//    }
-//
-//    /**
-//     * Lấy ds love song cua nguoi dung
-//     * USER
-//     */
-//    @GetMapping("/{id}/get-love-song")
-//    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-//    public ResponseEntity<?> getLoveSong(@PathVariable Long id) {
-//        Set<Song> songs = userService.getLoveSong(id);
-//        Set<SongResponse> responses = SongResponse.toResponseSet(songs);
-//        return new ResponseEntity<>(new ApiResponse(true, "Success", responses), HttpStatus.OK);
-//    }
-//
-//    /**
-//     * Kiem tra co yeu thich ko
-//     * USER
-//     */
-//    @GetMapping("/{id}/is-love-song/{songId}")
-//    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-//    public ResponseEntity<?> isLoveSong(@PathVariable Long id, @PathVariable Long songId) {
-//        boolean b = userService.isLoveSong(id, songId);
-//        return new ResponseEntity<>(new ApiResponse(true, "Success", b), HttpStatus.OK);
-//    }
 
 }

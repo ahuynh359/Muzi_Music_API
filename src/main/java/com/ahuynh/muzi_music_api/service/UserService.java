@@ -1,5 +1,6 @@
 package com.ahuynh.muzi_music_api.service;
 
+import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.exception.CustomException;
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.exception.PasswordException;
@@ -34,35 +35,9 @@ public class UserService {
     private final SongRepository songRepository;
     private final UserMapper userMapper;
 
-//
-//    public UserDto createUser(SignUpRequest signUpRequest) {
-//        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-//            throw new CustomException("Email already exists");
-//        }
-//
-//        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-//            throw new CustomException("Username already exists");
-//        }
-//
-//        //Lưu user vào db
-//        String encodedPassword = passwordEncoder.encode(signUpRequest.getPassword());
-//        Set<Role> roles = new HashSet<>();
-//        if (userRepository.count() == 0) {
-//            roles.add(roleRepository.findByName(RoleName.ROLE_ADMIN)
-//                    .orElseThrow(() -> new CustomException("There is no role in db")));
-//            roles.add(roleRepository.findByName(RoleName.ROLE_USER)
-//                    .orElseThrow(() -> new CustomException("There is no role in db")));
-//
-//        } else {
-//            roles.add(roleRepository.findByName(RoleName.ROLE_USER)
-//                    .orElseThrow(() -> new CustomException("There is no role in db")));
-//        }
-//        User user = userRepository.save(new User(signUpRequest.getEmail(), encodedPassword, signUpRequest.getUsername(), roles));
-//
-//        return userMapper.convertToDto(user);
-//    }
 
-    public UserDto createUser(String email, String password, String username, MultipartFile avatar, boolean enable) {
+
+    public UserDto createUser(String email, String password, String username, MultipartFile avatar) {
         if (userRepository.existsByEmail(email)) {
             throw new CustomException("Email already exists");
         }
@@ -85,12 +60,14 @@ public class UserService {
                     .orElseThrow(() -> new CustomException("There is no role in db")));
         }
         String url = firebaseService.upload(avatar, "image/png");
-        User user = userRepository.save(new User(email, encodedPassword, username, roles, url, enable));
+        User user = userRepository.save(new User(email, encodedPassword, username, roles, url));
         return userMapper.convertToDto(user);
     }
 
     public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found " + id));
+        userRepository.delete(user);
     }
 
     public UserDto updateUserForAdmin(UpdateUserForAdmin request) {
@@ -117,14 +94,14 @@ public class UserService {
     public UserDto unlock(Long id) {
         User updateUser = userRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("User not exits id = " + id));
-        updateUser.setEnabled(true);
+        updateUser.setLocked(false);
         return userMapper.convertToDto(userRepository.save(updateUser));
     }
 
     public UserDto lock(Long id) {
         User updateUser = userRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("User not exits id = " + id));
-        updateUser.setEnabled(false);
+        updateUser.setLocked(true);
         return userMapper.convertToDto(userRepository.save(updateUser));
     }
 
@@ -138,17 +115,17 @@ public class UserService {
     }
 
 
-    public UserDto updateAvatar(Long id, MultipartFile avatar) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found " + id));
+    public UserDto updateAvatar(CustomUserDetail currentUser, MultipartFile avatar) {
+        User user = userRepository.findById(currentUser.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
         String url = firebaseService.upload(avatar, "image/png");
         user.setAvatar(url);
         return userMapper.convertToDto(userRepository.save(user));
     }
 
-    public UserDto updatePassword(UpdatePasswordRequest request) {
-        User user = userRepository.findById(request.getId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found " + request.getId()));
+    public void updatePassword(UpdatePasswordRequest request, CustomUserDetail currentUser) {
+        User user = userRepository.findById(currentUser.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
         if (!validatePassword(request.getOldPassword(), user.getHashPassword())) {
             throw new PasswordException("Old password don't match");
         }
@@ -158,7 +135,7 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(request.getNewPassword());
         user.setHashPassword(encodedPassword);
 
-        return userMapper.convertToDto(userRepository.save(user));
+        userMapper.convertToDto(userRepository.save(user));
     }
 
 
@@ -166,59 +143,10 @@ public class UserService {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
-//    public void loveSong(Long userId, Long songId) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found " + userId));
-//        Song song = songRepository.findById(songId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Song not found " + songId));
-//        user.addLovedSong(song);
-//        userRepository.save(user);
-//    }
-//
-//    public void unloveSong(Long userId, Long songId) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found " + userId));
-//        Song song = songRepository.findById(songId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Song not found " + songId));
-//        user.removeLovedSong(song);
-//        userRepository.save(user);
-//    }
-//
-//    public Set<Song> getLoveSong(Long id) {
-//        User user = userRepository.findById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found " + id));
-//        return user.getLoveSongs();
-//
-//    }
-//
-//    public boolean isLoveSong(Long id, Long songId) {
-//        User user = userRepository.findById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found " + id));
-//        Song song = songRepository.findById(songId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Song not found " + songId));
-//        return user.getLoveSongs().contains(song);
-//
-//    }
 
-
-//    public List<Playlist> getAllPlaylistById(Long id) {
-//        User user = userRepository.findById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found " + id));
-//        return userRepository.findPlaylistById(id);
-//    }
-//
-//    public User getUserByUserName(String username) {
-//        return userRepository.findByUsernameOrEmail(username, username)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found " + username));
-//    }
-//
-//
-//    public User findByEmail(String email) {
-//
-//        return userRepository.findByEmail(email)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found " + email));
-//    }
-//
-//
-
+    public UserDto getInformationOfUser(CustomUserDetail currentUser) {
+        User user = userRepository.findById(currentUser.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
+        return userMapper.convertToDto(user);
+    }
 }

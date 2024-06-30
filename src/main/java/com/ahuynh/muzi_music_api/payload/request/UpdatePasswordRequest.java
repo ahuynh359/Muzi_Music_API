@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdatePasswordRequest {
-    private Long id;
     private String oldPassword;
     @Size(min = 6)
     private String newPassword;

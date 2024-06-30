@@ -35,36 +35,19 @@ public class AuthController {
         return "Hello World";
     }
 
-    /**
-     * Đăng kí
-     * Ai cũng được
-     * Trả về message success
-     */
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequest request, final HttpServletRequest httpServletRequest) {
         User user = authService.createUser(request);
-        return new ResponseEntity<>(new MessageResponse("Sign in success please check email"), HttpStatus.OK);
+        return new ResponseEntity<>(new MessageResponse("Sign Up Successfully"), HttpStatus.OK);
     }
 
-
-    /**
-     * login
-     * Ai cung duoc
-     * Tra ve LoginResponse
-     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         return
                 new ResponseEntity<>(new ApiResponse
-                        ("Login Success", authService.login(request)), HttpStatus.OK);
+                        ("Login Successfully", authService.login(request)), HttpStatus.OK);
     }
 
-
-    /**
-     * Forgotpass -> gui email
-     * Ai cũng được
-     * Tra ve message success
-     */
     @PostMapping("/forgot")
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPassRequest request,
                                             final HttpServletRequest httpServletRequest) {
@@ -73,21 +56,16 @@ public class AuthController {
                 (user, getCurrentUrl(httpServletRequest)));
         return new ResponseEntity<>(
                 new MessageResponse(
-                        "Resent otp Success"), HttpStatus.OK);
+                        "Resent Otp Successfully"), HttpStatus.OK);
     }
 
-    /**
-     * Reset new password
-     * Ai cũng được
-     * Tra ve message success
-     */
     @PostMapping("/reset")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody NewPasswordRequest request
     ) {
         verificationTokenService.resetPassword(request);
         return
                 new ResponseEntity<>(new MessageResponse
-                        ("Change password Success"), HttpStatus.OK);
+                        ("Change Password Successfully"), HttpStatus.OK);
     }
 
 

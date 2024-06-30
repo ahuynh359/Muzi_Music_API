@@ -18,7 +18,7 @@ public class CustomUserDetailService implements UserDetailsService {
 
     public CustomUserDetail loadUserByUsername(String usernameOrEmail) {
         User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail).orElseThrow(
-                () -> new EntityNotFoundException("User not found with username or email: " + usernameOrEmail)
+                () -> new EntityNotFoundException("Invalid username or password")
         );
         return CustomUserDetail.createUserDetail(user);
 

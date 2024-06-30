@@ -25,7 +25,7 @@ public class AlbumController {
      */
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> addAlbum(@RequestParam("avatar") MultipartFile avatar,
+    public ResponseEntity<?> addAlbum(@RequestPart("avatar") MultipartFile avatar,
                                       @RequestParam("name") String name
     ) {
         return new ResponseEntity<>
@@ -100,7 +100,7 @@ public class AlbumController {
      */
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> updateAlbum(@RequestParam Long id, @RequestParam MultipartFile avatar) {
+    public ResponseEntity<?> updateAlbum(@RequestParam Long id, @RequestPart MultipartFile avatar) {
         return new ResponseEntity<>(new ApiResponse("Update Success", albumService.updateAvatar(id, avatar)), HttpStatus.OK);
     }
 
