@@ -3,6 +3,7 @@ package com.ahuynh.muzi_music_api.controller;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
 import com.ahuynh.muzi_music_api.payload.response.MessageResponse;
 import com.ahuynh.muzi_music_api.service.TypeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,74 +18,44 @@ public class TypeController {
 
     private final TypeService typeService;
 
-    /**
-     * Tao type
-     * ADMIN
-     * TypeDto
-     */
+
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> addType(@RequestParam  String name, @RequestParam MultipartFile avatar) {
+    public ResponseEntity<?> addType(@RequestParam String name , @RequestPart MultipartFile avatar) {
 
-        return new ResponseEntity<>(new ApiResponse("Success",
+        return new ResponseEntity<>(new ApiResponse("Create Type Successfully",
                 typeService.createType(name,avatar)), HttpStatus.CREATED);
     }
 
-    /**
-     * Lay type theo id
-     * ADMIN - USER
-     * TypeDto
-     */
-    @GetMapping("{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getTypeById(@PathVariable(name = "id") Long id) {
-        return new ResponseEntity<>(new ApiResponse("Success", typeService.getTypeById(id)), HttpStatus.OK);
-    }
 
-    /**
-     * Xoa delete
-     * ADMIN
-     * Message
-     */
-    @DeleteMapping("{id}")
+
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteType(@PathVariable(name = "id") Long id) {
         typeService.deleteType(id);
-        return new ResponseEntity<>(new MessageResponse("Success"), HttpStatus.OK);
+        return new ResponseEntity<>(new MessageResponse("Delete Type Successfully"), HttpStatus.OK);
     }
 
-    /**
-     * Sua type
-     * ADMIN
-     * TypeDto
-     */
+
     @PutMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> updateType(@RequestParam Long id, @RequestParam  String name, @RequestParam MultipartFile avatar) {
-        return new ResponseEntity<>(new ApiResponse(" Success",
+    public ResponseEntity<?> updateType(@RequestParam Long id, @RequestParam(required = false)  String name, @RequestPart(required = false)  MultipartFile avatar) {
+        return new ResponseEntity<>(new ApiResponse(" Update Type Successfully",
                 typeService.updateType(id,name,avatar)), HttpStatus.OK);
     }
 
-    /**
-     * Lay all type
-     * ADMIN - USER
-     * List<TypeDto>
-     */
+
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getAllType() {
-        return new ResponseEntity<>(new ApiResponse("Success", typeService.getAllType()), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse("Get All Types Successfully", typeService.getAllType()), HttpStatus.OK);
     }
 
-    /**
-     * Lay tat ca song cua type
-     * ADMIN - USER
-     * List<SongDto>
-     */
+
     @GetMapping("/{id}/songs")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getSongFromType(@PathVariable(name = "id") Long id) {
-        return new ResponseEntity<>(new ApiResponse("Success", typeService.getSongFromType(id)), HttpStatus.OK);
+    public ResponseEntity<?> getSongsFromType(@PathVariable(name = "id") Long id) {
+        return new ResponseEntity<>(new ApiResponse("Get Songs From Type Successfully", typeService.getSongFromType(id)), HttpStatus.OK);
     }
 
 

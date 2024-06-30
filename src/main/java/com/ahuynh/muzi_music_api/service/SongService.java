@@ -1,5 +1,7 @@
 package com.ahuynh.muzi_music_api.service;
 
+import com.ahuynh.muzi_music_api.config.security.CurrentUser;
+import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.model.dto.AlbumDto;
 import com.ahuynh.muzi_music_api.model.dto.SingerDto;
@@ -59,6 +61,7 @@ public class SongService {
     }
 
     public void deleteSong(Long id) {
+        Song song = songRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Song not found " + id));
         songRepository.deleteById(id);
     }
 
@@ -78,8 +81,8 @@ public class SongService {
         return new SearchResponse(songs, albums, singers);
     }
 
-    public void loveOrUnloveSong(Long userId, Long songId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found " + userId));
+    public void loveOrUnloveSong(CustomUserDetail currentUser, Long songId) {
+        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
         Song song = songRepository.findById(songId).orElseThrow(() -> new EntityNotFoundException("Song not found " + songId));
         if (user.getLoveSongs().contains(song))
             user.removeLovedSong(song);
@@ -88,15 +91,15 @@ public class SongService {
     }
 
 
-    public Set<SongDto> getLoveSongByUserId(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found " + userId));
+    public Set<SongDto> getLoveSongs(CustomUserDetail currentUser) {
+        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
         return songMapper.convertToDtoSet(user.getLoveSongs());
 
     }
 
-    public boolean isUserLoveSong(Long userId, Long songId) {
+    public boolean isUserLoveSong(CustomUserDetail currentUser, Long songId) {
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found " + userId));
+        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
         Song song = songRepository.findById(songId).orElseThrow(() -> new EntityNotFoundException("Song not found " + songId));
         return user.getLoveSongs().contains(song);
     }

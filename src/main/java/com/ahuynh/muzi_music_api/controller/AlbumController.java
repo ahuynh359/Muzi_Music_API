@@ -1,6 +1,5 @@
 package com.ahuynh.muzi_music_api.controller;
 
-import com.ahuynh.muzi_music_api.payload.request.AddAlbumRequest;
 import com.ahuynh.muzi_music_api.payload.request.UpdateAlbumRequest;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
 import com.ahuynh.muzi_music_api.payload.response.MessageResponse;
@@ -22,11 +21,11 @@ public class AlbumController {
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> addAlbum(@Valid @RequestBody AddAlbumRequest addAlbumRequest
+    public ResponseEntity<?> addAlbum(@RequestParam String name, @RequestPart MultipartFile avatar
     ) {
         return new ResponseEntity<>
                 (new ApiResponse("Create Album Successfully",
-                        albumService.createAlbum(addAlbumRequest)), HttpStatus.CREATED);
+                        albumService.createAlbum(name, avatar)), HttpStatus.CREATED);
     }
 
 

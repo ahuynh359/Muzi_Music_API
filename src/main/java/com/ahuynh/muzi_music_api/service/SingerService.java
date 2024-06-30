@@ -35,7 +35,8 @@ public class SingerService {
     }
 
     public void deleteSinger(Long id) {
-        singerRepository.deleteById(id);
+        Singer singer = singerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Singer with id " + id + " not found"));
+        singerRepository.delete(singer);
     }
 
     public SingerDto updateSinger(Long id, String name, MultipartFile avatar) {
@@ -58,7 +59,7 @@ public class SingerService {
         return singerMapper.convertToDtoList(singerRepository.findTop10ByOrderByCreatedAtDesc());
     }
 
-    public List<SongDto> getSongFromSinger(Long id) {
+    public List<SongDto> getSongsFromSinger(Long id) {
 
         return songMapper.convertToDtoList(singerRepository.findSongById(id));
 

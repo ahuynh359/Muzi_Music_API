@@ -7,10 +7,8 @@ import com.ahuynh.muzi_music_api.model.dto.SongDto;
 import com.ahuynh.muzi_music_api.model.entity.Album;
 import com.ahuynh.muzi_music_api.model.mapper.AlbumMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
-import com.ahuynh.muzi_music_api.payload.request.AddAlbumRequest;
 import com.ahuynh.muzi_music_api.payload.request.UpdateAlbumRequest;
 import com.ahuynh.muzi_music_api.repository.AlbumRepository;
-import com.ahuynh.muzi_music_api.repository.SongRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,11 +23,18 @@ public class AlbumService {
     private final FirebaseService firebaseService;
     private final SongMapper songMapper;
 
-    public AlbumDto createAlbum(AddAlbumRequest addAlbumRequest) {
-        if (albumRepository.existsByName(addAlbumRequest.getName())) {
-            throw new DuplicateException("Album with name " + addAlbumRequest.getName() + " already exists");
+    public AlbumDto createAlbum(String name, MultipartFile avatar) {
+        if (albumRepository.existsByName(name)) {
+            throw new DuplicateException("Album with name " + name + " already exists");
         }
-        return albumMapper.convertToDto(albumRepository.save(new Album(addAlbumRequest.getName())));
+        String url = "";
+        try {
+             url = firebaseService.upload(avatar, "image/png");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to upload avatar: " + e.getMessage());
+
+        }
+        return albumMapper.convertToDto(albumRepository.save(new Album(name, url)));
     }
 
     public void deleteAlbum(Long id) {

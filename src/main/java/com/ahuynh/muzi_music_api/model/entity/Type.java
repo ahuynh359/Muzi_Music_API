@@ -32,7 +32,7 @@ public class Type extends DateAudit {
     @ManyToMany(mappedBy = "types", fetch = FetchType.LAZY)
     private Set<Song> songs = new HashSet<>();
 
-    public Type(String name, String avatar) {
+    public Type(String name,String avatar) {
         this.name = name;
         this.avatar = avatar;
     }

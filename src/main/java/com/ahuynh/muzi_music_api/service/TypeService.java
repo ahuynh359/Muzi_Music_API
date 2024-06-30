@@ -22,12 +22,12 @@ public class TypeService {
     private final SongMapper songMapper;
     private final FirebaseService firebaseService;
 
-    public TypeDto createType(String name, MultipartFile avatar) {
+    public TypeDto createType(String name , MultipartFile avatar) {
         if (typeRepository.existsByName(name)) {
             throw new DuplicateException("Type with name " + name + " already exists");
         }
-        String url = firebaseService.upload(avatar, "image/png");
-        return typeMapper.convertToDto(typeRepository.save(new Type(name, url)));
+        String url = firebaseService.upload(avatar,"image/png");
+        return typeMapper.convertToDto(typeRepository.save(new Type(name,url)));
     }
 
     public Type getTypeById(Long id) {
@@ -40,19 +40,23 @@ public class TypeService {
     }
 
     public TypeDto updateType(Long id, String name, MultipartFile avatar) {
-        Type updateType = typeRepository.findById(id).orElseThrow(()
-                -> new EntityNotFoundException("Type not exits id =" + id));
+        Type updateType = typeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Type not found with id: " + id));
 
-        if (typeRepository.existsByName(name)) {
-            throw new DuplicateException("Type with name " + name + " already exists");
-        }
-        if (name != null) {
+        if (name != null && !name.isEmpty()) {
+            if (typeRepository.existsByName(name) && !updateType.getName().equals(name)) {
+                throw new DuplicateException("Type with name " + name + " already exists");
+            }
             updateType.setName(name);
         }
 
-        if (avatar != null) {
-            String url = firebaseService.upload(avatar, "image/png");
-            updateType.setAvatar(url);
+        if (avatar != null && !avatar.isEmpty()) {
+            try {
+                String url = firebaseService.upload(avatar, "image/png");
+                updateType.setAvatar(url);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to upload avatar: " + e.getMessage());
+            }
         }
 
         return typeMapper.convertToDto(typeRepository.save(updateType));
