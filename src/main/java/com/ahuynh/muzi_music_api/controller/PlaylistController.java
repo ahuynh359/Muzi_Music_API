@@ -4,6 +4,7 @@ import com.ahuynh.muzi_music_api.config.security.CurrentUser;
 import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.payload.request.AddPlaylistRequest;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
+import com.ahuynh.muzi_music_api.payload.response.MessageResponse;
 import com.ahuynh.muzi_music_api.service.CommentService;
 import com.ahuynh.muzi_music_api.service.PlaylistService;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class PlaylistController {
     private final PlaylistService playlistService;
 
-    /**
-     * Tao playlist
-     * USER
-     * PlaylistDto
-     */
+
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> createPlaylist( @RequestBody AddPlaylistRequest request,@CurrentUser CustomUserDetail currentUser) {
@@ -35,16 +32,25 @@ public class PlaylistController {
     }
 
 
-    /**
-     * Get All Playlist
-     * USER
-     * List<PlaylistDto>
-     */
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> getAllPlaylist(@CurrentUser CustomUserDetail currentUser) {
 
         return new ResponseEntity<>(new ApiResponse("Success",
                 playlistService.getAllPlaylist(currentUser)), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> deletePlaylist( @PathVariable Long id,@CurrentUser CustomUserDetail currentUser) {
+        playlistService.deletePlaylist(id,currentUser);
+        return new ResponseEntity<>(new MessageResponse("Success"), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> updatePlaylist(@RequestBody AddPlaylistRequest request,@CurrentUser CustomUserDetail currentUser,@PathVariable Long id) {
+        return new ResponseEntity<>(new ApiResponse("Success",
+                playlistService.updatePlaylist(request,currentUser,id)), HttpStatus.CREATED);
     }
 }
