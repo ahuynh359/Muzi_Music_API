@@ -69,7 +69,7 @@ public class SongController {
         return new ResponseEntity<>(new MessageResponse("Successfully"), HttpStatus.OK);
     }
 
-    @GetMapping("/love-songs")
+    @GetMapping("/love")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getLoveSongs(@CurrentUser CustomUserDetail currentUser) {
         return new ResponseEntity<>(new ApiResponse("Successfully", songService.getLoveSongs(currentUser)), HttpStatus.OK);

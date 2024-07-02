@@ -10,6 +10,7 @@ import com.ahuynh.muzi_music_api.model.entity.*;
 import com.ahuynh.muzi_music_api.model.mapper.AlbumMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SingerMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
+import com.ahuynh.muzi_music_api.payload.response.LoveSongResponse;
 import com.ahuynh.muzi_music_api.payload.response.SearchResponse;
 import com.ahuynh.muzi_music_api.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -90,9 +91,10 @@ public class SongService {
     }
 
 
-    public Set<SongDto> getLoveSongs(CustomUserDetail currentUser) {
+    public LoveSongResponse getLoveSongs(CustomUserDetail currentUser) {
         User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
-        return songMapper.convertToDtoSet(user.getLoveSongs());
+        Set<Song> loveSongs = userRepository.findLoveSongById(user.getId());
+        return new LoveSongResponse(loveSongs.size() + " songs ",songMapper.convertToDtoList(loveSongs));
 
     }
 

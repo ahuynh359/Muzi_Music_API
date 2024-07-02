@@ -7,14 +7,14 @@ import lombok.*;
 
 import java.util.*;
 
-@EqualsAndHashCode(callSuper = true,exclude = {"singers","types"})
+@EqualsAndHashCode(callSuper = true, exclude = {"singers", "types"})
 @Entity
 @Table(name = "song")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"singers","types"})
+@ToString(exclude = {"singers", "types"})
 public class Song extends DateAudit {
     private static final long serialVersionUID = 1L;
 
@@ -52,6 +52,7 @@ public class Song extends DateAudit {
 
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Listen> listens;
+
 
     public Song(String name, String avatar, String file, String lyrics, Album album) {
         this.name = name;

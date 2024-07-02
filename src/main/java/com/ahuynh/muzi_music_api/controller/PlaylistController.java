@@ -25,15 +25,15 @@ public class PlaylistController {
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<?> createPlaylist( @RequestBody AddPlaylistRequest request,@CurrentUser CustomUserDetail currentUser) {
+    public ResponseEntity<?> createPlaylist(@RequestBody AddPlaylistRequest request, @CurrentUser CustomUserDetail currentUser) {
 
         return new ResponseEntity<>(new ApiResponse("Create Playlist Successfully",
-                playlistService.createPlaylist(request,currentUser)), HttpStatus.CREATED);
+                playlistService.createPlaylist(request, currentUser)), HttpStatus.CREATED);
     }
 
 
     @GetMapping("/all")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER') ")
     public ResponseEntity<?> getAllPlaylist(@CurrentUser CustomUserDetail currentUser) {
 
         return new ResponseEntity<>(new ApiResponse("Get All Playlists Successfully",
@@ -41,16 +41,42 @@ public class PlaylistController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<?> deletePlaylist( @PathVariable Long id,@CurrentUser CustomUserDetail currentUser) {
-        playlistService.deletePlaylist(id,currentUser);
+    @PreAuthorize("hasRole('ROLE_USER') ")
+    public ResponseEntity<?> deletePlaylist(@PathVariable Long id, @CurrentUser CustomUserDetail currentUser) {
+        playlistService.deletePlaylist(id, currentUser);
         return new ResponseEntity<>(new MessageResponse("Delete Playlist Successfully"), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<?> updatePlaylist(@RequestBody AddPlaylistRequest request,@CurrentUser CustomUserDetail currentUser,@PathVariable Long id) {
+    public ResponseEntity<?> updatePlaylist(@RequestBody AddPlaylistRequest request, @CurrentUser CustomUserDetail currentUser, @PathVariable Long id) {
         return new ResponseEntity<>(new ApiResponse("Update Playlist Successfully",
-                playlistService.updatePlaylist(request,currentUser,id)), HttpStatus.CREATED);
+                playlistService.updatePlaylist(request, currentUser, id)), HttpStatus.CREATED);
     }
+
+    @PostMapping("/{playlistId}/song/{songId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> addSongToPlaylist(@PathVariable Long playlistId, @PathVariable Long songId, @CurrentUser CustomUserDetail currentUser) {
+        playlistService.addSongToPlaylist(playlistId,songId, currentUser);
+        return new ResponseEntity<>(new MessageResponse("Add Song To Playlist Successfully")
+              , HttpStatus.CREATED);
+    }
+
+    @GetMapping("/songs/{id}")
+    @PreAuthorize("hasRole('ROLE_USER') ")
+    public ResponseEntity<?> getAllSongsOfPlaylist(@CurrentUser CustomUserDetail currentUser,@PathVariable Long id) {
+
+        return new ResponseEntity<>(new ApiResponse("Get All Songs Of Playlist Successfully",
+                playlistService.getAllSongsOfPlaylist(currentUser,id)), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/songs/not/{id}")
+    @PreAuthorize("hasRole('ROLE_USER') ")
+    public ResponseEntity<?> getAllSongsNotFromPlaylist(@CurrentUser CustomUserDetail currentUser,@PathVariable Long id) {
+
+        return new ResponseEntity<>(new ApiResponse("Get All Songs Not From Playlist Successfully",
+                playlistService.getAllSongsNotFromPlaylist(currentUser,id)), HttpStatus.CREATED);
+    }
+
+
 }
