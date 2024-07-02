@@ -10,7 +10,6 @@ import com.ahuynh.muzi_music_api.model.entity.*;
 import com.ahuynh.muzi_music_api.model.mapper.AlbumMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SingerMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
-import com.ahuynh.muzi_music_api.payload.request.AddSongRequest;
 import com.ahuynh.muzi_music_api.payload.response.SearchResponse;
 import com.ahuynh.muzi_music_api.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -81,7 +80,7 @@ public class SongService {
         return new SearchResponse(songs, albums, singers);
     }
 
-    public void loveOrUnloveSong(CustomUserDetail currentUser, Long songId) {
+    public void loveOrUnloveSong(Long songId, CustomUserDetail currentUser) {
         User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
         Song song = songRepository.findById(songId).orElseThrow(() -> new EntityNotFoundException("Song not found " + songId));
         if (user.getLoveSongs().contains(song))

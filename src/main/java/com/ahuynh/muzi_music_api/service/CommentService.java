@@ -8,8 +8,6 @@ import com.ahuynh.muzi_music_api.model.entity.Song;
 import com.ahuynh.muzi_music_api.model.entity.User;
 import com.ahuynh.muzi_music_api.model.mapper.CommentMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
-import com.ahuynh.muzi_music_api.payload.request.AddCommentChildrenRequest;
-import com.ahuynh.muzi_music_api.payload.request.AnsCommentRequest;
 import com.ahuynh.muzi_music_api.payload.request.CommentRequest;
 import com.ahuynh.muzi_music_api.payload.request.EditCommentRequest;
 import com.ahuynh.muzi_music_api.payload.response.CommentParentAndChildrenResponse;

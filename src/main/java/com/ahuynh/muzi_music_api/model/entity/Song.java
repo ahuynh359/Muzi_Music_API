@@ -7,14 +7,14 @@ import lombok.*;
 
 import java.util.*;
 
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true,exclude = {"singers","types"})
 @Entity
 @Table(name = "song")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
+@ToString(exclude = {"singers","types"})
 public class Song extends DateAudit {
     private static final long serialVersionUID = 1L;
 
@@ -37,15 +37,14 @@ public class Song extends DateAudit {
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments;
 
-    @ManyToMany(fetch = FetchType.LAZY,
+    @ManyToMany(fetch = FetchType.EAGER,
             cascade = CascadeType.ALL)
     @JoinTable(name = "song_singer",
             joinColumns = {@JoinColumn(name = "song_id")},
             inverseJoinColumns = {@JoinColumn(name = "singer_id")})
     private Set<Singer> singers = new HashSet<>();
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "song_type"
             , joinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "type_id", referencedColumnName = "id"))

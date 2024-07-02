@@ -2,7 +2,6 @@ package com.ahuynh.muzi_music_api.controller;
 
 import com.ahuynh.muzi_music_api.config.security.CurrentUser;
 import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
-import com.ahuynh.muzi_music_api.payload.request.AddSongRequest;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -63,10 +62,10 @@ public class SongController {
         return new ResponseEntity<>(new ApiResponse("Search Successfully", songService.search(query)), HttpStatus.OK);
     }
 
-    @PostMapping("/love-or-unlove/{songId}")
+    @PutMapping("/love-or-unlove/{songId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> loveOrUnloveSong(@CurrentUser CustomUserDetail currentUser, @PathVariable(name = "songId") Long songId) {
-        songService.loveOrUnloveSong(currentUser, songId);
+    public ResponseEntity<?> loveOrUnloveSong(@PathVariable(name = "songId") Long songId,@CurrentUser CustomUserDetail currentUser) {
+        songService.loveOrUnloveSong(songId,currentUser);
         return new ResponseEntity<>(new MessageResponse("Successfully"), HttpStatus.OK);
     }
 
@@ -76,7 +75,7 @@ public class SongController {
         return new ResponseEntity<>(new ApiResponse("Successfully", songService.getLoveSongs(currentUser)), HttpStatus.OK);
     }
 
-    @GetMapping("/is-love-song{songId}")
+    @GetMapping("/is-love-song/{songId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> isUserLoveSong(@CurrentUser CustomUserDetail currentUser, @PathVariable Long songId) {
         return new ResponseEntity<>(new ApiResponse("Successfully", songService.isUserLoveSong(currentUser, songId)), HttpStatus.OK);

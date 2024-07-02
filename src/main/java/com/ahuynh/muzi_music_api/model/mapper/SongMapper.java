@@ -13,7 +13,15 @@ import java.util.Set;
 
 @Component
 public class SongMapper extends BaseMapper<Song, SongDto> {
+    private final SingerMapper singerMapper;
+    private final TypeMapper typeMapper;
     private AlbumMapper albumMapper = new AlbumMapper();
+
+    public SongMapper(SingerMapper singerMapper, TypeMapper typeMapper) {
+        super();
+        this.singerMapper = singerMapper;
+        this.typeMapper = typeMapper;
+    }
 
 
     @Override
@@ -21,8 +29,10 @@ public class SongMapper extends BaseMapper<Song, SongDto> {
         Song entity = new Song();
         if (dto != null) {
 
-            BeanUtils.copyProperties(dto, entity,"album");
+            BeanUtils.copyProperties(dto, entity,"album","singers","types");
             entity.setAlbum(albumMapper.convertToEntity(dto.getAlbum()));
+            entity.setSingers(singerMapper.convertToEntitySet(dto.getSingers()));
+            entity.setTypes(typeMapper.convertToEntitySet(dto.getTypes()));
 
         }
         return entity;
@@ -32,8 +42,10 @@ public class SongMapper extends BaseMapper<Song, SongDto> {
     public SongDto convertToDto(Song entity, Object... args) {
         SongDto dto = new SongDto();
         if (entity != null) {
-            BeanUtils.copyProperties(entity, dto,"album");
+            BeanUtils.copyProperties(entity, dto,"album","singers","types");
             dto.setAlbum(albumMapper.convertToDto(entity.getAlbum()));
+            dto.setSingers(singerMapper.convertToDtoSet(entity.getSingers()));
+            dto.setTypes(typeMapper.convertToDtoSet(entity.getTypes()));
         }
         return dto;
     }

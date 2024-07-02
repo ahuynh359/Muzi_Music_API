@@ -27,10 +27,8 @@ public class Singer extends DateAudit {
 
     private String avatar = "https://firebasestorage.googleapis.com/v0/b/muzimusic-c2598.appspot.com/o/avatar%2Fsinger.png?alt=media&token=88843039-e083-4713-befd-18e19c365536";
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade=  CascadeType.ALL,
-            mappedBy = "singers")
     @JsonIgnore
+    @ManyToMany(mappedBy = "singers")
     private Set<Song> songs = new HashSet<>();
 
 
