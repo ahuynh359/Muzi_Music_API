@@ -62,7 +62,7 @@ public class SongController {
         return new ResponseEntity<>(new ApiResponse("Search Successfully", songService.search(query)), HttpStatus.OK);
     }
 
-    @PutMapping("/love-or-unlove/{songId}")
+    @PostMapping("/love-or-unlove/{songId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> loveOrUnloveSong(@PathVariable(name = "songId") Long songId,@CurrentUser CustomUserDetail currentUser) {
         songService.loveOrUnloveSong(songId,currentUser);

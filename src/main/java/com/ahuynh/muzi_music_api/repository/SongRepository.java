@@ -22,7 +22,7 @@ public interface SongRepository extends JpaRepository<Song, Long> {
     @Query(value = "SELECT song.types FROM Song song where song.id = :id")
     Optional<List<Type>> findAllTypeById(Long id);
 
-    List<Song> findTop10ByOrderByCreatedAtDesc();
+    List<Song> findTop4ByOrderByCreatedAtDesc();
 
     Collection<Song> findByNameContainingIgnoreCase(@NotBlank String name);
 

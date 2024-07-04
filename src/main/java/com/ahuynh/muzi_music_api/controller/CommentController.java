@@ -29,7 +29,7 @@ public class CommentController {
     public ResponseEntity<?> getAllCommentBySongId(@PathVariable Long id) {
 
         return new ResponseEntity<>(new ApiResponse("Success",
-                commentService.getAllCommentBySongId(id)), HttpStatus.CREATED);
+                commentService.getAllCommentBySongId(id)), HttpStatus.OK);
     }
 
 

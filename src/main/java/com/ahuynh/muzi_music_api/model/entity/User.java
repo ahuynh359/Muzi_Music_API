@@ -104,10 +104,17 @@ public class User extends DateAudit {
         loveSongs.add(song);
     }
 
-    public void removeLovedSong(Song song) {
+    public void removeLoveSong(Song song) {
         loveSongs.remove(song);
     }
 
+    public void removeLoveSinger(Singer singer) {
+        loveSingers.remove(singer);
+    }
+
+    public void addLoveSinger(Singer singer) {
+        loveSingers.add(singer);
+    }
 }
 
 

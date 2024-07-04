@@ -1,12 +1,19 @@
 package com.ahuynh.muzi_music_api.service;
 
+import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
+import com.ahuynh.muzi_music_api.exception.CustomException;
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.model.dto.SingerDto;
 import com.ahuynh.muzi_music_api.model.dto.SongDto;
+import com.ahuynh.muzi_music_api.model.entity.Playlist;
 import com.ahuynh.muzi_music_api.model.entity.Singer;
+import com.ahuynh.muzi_music_api.model.entity.Song;
+import com.ahuynh.muzi_music_api.model.entity.User;
 import com.ahuynh.muzi_music_api.model.mapper.SingerMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
 import com.ahuynh.muzi_music_api.repository.SingerRepository;
+import com.ahuynh.muzi_music_api.repository.UserRepository;
+import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +30,7 @@ public class SingerService {
     private final FirebaseService firebaseService;
     private final SingerMapper singerMapper;
     private final SongMapper songMapper;
+    private final UserRepository userRepository;
 
     public SingerDto createSinger(String name, MultipartFile avatar) {
         String url = firebaseService.upload(avatar, "image/png");
@@ -66,4 +74,24 @@ public class SingerService {
     }
 
 
+    public List<SingerDto> getLoveSingersOfUser(CustomUserDetail currentUser) {
+        User user = userRepository.getUser(currentUser);
+        return singerMapper.convertToDtoList(user.getLoveSingers());
+    }
+
+    public void loveOrUnloveSinger(Long id, CustomUserDetail currentUser) {
+        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
+        Singer singer = singerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Singer not found " + id));
+        if (user.getLoveSingers().contains(singer))
+            user.removeLoveSinger(singer);
+        else user.addLoveSinger(singer);
+        userRepository.save(user);
+    }
+
+    public boolean isUserLoveSinger(CustomUserDetail currentUser, Long id) {
+
+        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
+        Singer singer = singerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Singer not found " + id));
+        return user.getLoveSingers().contains(singer);
+    }
 }

@@ -24,7 +24,7 @@ public class TypeController {
     public ResponseEntity<?> addType(@RequestParam String name , @RequestPart MultipartFile avatar) {
 
         return new ResponseEntity<>(new ApiResponse("Create Type Successfully",
-                typeService.createType(name,avatar)), HttpStatus.CREATED);
+                typeService.createType(name,avatar)), HttpStatus.OK);
     }
 
 

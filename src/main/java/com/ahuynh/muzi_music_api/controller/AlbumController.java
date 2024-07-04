@@ -25,7 +25,7 @@ public class AlbumController {
     ) {
         return new ResponseEntity<>
                 (new ApiResponse("Create Album Successfully",
-                        albumService.createAlbum(name, avatar)), HttpStatus.CREATED);
+                        albumService.createAlbum(name, avatar)), HttpStatus.OK);
     }
 
 

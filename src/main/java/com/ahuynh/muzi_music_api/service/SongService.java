@@ -70,7 +70,7 @@ public class SongService {
     }
 
     public List<SongDto> getNewSongs() {
-        return songMapper.convertToDtoList(songRepository.findTop10ByOrderByCreatedAtDesc());
+        return songMapper.convertToDtoList(songRepository.findTop4ByOrderByCreatedAtDesc());
     }
 
 
@@ -85,7 +85,7 @@ public class SongService {
         User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
         Song song = songRepository.findById(songId).orElseThrow(() -> new EntityNotFoundException("Song not found " + songId));
         if (user.getLoveSongs().contains(song))
-            user.removeLovedSong(song);
+            user.removeLoveSong(song);
         else user.addLovedSong(song);
         userRepository.save(user);
     }
