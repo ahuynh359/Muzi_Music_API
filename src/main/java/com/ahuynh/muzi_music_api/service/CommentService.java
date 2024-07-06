@@ -1,5 +1,6 @@
 package com.ahuynh.muzi_music_api.service;
 
+import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.model.dto.CommentDto;
 import com.ahuynh.muzi_music_api.model.entity.Comment;
@@ -11,11 +12,13 @@ import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
 import com.ahuynh.muzi_music_api.payload.request.CommentRequest;
 import com.ahuynh.muzi_music_api.payload.request.EditCommentRequest;
 import com.ahuynh.muzi_music_api.payload.response.CommentParentAndChildrenResponse;
+import com.ahuynh.muzi_music_api.payload.response.CommentResponse;
 import com.ahuynh.muzi_music_api.repository.CommentRepository;
 import com.ahuynh.muzi_music_api.repository.SingerRepository;
 import com.ahuynh.muzi_music_api.repository.SongRepository;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,27 +33,27 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
 
-    public List<CommentDto> getAllCommentBySongId(Long id) {
+    public CommentResponse getAllCommentBySongId(Long id) {
+        CommentResponse commentResponse = new CommentResponse();
+
         Song song = songRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No song found"));
-        return commentMapper.convertToDtoList(song.getComments());
+        List<Comment> comments = songRepository.findCommentById(id);
+        return new CommentResponse(commentMapper.convertToDtoList(comments), comments.size());
     }
 
 
-
-    public CommentDto addComment(CommentRequest request) {
+    public CommentDto addComment(CommentRequest request, CustomUserDetail currentUser) {
         Song song = songRepository.findById(request.getSongId()).orElseThrow(() -> new EntityNotFoundException("No song found"));
-        User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new EntityNotFoundException("No user found"));
+        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("No user found"));
         Comment comment = new Comment(user, song, request.getContent());
         return commentMapper.convertToDto(commentRepository.save(comment));
 
     }
 
 
-
-    public CommentDto editComment(EditCommentRequest request) {
-        Song song = songRepository.findById(request.getSongId()).orElseThrow(() -> new EntityNotFoundException("No song found"));
-        User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new EntityNotFoundException("No user found"));
-        if (!Objects.equals(request.getUserId(), user.getId())) {
+    public CommentDto editComment(EditCommentRequest request, CustomUserDetail currentUser) {
+        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("No user found"));
+        if (!Objects.equals(currentUser.getId(), user.getId())) {
             throw new EntityNotFoundException("Don't allow to edit comment");
         }
         Comment comment = commentRepository.findById(request.getCommentId()).orElseThrow(() -> new EntityNotFoundException("No comment found"));
@@ -59,7 +62,12 @@ public class CommentService {
         return commentMapper.convertToDto(commentRepository.save(comment));
     }
 
-    public void deleteComment(Long id) {
-        commentRepository.deleteById(id);
+    public void deleteComment(Long id, CustomUserDetail currentUser) {
+        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("No user found"));
+        Comment  comment = commentRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No comment found"));
+        if (!Objects.equals(user.getId(), comment.getUser().getId())) {
+            throw new EntityNotFoundException("Don't allow to delete comment");
+        }
+        commentRepository.delete(comment);
     }
 }

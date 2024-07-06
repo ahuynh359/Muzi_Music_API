@@ -1,5 +1,7 @@
 package com.ahuynh.muzi_music_api.controller;
 
+import com.ahuynh.muzi_music_api.config.security.CurrentUser;
+import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.payload.request.CommentRequest;
 import com.ahuynh.muzi_music_api.payload.request.EditCommentRequest;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
@@ -19,53 +21,33 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    /**
-     * Get binh luan cua 1 bai hat
-     * ADMIN - USER
-     * List<CommentDto>
-     */
     @GetMapping("/song/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') ")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
     public ResponseEntity<?> getAllCommentBySongId(@PathVariable Long id) {
 
-        return new ResponseEntity<>(new ApiResponse("Success",
+        return new ResponseEntity<>(new ApiResponse("Get All Comments Of Song Successfully" ,
                 commentService.getAllCommentBySongId(id)), HttpStatus.OK);
     }
 
 
-
-    /**
-     * Them comment vao bai hat
-     * ADMIN
-     * CommentDto
-     */
-    @PostMapping("{id}")
+    @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
-    public ResponseEntity<?> addComment(@RequestBody CommentRequest request) {
-        return new ResponseEntity<>(new ApiResponse("Success", commentService.addComment(request)), HttpStatus.OK);
+    public ResponseEntity<?> addComment(@RequestBody CommentRequest request, @CurrentUser CustomUserDetail currentUser) {
+        return new ResponseEntity<>(new ApiResponse("Add Comment To Song Successfully", commentService.addComment(request,currentUser)), HttpStatus.OK);
     }
 
-    /**
-     * Sua binh luan
-     * ADMIN - USER
-     * CommentDto
-     */
+
     @PutMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')  or hasRole('ROLE_USER')")
-    public ResponseEntity<?> editComment(@RequestBody EditCommentRequest request) {
+    public ResponseEntity<?> editComment(@RequestBody EditCommentRequest request,@CurrentUser CustomUserDetail currentUser) {
         return new ResponseEntity<>(new ApiResponse(" Success",
-                commentService.editComment(request)), HttpStatus.OK);
+                commentService.editComment(request,currentUser)), HttpStatus.OK);
     }
 
-    /**
-     * xoa binh luan
-     * ADMIN - USER
-     * Message
-     */
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')  or hasRole('ROLE_USER')")
-    public ResponseEntity<?> deleteComment(@PathVariable Long id) {
-        commentService.deleteComment(id);
+    public ResponseEntity<?> deleteComment(@PathVariable Long id,@CurrentUser CustomUserDetail currentUser) {
+        commentService.deleteComment(id,currentUser);
         return new ResponseEntity<>(new MessageResponse(" Success"), HttpStatus.OK);
     }
 

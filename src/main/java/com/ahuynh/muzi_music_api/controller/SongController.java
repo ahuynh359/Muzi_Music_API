@@ -4,20 +4,15 @@ import com.ahuynh.muzi_music_api.config.security.CurrentUser;
 import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
 import com.ahuynh.muzi_music_api.payload.response.MessageResponse;
 import com.ahuynh.muzi_music_api.service.SongService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -55,6 +50,13 @@ public class SongController {
         return new ResponseEntity<>(new ApiResponse("Get New Songs Successfully", songService.getNewSongs()), HttpStatus.OK);
     }
 
+    @GetMapping("/top10")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getTop10Songs() {
+        return new ResponseEntity<>(new ApiResponse("Get Top 10 Songs Successfully", songService.getTop10Songs()), HttpStatus.OK);
+    }
+
+
 
     @GetMapping("/search")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
@@ -85,6 +87,12 @@ public class SongController {
     @PreAuthorize("hasRole('ROLE_ADMIN') ")
     public ResponseEntity<?> deleteSong(@PathVariable Long id) {
         songService.deleteSong(id);
+        return new ResponseEntity<>(new MessageResponse("Successfully"), HttpStatus.OK);
+    }
+
+    @PostMapping("/listen/{songId}")
+    public ResponseEntity<?> listenToSong(@CurrentUser CustomUserDetail currentUser, @PathVariable Long songId) {
+        songService.listenToSong(currentUser, songId);
         return new ResponseEntity<>(new MessageResponse("Successfully"), HttpStatus.OK);
     }
 

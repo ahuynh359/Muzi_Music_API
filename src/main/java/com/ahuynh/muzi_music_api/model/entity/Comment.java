@@ -1,6 +1,7 @@
 package com.ahuynh.muzi_music_api.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.Set;

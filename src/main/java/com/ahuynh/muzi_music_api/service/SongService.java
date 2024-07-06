@@ -20,7 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +36,7 @@ public class SongService {
     private final AlbumMapper albumMapper;
     private final SingerMapper singerMapper;
     private final UserRepository userRepository;
+    private final ListenRepository listenRepository;
 
 
     public SongDto createSong(String name, MultipartFile avatar, MultipartFile file, String lyrics, Long albumIb, Set<Long> singerId, Set<Long> typeId) {
@@ -73,6 +76,20 @@ public class SongService {
         return songMapper.convertToDtoList(songRepository.findTop4ByOrderByCreatedAtDesc());
     }
 
+    public List<SongDto> getTop10Songs() {
+        List<Listen> listens = listenRepository.findAll();
+
+        Map<Song, Long> songListenCounts = listens.stream()
+                .collect(Collectors.groupingBy(Listen::getSong, Collectors.counting()));
+
+        List<Song> songs =  songListenCounts.entrySet().stream()
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+                .limit(10)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        return songMapper.convertToDtoList(songs);
+    }
+
 
     public SearchResponse search(String query) {
         List<SongDto> songs = songMapper.convertToDtoList(songRepository.findByNameContainingIgnoreCase(query));
@@ -94,7 +111,7 @@ public class SongService {
     public LoveSongResponse getLoveSongs(CustomUserDetail currentUser) {
         User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
         Set<Song> loveSongs = userRepository.findLoveSongById(user.getId());
-        return new LoveSongResponse(loveSongs.size() + " songs ",songMapper.convertToDtoList(loveSongs));
+        return new LoveSongResponse(loveSongs.size() + " songs ", songMapper.convertToDtoList(loveSongs));
 
     }
 
@@ -103,6 +120,16 @@ public class SongService {
         User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
         Song song = songRepository.findById(songId).orElseThrow(() -> new EntityNotFoundException("Song not found " + songId));
         return user.getLoveSongs().contains(song);
+    }
+
+
+    public void listenToSong(CustomUserDetail currentUser, Long songId) {
+        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new RuntimeException("User not found " + currentUser.getId()));
+        Song song = songRepository.findById(songId).orElseThrow(() -> new RuntimeException("Song not found " + songId));
+
+        Listen listen = new Listen(user,song);
+
+        listenRepository.save(listen);
     }
 }
 

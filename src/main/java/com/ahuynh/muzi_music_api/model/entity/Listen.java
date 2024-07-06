@@ -24,4 +24,9 @@ public class Listen extends DateAudit {
     private Song song;
 
 
+    public Listen(User user, Song song) {
+        this.user = user;
+        this.song = song;
+    }
+
 }

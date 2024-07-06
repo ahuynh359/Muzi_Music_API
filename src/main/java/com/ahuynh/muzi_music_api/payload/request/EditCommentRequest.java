@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EditCommentRequest {
-    private Long songId;
-    private Long userId;
     private String content;
     private Long commentId;
 }

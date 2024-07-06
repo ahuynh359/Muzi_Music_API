@@ -1,5 +1,6 @@
 package com.ahuynh.muzi_music_api.repository;
 
+import com.ahuynh.muzi_music_api.model.entity.Comment;
 import com.ahuynh.muzi_music_api.model.entity.Song;
 import com.ahuynh.muzi_music_api.model.entity.Type;
 import jakarta.validation.constraints.NotBlank;
@@ -26,5 +27,6 @@ public interface SongRepository extends JpaRepository<Song, Long> {
 
     Collection<Song> findByNameContainingIgnoreCase(@NotBlank String name);
 
-
+    @Query(value = "SELECT song.comments FROM Song song where song.id = :id")
+    List<Comment> findCommentById(Long id);
 }
