@@ -15,12 +15,13 @@ import java.util.Set;
 public class SongMapper extends BaseMapper<Song, SongDto> {
     private final SingerMapper singerMapper;
     private final TypeMapper typeMapper;
-    private AlbumMapper albumMapper = new AlbumMapper();
+    private final AlbumMapper albumMapper ;
 
-    public SongMapper(SingerMapper singerMapper, TypeMapper typeMapper) {
+    public SongMapper(SingerMapper singerMapper, TypeMapper typeMapper, AlbumMapper albumMapper) {
         super();
         this.singerMapper = singerMapper;
         this.typeMapper = typeMapper;
+        this.albumMapper = albumMapper;
     }
 
 

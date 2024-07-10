@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,12 +25,9 @@ public class CustomUserDetail implements UserDetails {
     private Collection<? extends GrantedAuthority> authorities;
 
     public static CustomUserDetail createUserDetail(User user) {
-        List<GrantedAuthority> authorities = user
-                .getRoles()
-                .stream()
-                .map(role ->
-                        new SimpleGrantedAuthority(role.getName().name()))
-                .collect(Collectors.toList());
+        Collection<? extends GrantedAuthority> authorities =
+                Collections.singleton(new SimpleGrantedAuthority(user.getRole().getName().name()));
+
 
         return new CustomUserDetail(user.getId(), user.getEmail(), user.getUsername(), user.getHashPassword(), authorities);
     }

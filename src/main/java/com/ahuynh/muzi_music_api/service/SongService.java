@@ -101,9 +101,13 @@ public class SongService {
     public void loveOrUnloveSong(Long songId, CustomUserDetail currentUser) {
         User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
         Song song = songRepository.findById(songId).orElseThrow(() -> new EntityNotFoundException("Song not found " + songId));
-        if (user.getLoveSongs().contains(song))
+       Set<Song> loveSong = userRepository.findLoveSongById(currentUser.getId());
+        System.out.println(loveSong);
+        if (loveSong.contains(song)) {
             user.removeLoveSong(song);
-        else user.addLovedSong(song);
+        } else {
+            user.addLovedSong(song);
+        }
         userRepository.save(user);
     }
 

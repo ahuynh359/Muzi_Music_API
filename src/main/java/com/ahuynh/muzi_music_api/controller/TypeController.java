@@ -37,9 +37,9 @@ public class TypeController {
     }
 
 
-    @PutMapping()
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> updateType(@RequestParam Long id, @RequestParam(required = false)  String name, @RequestPart(required = false)  MultipartFile avatar) {
+    public ResponseEntity<?> updateType(@PathVariable Long id, @RequestParam(required = false)  String name, @RequestPart(required = false)  MultipartFile avatar) {
         return new ResponseEntity<>(new ApiResponse(" Update Type Successfully",
                 typeService.updateType(id,name,avatar)), HttpStatus.OK);
     }
@@ -49,6 +49,13 @@ public class TypeController {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getAllType() {
         return new ResponseEntity<>(new ApiResponse("Get All Types Successfully", typeService.getAllType()), HttpStatus.OK);
+    }
+
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getTypeById(@PathVariable Long id) {
+        return new ResponseEntity<>(new ApiResponse("Get Type Successfully", typeService.getTypeById(id)), HttpStatus.OK);
     }
 
 

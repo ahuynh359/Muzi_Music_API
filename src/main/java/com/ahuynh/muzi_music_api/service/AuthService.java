@@ -57,15 +57,14 @@ public class AuthService {
 
         //Lưu user vào db
         String encodedPassword = passwordEncoder.encode(request.getPassword());
-        Set<Role> roles = new HashSet<>();
+        Role role = new Role();
         if (userRepository.count() == 0) {
-            roles.add(roleRepository.findByName(RoleName.ROLE_ADMIN).orElseThrow(() -> new EntityNotFoundException("There is no role admin in db")));
-            roles.add(roleRepository.findByName(RoleName.ROLE_USER).orElseThrow(() -> new EntityNotFoundException("There is no role user in db")));
+            role = roleRepository.findByName(RoleName.ROLE_ADMIN).orElseThrow(() -> new EntityNotFoundException("There is no role admin in db"));
 
         } else {
-            roles.add(roleRepository.findByName(RoleName.ROLE_USER).orElseThrow(() -> new EntityNotFoundException("There is no role user in db")));
+            role = roleRepository.findByName(RoleName.ROLE_USER).orElseThrow(() -> new EntityNotFoundException("There is no role user in db"));
         }
-        return userRepository.save(new User(request.getEmail(), encodedPassword, request.getUsername(), roles));
+        return userRepository.save(new User(request.getEmail(), encodedPassword, request.getUsername(), role));
     }
 
 
@@ -81,7 +80,7 @@ public class AuthService {
             if (user.isLocked()) {
                 throw new InvalidUserException("User is locked");
             }
-            return new LoginResponse(user.getId(), user.getUsername(), user.getEmail(), jwt);
+            return new LoginResponse(user.getId(), user.getUsername(), user.getEmail(), jwt,user.getRole().getName() == RoleName.ROLE_ADMIN);
         } catch (BadCredentialsException e) {
             throw new InvalidUserException("Invalid username or password");
         }

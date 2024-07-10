@@ -52,21 +52,23 @@ public class User extends DateAudit {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Listen> listens;
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_role"
-            , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
-            , inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-    private Set<Role> roles = new HashSet<>();
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id")
+    private Role role;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Notification> notifications;
     @JsonIgnore
     @ManyToMany
     @JoinTable(name = "user_love_song"
             , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
+
     private Set<Song> loveSongs = new HashSet<>();
 
     @JsonIgnore
@@ -80,22 +82,22 @@ public class User extends DateAudit {
 
 
 
-    public User(String email, String hashPassword, String username, Set<Role> roles, String avatar) {
+    public User(String email, String hashPassword, String username, Role role, String avatar) {
         this.email = email;
         this.hashPassword = hashPassword;
         this.username = username;
-        this.roles = roles;
+        this.role = role;
         this.avatar = avatar;
 
 
     }
 
 
-    public User(String email, String hashPassword, String username, Set<Role> role) {
+    public User(String email, String hashPassword, String username, Role role) {
         this.email = email;
         this.hashPassword = hashPassword;
         this.username = username;
-        this.roles = role;
+        this.role = role;
 
 
     }

@@ -9,12 +9,15 @@ import com.ahuynh.muzi_music_api.model.entity.User;
 import com.ahuynh.muzi_music_api.model.entity.role.Role;
 import com.ahuynh.muzi_music_api.model.entity.role.RoleName;
 import com.ahuynh.muzi_music_api.model.mapper.UserMapper;
+import com.ahuynh.muzi_music_api.payload.request.AddUserRequest;
 import com.ahuynh.muzi_music_api.payload.request.UpdatePasswordRequest;
 import com.ahuynh.muzi_music_api.payload.request.UpdateUserForAdmin;
 import com.ahuynh.muzi_music_api.repository.RoleRepository;
 import com.ahuynh.muzi_music_api.repository.SongRepository;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
+import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,16 +35,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final FirebaseService firebaseService;
-    private final SongRepository songRepository;
     private final UserMapper userMapper;
 
-
-
-    public void deleteUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found " + id));
-        userRepository.delete(user);
-    }
 
     public UserDto unlock(Long id) {
         User updateUser = userRepository.findById(id).orElseThrow(() ->
@@ -65,6 +60,7 @@ public class UserService {
     public UserDto updateAvatar(CustomUserDetail currentUser, MultipartFile avatar) {
         User user = userRepository.findById(currentUser.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
+
         String url = firebaseService.upload(avatar, "image/png");
         user.setAvatar(url);
         return userMapper.convertToDto(userRepository.save(user));
@@ -91,9 +87,24 @@ public class UserService {
     }
 
 
-    public UserDto getInformationOfUser(CustomUserDetail currentUser) {
-        User user = userRepository.findById(currentUser.getId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
+
+    public UserDto getUserById(Long id, CustomUserDetail currentUser) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found " + id));
+        if (currentUser.getAuthorities().contains(new SimpleGrantedAuthority(RoleName.ROLE_USER.name()))) {
+            if (!currentUser.getId().equals(id)) {
+                throw new CustomException("You are not authorized to view this user");
+            }
+        }
         return userMapper.convertToDto(user);
+    }
+
+    public UserDto createUser(AddUserRequest request) {
+        Role role = roleRepository.findByName(RoleName.ROLE_USER).orElseThrow(() -> new EntityNotFoundException("Role not found " + RoleName.ROLE_USER));
+        if (userRepository.existsByEmail(request.getEmail()) || userRepository.existsByUsername(request.getUsername())) {
+            throw new EntityExistsException("User exist");
+        }
+        User user = new User(request.getEmail(), passwordEncoder.encode(request.getPassword()), request.getUsername(), role);
+        return userMapper.convertToDto(userRepository.save(user));
     }
 }

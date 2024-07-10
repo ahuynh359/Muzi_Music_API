@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +22,8 @@ public class UserDto {
     private String username;
     private String avatar;
     private boolean locked;
-    private Set<RoleDto> roles;
+    private RoleDto role;
+    private String createdAt;
+    private String updatedAt;
 
 }

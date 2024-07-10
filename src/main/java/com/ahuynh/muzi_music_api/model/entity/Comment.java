@@ -1,5 +1,6 @@
 package com.ahuynh.muzi_music_api.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -29,6 +30,10 @@ public class Comment extends DateAudit {
     @ManyToOne
     @JoinColumn(name = "song_id", nullable = false)
     private Song song;
+
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private Comment parentComment;
 
 
 

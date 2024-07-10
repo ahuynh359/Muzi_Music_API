@@ -3,6 +3,7 @@ package com.ahuynh.muzi_music_api.repository;
 import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.model.entity.Playlist;
+import com.ahuynh.muzi_music_api.model.entity.Singer;
 import com.ahuynh.muzi_music_api.model.entity.Song;
 import com.ahuynh.muzi_music_api.model.entity.User;
 import jakarta.validation.constraints.NotBlank;
@@ -34,4 +35,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     }
     @Query("SELECT u.loveSongs FROM User u WHERE u.id = :id")
     Set<Song> findLoveSongById(Long id);
+
+    @Query("SELECT u.loveSingers FROM User u WHERE u.id = :id")
+    Set<Singer> findLoveSingerById(Long id);
 }

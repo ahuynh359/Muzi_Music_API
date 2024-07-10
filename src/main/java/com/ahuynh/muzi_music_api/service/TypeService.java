@@ -22,17 +22,17 @@ public class TypeService {
     private final SongMapper songMapper;
     private final FirebaseService firebaseService;
 
-    public TypeDto createType(String name , MultipartFile avatar) {
+    public TypeDto createType(String name, MultipartFile avatar) {
         if (typeRepository.existsByName(name)) {
             throw new DuplicateException("Type with name " + name + " already exists");
         }
-        String url = firebaseService.upload(avatar,"image/png");
-        return typeMapper.convertToDto(typeRepository.save(new Type(name,url)));
+        String url = firebaseService.upload(avatar, "image/png");
+        return typeMapper.convertToDto(typeRepository.save(new Type(name, url)));
     }
 
-    public Type getTypeById(Long id) {
-        return typeRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("Type with id " + id + " not found"));
+    public TypeDto getTypeById(Long id) {
+        return typeMapper.convertToDto(typeRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Type with id " + id + " not found")));
     }
 
     public void deleteType(Long id) {

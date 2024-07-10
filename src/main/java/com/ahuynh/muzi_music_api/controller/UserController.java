@@ -3,6 +3,7 @@ package com.ahuynh.muzi_music_api.controller;
 import com.ahuynh.muzi_music_api.config.security.CurrentUser;
 import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.model.entity.User;
+import com.ahuynh.muzi_music_api.payload.request.AddUserRequest;
 import com.ahuynh.muzi_music_api.payload.request.UpdatePasswordRequest;
 import com.ahuynh.muzi_music_api.payload.request.UpdateUserForAdmin;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
@@ -23,14 +24,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> deleteUser(@PathVariable(name = "id") Long id) {
-        userService.deleteUser(id);
-        return new ResponseEntity<>(new MessageResponse("Delete User Successfully"), HttpStatus.OK);
-    }
-
-
     @PutMapping("/unlock/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') ")
     public ResponseEntity<?> unlock(@PathVariable(name = "id") Long id) {
@@ -50,12 +43,15 @@ public class UserController {
                 HttpStatus.OK);
     }
 
-    @GetMapping("/information")
+
+
+    @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getInformationOfUser(@CurrentUser CustomUserDetail currentUser) {
+    public ResponseEntity<?> getUserById(@PathVariable Long id,@CurrentUser CustomUserDetail currentUser) {
         return new ResponseEntity<>(new ApiResponse("Success",
-                userService.getInformationOfUser(currentUser)), HttpStatus.OK);
+                userService.getUserById(id,currentUser)), HttpStatus.OK);
     }
+
 
 
     @PutMapping("/avatar")
@@ -74,6 +70,14 @@ public class UserController {
         userService.updatePassword(request, currentUser);
         return new ResponseEntity<>(new MessageResponse("Change Password Successfully"), HttpStatus.OK);
     }
+
+    @PostMapping("/create")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> createUser(@Valid @RequestBody AddUserRequest request) {
+
+        return new ResponseEntity<>(new ApiResponse("Create User Successfully",userService.createUser(request)), HttpStatus.OK);
+    }
+
 
 
 }

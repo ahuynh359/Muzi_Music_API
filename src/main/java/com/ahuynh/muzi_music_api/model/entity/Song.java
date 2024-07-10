@@ -30,26 +30,30 @@ public class Song extends DateAudit {
     @Column(columnDefinition = "TEXT")
     private String lyrics;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "album_id", nullable = false)
     private Album album;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments;
 
-    @ManyToMany(fetch = FetchType.EAGER,
-            cascade = CascadeType.ALL)
+    @JsonIgnore
+    @ManyToMany
     @JoinTable(name = "song_singer",
             joinColumns = {@JoinColumn(name = "song_id")},
             inverseJoinColumns = {@JoinColumn(name = "singer_id")})
     private Set<Singer> singers = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnore
+    @ManyToMany
     @JoinTable(name = "song_type"
             , joinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "type_id", referencedColumnName = "id"))
     private Set<Type> types = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Listen> listens;
 

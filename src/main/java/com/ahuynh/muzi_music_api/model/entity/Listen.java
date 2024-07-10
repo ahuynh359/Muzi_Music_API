@@ -3,14 +3,13 @@ package com.ahuynh.muzi_music_api.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "listen")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Listen extends DateAudit {
+public class Listen {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

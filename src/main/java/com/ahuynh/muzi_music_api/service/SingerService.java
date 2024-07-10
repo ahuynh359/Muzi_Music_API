@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/singer")
@@ -82,9 +83,13 @@ public class SingerService {
     public void loveOrUnloveSinger(Long id, CustomUserDetail currentUser) {
         User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
         Singer singer = singerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Singer not found " + id));
-        if (user.getLoveSingers().contains(singer))
+        Set<Singer> loveSinger = userRepository.findLoveSingerById(currentUser.getId());
+        System.out.println(loveSinger);
+        if (user.getLoveSingers().contains(singer)) {
             user.removeLoveSinger(singer);
-        else user.addLoveSinger(singer);
+        } else {
+            user.addLoveSinger(singer);
+        }
         userRepository.save(user);
     }
 
