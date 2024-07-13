@@ -38,4 +38,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u.loveSingers FROM User u WHERE u.id = :id")
     Set<Singer> findLoveSingerById(Long id);
+
+    List<User> findAllByOrderByCreatedAtDesc();
 }

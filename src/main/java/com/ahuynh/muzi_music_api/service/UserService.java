@@ -38,22 +38,17 @@ public class UserService {
     private final UserMapper userMapper;
 
 
-    public UserDto unlock(Long id) {
+    public UserDto lockOrUnLock(Long id) {
         User updateUser = userRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("User not exits id = " + id));
-        updateUser.setLocked(false);
+        updateUser.setLocked(!updateUser.isLocked());
         return userMapper.convertToDto(userRepository.save(updateUser));
     }
 
-    public UserDto lock(Long id) {
-        User updateUser = userRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("User not exits id = " + id));
-        updateUser.setLocked(true);
-        return userMapper.convertToDto(userRepository.save(updateUser));
-    }
 
-    public List<UserDto> getAllUser() {
-        return userMapper.convertToDtoList(userRepository.findAll());
+
+    public List<UserDto> getNewUsers() {
+        return userMapper.convertToDtoList(userRepository.findAllByOrderByCreatedAtDesc());
     }
 
 
@@ -85,7 +80,6 @@ public class UserService {
     private boolean validatePassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
-
 
 
     public UserDto getUserById(Long id, CustomUserDetail currentUser) {

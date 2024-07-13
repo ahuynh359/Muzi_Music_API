@@ -24,34 +24,26 @@ public class UserController {
 
     private final UserService userService;
 
-    @PutMapping("/unlock/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') ")
-    public ResponseEntity<?> unlock(@PathVariable(name = "id") Long id) {
-        return new ResponseEntity<>(new ApiResponse("Unlock Successfully", userService.unlock(id)), HttpStatus.OK);
-    }
-
     @PutMapping("/lock/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') ")
-    public ResponseEntity<?> lock(@PathVariable(name = "id") Long id) {
-        return new ResponseEntity<>(new ApiResponse("Lock Successfully", userService.lock(id)), HttpStatus.OK);
+    public ResponseEntity<?> lockOrUnlock(@PathVariable(name = "id") Long id) {
+        return new ResponseEntity<>(new ApiResponse("Lock Successfully", userService.lockOrUnLock(id)), HttpStatus.OK);
     }
 
-    @GetMapping("/all")
+    @GetMapping("/new")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getAllUser() {
-        return new ResponseEntity<>(new ApiResponse("Get All Users Successfully", userService.getAllUser()),
+    public ResponseEntity<?> getNewUsers() {
+        return new ResponseEntity<>(new ApiResponse("Get All Users Successfully", userService.getNewUsers()),
                 HttpStatus.OK);
     }
 
 
-
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getUserById(@PathVariable Long id,@CurrentUser CustomUserDetail currentUser) {
+    public ResponseEntity<?> getUserById(@PathVariable Long id, @CurrentUser CustomUserDetail currentUser) {
         return new ResponseEntity<>(new ApiResponse("Success",
-                userService.getUserById(id,currentUser)), HttpStatus.OK);
+                userService.getUserById(id, currentUser)), HttpStatus.OK);
     }
-
 
 
     @PutMapping("/avatar")
@@ -75,9 +67,8 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> createUser(@Valid @RequestBody AddUserRequest request) {
 
-        return new ResponseEntity<>(new ApiResponse("Create User Successfully",userService.createUser(request)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse("Create User Successfully", userService.createUser(request)), HttpStatus.OK);
     }
-
 
 
 }
