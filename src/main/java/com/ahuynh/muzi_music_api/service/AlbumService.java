@@ -29,7 +29,7 @@ public class AlbumService {
         }
         String url = "";
         try {
-             url = firebaseService.upload(avatar, "image/png");
+            url = firebaseService.upload(avatar, "image/png");
         } catch (Exception e) {
             throw new RuntimeException("Failed to upload avatar: " + e.getMessage());
 
@@ -55,8 +55,8 @@ public class AlbumService {
     }
 
     public AlbumDto updateAlbum(UpdateAlbumRequest request) {
-        Album album = albumRepository.findById(request.getAlbumId()).orElseThrow(() ->
-                new EntityNotFoundException("Album with id " + request.getAlbumId() + " not found"));
+        Album album = albumRepository.findById(request.getId()).orElseThrow(() ->
+                new EntityNotFoundException("Album with id " + request.getId() + " not found"));
         album.setName(request.getName());
         return albumMapper.convertToDto(albumRepository.save(album));
     }
@@ -68,5 +68,10 @@ public class AlbumService {
         String url = firebaseService.upload(avatar, "image/png");
         album.setAvatar(url);
         return albumMapper.convertToDto(albumRepository.save(album));
+    }
+
+    public AlbumDto getAlbumById(Long id) {
+        return albumMapper.convertToDto(albumRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Album with id " + id + " not found")));
     }
 }

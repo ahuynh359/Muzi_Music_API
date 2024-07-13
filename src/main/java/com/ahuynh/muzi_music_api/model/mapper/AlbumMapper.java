@@ -2,6 +2,7 @@ package com.ahuynh.muzi_music_api.model.mapper;
 
 import com.ahuynh.muzi_music_api.model.dto.AlbumDto;
 import com.ahuynh.muzi_music_api.model.entity.Album;
+import com.ahuynh.muzi_music_api.utils.Utils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,9 @@ public class AlbumMapper extends BaseMapper<Album, AlbumDto> {
     public AlbumDto convertToDto(Album entity, Object... args) {
         AlbumDto dto = new AlbumDto();
         if (entity != null) {
-            BeanUtils.copyProperties(entity, dto);
+            BeanUtils.copyProperties(entity, dto, "createdAt", "updatedAt");
+            dto.setCreatedAt(Utils.convertInstantToTime(entity.getCreatedAt()));
+            dto.setUpdatedAt(Utils.convertInstantToTime(entity.getUpdatedAt()));
         }
         return dto;
     }

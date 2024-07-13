@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EditCommentRequest {
+public class UpdateCommentRequest {
     private String content;
     private Long commentId;
 }

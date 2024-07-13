@@ -1,5 +1,6 @@
 package com.ahuynh.muzi_music_api.controller;
 
+import com.ahuynh.muzi_music_api.payload.request.UpdateTypeRequest;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
 import com.ahuynh.muzi_music_api.payload.response.MessageResponse;
 import com.ahuynh.muzi_music_api.service.TypeService;
@@ -37,11 +38,11 @@ public class TypeController {
     }
 
 
-    @PutMapping("/{id}")
+    @PutMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> updateType(@PathVariable Long id, @RequestParam(required = false)  String name, @RequestPart(required = false)  MultipartFile avatar) {
+    public ResponseEntity<?> updateType(@Valid @RequestBody UpdateTypeRequest request) {
         return new ResponseEntity<>(new ApiResponse(" Update Type Successfully",
-                typeService.updateType(id,name,avatar)), HttpStatus.OK);
+                typeService.updateType(request)), HttpStatus.OK);
     }
 
 
@@ -49,6 +50,15 @@ public class TypeController {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getAllType() {
         return new ResponseEntity<>(new ApiResponse("Get All Types Successfully", typeService.getAllType()), HttpStatus.OK);
+    }
+
+    @PutMapping("/avatar/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') ")
+    public ResponseEntity<?> updateAvatar(@PathVariable Long id,
+                                          @RequestPart("avatar") MultipartFile avatar) {
+
+        return new ResponseEntity<>(new ApiResponse("Change Avatar Successfully",
+                typeService.updateAvatar( id, avatar)), HttpStatus.OK);
     }
 
 

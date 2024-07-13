@@ -2,11 +2,14 @@ package com.ahuynh.muzi_music_api.service;
 
 import com.ahuynh.muzi_music_api.exception.DuplicateException;
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
+import com.ahuynh.muzi_music_api.model.dto.AlbumDto;
 import com.ahuynh.muzi_music_api.model.dto.SongDto;
 import com.ahuynh.muzi_music_api.model.dto.TypeDto;
+import com.ahuynh.muzi_music_api.model.entity.Album;
 import com.ahuynh.muzi_music_api.model.entity.Type;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
 import com.ahuynh.muzi_music_api.model.mapper.TypeMapper;
+import com.ahuynh.muzi_music_api.payload.request.UpdateTypeRequest;
 import com.ahuynh.muzi_music_api.repository.TypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,25 +42,17 @@ public class TypeService {
         typeRepository.deleteById(id);
     }
 
-    public TypeDto updateType(Long id, String name, MultipartFile avatar) {
-        Type updateType = typeRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Type not found with id: " + id));
+    public TypeDto updateType(UpdateTypeRequest request) {
+        Type updateType = typeRepository.findById(request.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Type not found with id: " + request.getId()));
 
-        if (name != null && !name.isEmpty()) {
-            if (typeRepository.existsByName(name) && !updateType.getName().equals(name)) {
-                throw new DuplicateException("Type with name " + name + " already exists");
+        if (request.getName() != null && !request.getName().isEmpty()) {
+            if (typeRepository.existsByName(request.getName()) && !updateType.getName().equals(request.getName())) {
+                throw new DuplicateException("Type with name " + request.getName() + " already exists");
             }
-            updateType.setName(name);
+            updateType.setName(request.getName());
         }
 
-        if (avatar != null && !avatar.isEmpty()) {
-            try {
-                String url = firebaseService.upload(avatar, "image/png");
-                updateType.setAvatar(url);
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to upload avatar: " + e.getMessage());
-            }
-        }
 
         return typeMapper.convertToDto(typeRepository.save(updateType));
     }
@@ -70,5 +65,14 @@ public class TypeService {
 
         return songMapper.convertToDtoList(typeRepository.findSongById(id));
 
+    }
+
+
+    public TypeDto updateAvatar(Long id, MultipartFile avatar) {
+        Type type = typeRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Type with id " + id + " not found"));
+        String url = firebaseService.upload(avatar, "image/png");
+        type.setAvatar(url);
+        return typeMapper.convertToDto(typeRepository.save(type));
     }
 }

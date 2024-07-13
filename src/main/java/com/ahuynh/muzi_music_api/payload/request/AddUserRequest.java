@@ -1,6 +1,7 @@
 package com.ahuynh.muzi_music_api.payload.request;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,10 +10,10 @@ import lombok.Data;
 @AllArgsConstructor
 public class AddUserRequest {
     @Email
-    @NotNull
+    @NotBlank
     private String email;
-    @NotNull
+    @NotBlank
     private String password;
-    @NotNull
+    @NotBlank
     private String username;
 }

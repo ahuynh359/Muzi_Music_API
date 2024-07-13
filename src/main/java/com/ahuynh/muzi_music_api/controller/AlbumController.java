@@ -1,5 +1,7 @@
 package com.ahuynh.muzi_music_api.controller;
 
+import com.ahuynh.muzi_music_api.config.security.CurrentUser;
+import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.payload.request.UpdateAlbumRequest;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
 import com.ahuynh.muzi_music_api.payload.response.MessageResponse;
@@ -21,7 +23,7 @@ public class AlbumController {
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> addAlbum(@RequestParam String name, @RequestPart MultipartFile avatar
+    public ResponseEntity<?> createAlbum(@RequestParam String name, @RequestPart MultipartFile avatar
     ) {
         return new ResponseEntity<>
                 (new ApiResponse("Create Album Successfully",
@@ -36,12 +38,30 @@ public class AlbumController {
         return new ResponseEntity<>(new MessageResponse("Delete Success"), HttpStatus.OK);
     }
 
+    @PutMapping("/avatar/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') ")
+    public ResponseEntity<?> updateAvatar(@PathVariable Long id,
+                                          @RequestPart("avatar") MultipartFile avatar) {
+
+        return new ResponseEntity<>(new ApiResponse("Change Avatar Successfully",
+                albumService.updateAvatar( id, avatar)), HttpStatus.OK);
+    }
+
+
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getAllAlbum() {
         return new ResponseEntity<>(new ApiResponse("Get All Albums Successfully", albumService.getAllAlbum()), HttpStatus.OK);
     }
+
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getAlbumById(@PathVariable Long id) {
+        return new ResponseEntity<>(new ApiResponse("Get Album Successfully", albumService.getAlbumById(id)), HttpStatus.OK);
+    }
+
 
 
     @GetMapping("/{id}/songs")
@@ -54,16 +74,12 @@ public class AlbumController {
 
     @PutMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> updateAlbum(@RequestBody UpdateAlbumRequest request) {
+    public ResponseEntity<?> updateAlbum(@Valid @RequestBody UpdateAlbumRequest request) {
         return new ResponseEntity<>(new ApiResponse("Update Album Successfully", albumService.updateAlbum(request)), HttpStatus.OK);
     }
 
 
-    @PutMapping("/avatar/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> updateAvatarAlbum(@PathVariable Long id, @RequestPart MultipartFile avatar) {
-        return new ResponseEntity<>(new ApiResponse("Update Album Successfully", albumService.updateAvatar(id, avatar)), HttpStatus.OK);
-    }
+
 
 
 }

@@ -4,21 +4,17 @@ import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.model.dto.CommentDto;
 import com.ahuynh.muzi_music_api.model.entity.Comment;
-import com.ahuynh.muzi_music_api.model.entity.Singer;
 import com.ahuynh.muzi_music_api.model.entity.Song;
 import com.ahuynh.muzi_music_api.model.entity.User;
 import com.ahuynh.muzi_music_api.model.mapper.CommentMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
 import com.ahuynh.muzi_music_api.payload.request.CommentRequest;
-import com.ahuynh.muzi_music_api.payload.request.EditCommentRequest;
-import com.ahuynh.muzi_music_api.payload.response.CommentParentAndChildrenResponse;
+import com.ahuynh.muzi_music_api.payload.request.UpdateCommentRequest;
 import com.ahuynh.muzi_music_api.payload.response.CommentResponse;
 import com.ahuynh.muzi_music_api.repository.CommentRepository;
-import com.ahuynh.muzi_music_api.repository.SingerRepository;
 import com.ahuynh.muzi_music_api.repository.SongRepository;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,7 +47,7 @@ public class CommentService {
     }
 
 
-    public CommentDto editComment(EditCommentRequest request, CustomUserDetail currentUser) {
+    public CommentDto editComment(UpdateCommentRequest request, CustomUserDetail currentUser) {
         User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("No user found"));
         if (!Objects.equals(currentUser.getId(), user.getId())) {
             throw new EntityNotFoundException("Don't allow to edit comment");

@@ -3,7 +3,7 @@ package com.ahuynh.muzi_music_api.controller;
 import com.ahuynh.muzi_music_api.config.security.CurrentUser;
 import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.payload.request.CommentRequest;
-import com.ahuynh.muzi_music_api.payload.request.EditCommentRequest;
+import com.ahuynh.muzi_music_api.payload.request.UpdateCommentRequest;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
 import com.ahuynh.muzi_music_api.payload.response.MessageResponse;
 import com.ahuynh.muzi_music_api.service.CommentService;
@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/comment")
@@ -39,7 +38,7 @@ public class CommentController {
 
     @PutMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')  or hasRole('ROLE_USER')")
-    public ResponseEntity<?> editComment(@RequestBody EditCommentRequest request,@CurrentUser CustomUserDetail currentUser) {
+    public ResponseEntity<?> editComment(@RequestBody UpdateCommentRequest request, @CurrentUser CustomUserDetail currentUser) {
         return new ResponseEntity<>(new ApiResponse(" Success",
                 commentService.editComment(request,currentUser)), HttpStatus.OK);
     }
