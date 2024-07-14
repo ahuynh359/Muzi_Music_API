@@ -18,21 +18,25 @@ import java.util.Set;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-   Optional<User> findByUsernameOrEmail(String username, String email);
+    Optional<User> findByUsernameOrEmail(String username, String email);
+
     Optional<User> findUserByUsernameOrEmail(String username, String email);
-   Boolean existsByUsername(@NotBlank String username);
-   Boolean existsByEmail(@NotBlank String email);
+
+    Boolean existsByUsername(@NotBlank String username);
+
+    Boolean existsByEmail(@NotBlank String email);
 
 
-   Optional<User> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
-    default User getUser(CustomUserDetail currentUser){
-       return getByEmail(currentUser.getEmail());
+    default User getUser(CustomUserDetail currentUser) {
+        return getByEmail(currentUser.getEmail());
     }
 
     default User getByEmail(String email) {
         return findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User with email " + email + " not found"));
     }
+
     @Query("SELECT u.loveSongs FROM User u WHERE u.id = :id")
     Set<Song> findLoveSongById(Long id);
 
@@ -40,4 +44,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Set<Singer> findLoveSingerById(Long id);
 
     List<User> findAllByOrderByCreatedAtDesc();
+
+    List<User> findAllByOrderByUsernameAsc();
+
+    List<User> findAllByOrderByUsernameDesc();
+
+
+    List<User> findAllByOrderByCreatedAtAsc();
+
+    List<User> findByLockedTrue();
+
+    List<User> findByLockedFalse();
 }
+

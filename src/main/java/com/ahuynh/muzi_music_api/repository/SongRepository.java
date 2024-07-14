@@ -29,4 +29,6 @@ public interface SongRepository extends JpaRepository<Song, Long> {
 
     @Query(value = "SELECT song.comments FROM Song song where song.id = :id")
     List<Comment> findCommentById(Long id);
+
+    List<Song> findAllByOrderByCreatedAtDesc();
 }

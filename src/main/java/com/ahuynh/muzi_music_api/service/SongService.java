@@ -73,7 +73,7 @@ public class SongService {
     }
 
     public List<SongDto> getNewSongs() {
-        return songMapper.convertToDtoList(songRepository.findTop4ByOrderByCreatedAtDesc());
+        return songMapper.convertToDtoList(songRepository.findAllByOrderByCreatedAtDesc());
     }
 
     public List<SongDto> getTop10Songs() {

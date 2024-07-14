@@ -27,4 +27,6 @@ public class SongDto {
     private AlbumDto album;
     private Set<SingerDto> singers;
     private Set<TypeDto> types;
+    private String createdAt;
+    private String updatedAt;
 }

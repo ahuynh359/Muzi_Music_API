@@ -5,6 +5,7 @@ import com.ahuynh.muzi_music_api.model.dto.SingerDto;
 import com.ahuynh.muzi_music_api.model.dto.SongDto;
 import com.ahuynh.muzi_music_api.model.dto.TypeDto;
 import com.ahuynh.muzi_music_api.model.entity.Song;
+import com.ahuynh.muzi_music_api.utils.Utils;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -43,10 +44,12 @@ public class SongMapper extends BaseMapper<Song, SongDto> {
     public SongDto convertToDto(Song entity, Object... args) {
         SongDto dto = new SongDto();
         if (entity != null) {
-            BeanUtils.copyProperties(entity, dto,"album","singers","types");
+            BeanUtils.copyProperties(entity, dto,"album","singers","types","createdAt","updatedAt");
             dto.setAlbum(albumMapper.convertToDto(entity.getAlbum()));
             dto.setSingers(singerMapper.convertToDtoSet(entity.getSingers()));
             dto.setTypes(typeMapper.convertToDtoSet(entity.getTypes()));
+            dto.setCreatedAt(Utils.convertInstantToTime(entity.getCreatedAt()));
+            dto.setUpdatedAt(Utils.convertInstantToTime(entity.getUpdatedAt()));
         }
         return dto;
     }

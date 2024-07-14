@@ -11,10 +11,10 @@ import com.ahuynh.muzi_music_api.model.entity.role.RoleName;
 import com.ahuynh.muzi_music_api.model.mapper.UserMapper;
 import com.ahuynh.muzi_music_api.payload.request.AddUserRequest;
 import com.ahuynh.muzi_music_api.payload.request.UpdatePasswordRequest;
-import com.ahuynh.muzi_music_api.payload.request.UpdateUserForAdmin;
+import com.ahuynh.muzi_music_api.payload.request.UpdateUserRequest;
 import com.ahuynh.muzi_music_api.repository.RoleRepository;
-import com.ahuynh.muzi_music_api.repository.SongRepository;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
+import com.ahuynh.muzi_music_api.utils.SortName;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,9 +22,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -38,27 +37,66 @@ public class UserService {
     private final UserMapper userMapper;
 
 
-    public UserDto lockOrUnLock(Long id) {
+    public UserDto lockOrUnLock(Long id, CustomUserDetail customUserDetail) {
         User updateUser = userRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("User not exits id = " + id));
+        User user = userRepository.findById(customUserDetail.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found " + customUserDetail.getId()));
+        if (user.getId().equals(id)) {
+            throw new CustomException("You cannot lock or unlock yourself");
+        }
         updateUser.setLocked(!updateUser.isLocked());
         return userMapper.convertToDto(userRepository.save(updateUser));
     }
 
 
+    public List<UserDto> getAllUsers(SortName sort) {
+        List<User> users = new ArrayList<>();
+        switch (sort) {
+            case A_Z -> {
+                users = userRepository.findAllByOrderByUsernameAsc();
+            }
+            case Z_A -> {
+                users = userRepository.findAllByOrderByUsernameDesc();
+            }
+            case NEW -> {
+                users = userRepository.findAllByOrderByCreatedAtDesc();
+            }
+            case OLD -> {
+                users = userRepository.findAllByOrderByCreatedAtAsc();
+            }
+            case LOCKED -> {
+                users = userRepository.findByLockedTrue();
+            }
+            case UNLOCKED -> {
+                users = userRepository.findByLockedFalse();
+            }
+            default -> userRepository.findAllByOrderByCreatedAtDesc();
 
-    public List<UserDto> getNewUsers() {
-        return userMapper.convertToDtoList(userRepository.findAllByOrderByCreatedAtDesc());
+        }
+
+        users.removeIf(user -> user.getRole().getName().equals(RoleName.ROLE_ADMIN));
+        return userMapper.convertToDtoList(users);
     }
 
 
-    public UserDto updateAvatar(CustomUserDetail currentUser, MultipartFile avatar) {
-        User user = userRepository.findById(currentUser.getId())
+    public UserDto updateAvatar(Long id, CustomUserDetail currentUser, MultipartFile avatar) {
+        User curUser = userRepository.findById(currentUser.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
-
+        if (curUser.getRole().getName().equals(RoleName.ROLE_USER) && !curUser.getId().equals(id)) {
+            throw new CustomException("You cannot edit avatar");
+        }
         String url = firebaseService.upload(avatar, "image/png");
+        if (curUser.getRole().getName().equals(RoleName.ROLE_USER)) {
+            curUser.setAvatar(url);
+            return userMapper.convertToDto(userRepository.save(curUser));
+        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
         user.setAvatar(url);
         return userMapper.convertToDto(userRepository.save(user));
+
+
     }
 
     public void updatePassword(UpdatePasswordRequest request, CustomUserDetail currentUser) {
@@ -100,5 +138,29 @@ public class UserService {
         }
         User user = new User(request.getEmail(), passwordEncoder.encode(request.getPassword()), request.getUsername(), role);
         return userMapper.convertToDto(userRepository.save(user));
+    }
+
+    public void deleteUser(Long id, CustomUserDetail currentUser) {
+        User deleteUser = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found " + id));
+        User user = userRepository.findById(currentUser.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
+        if (user.getId().equals(id)) {
+            throw new CustomException("You cannot delete yourself");
+        }
+        userRepository.deleteById(id);
+    }
+
+    public UserDto updateUser(UpdateUserRequest updateUserRequest, CustomUserDetail customUserDetail) {
+        User updateUser = userRepository.findById(updateUserRequest.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found " + updateUserRequest.getId()));
+        User user = userRepository.findById(customUserDetail.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found " + customUserDetail.getId()));
+        if (user.getRole().getName().equals(RoleName.ROLE_USER) && !customUserDetail.getId().equals(updateUserRequest.getId())) {
+            throw new CustomException("You cannot update other users");
+        }
+        updateUser.setEmail(updateUserRequest.getEmail());
+        updateUser.setUsername(updateUserRequest.getUsername());
+        return userMapper.convertToDto(userRepository.save(updateUser));
     }
 }

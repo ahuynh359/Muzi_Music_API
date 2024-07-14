@@ -50,6 +50,12 @@ public class SongController {
         return new ResponseEntity<>(new ApiResponse("Get New Songs Successfully", songService.getNewSongs()), HttpStatus.OK);
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getSongById(@PathVariable Long id) {
+        return new ResponseEntity<>(new ApiResponse("Get Songs Successfully", songService.getSongById(id)), HttpStatus.OK);
+    }
+
     @GetMapping("/top10")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getTop10Songs() {
@@ -90,10 +96,10 @@ public class SongController {
         return new ResponseEntity<>(new MessageResponse("Successfully"), HttpStatus.OK);
     }
 
-    @PostMapping("/listen/{songId}")
-    public ResponseEntity<?> listenToSong(@CurrentUser CustomUserDetail currentUser, @PathVariable Long songId) {
-        songService.listenToSong(currentUser, songId);
-        return new ResponseEntity<>(new MessageResponse("Successfully"), HttpStatus.OK);
+    @PostMapping("/listen/{id}")
+    public ResponseEntity<?> listenToSong(@CurrentUser CustomUserDetail currentUser, @PathVariable Long id) {
+        songService.listenToSong(currentUser, id);
+        return new ResponseEntity<>(new MessageResponse("Listen Successfully"), HttpStatus.OK);
     }
 
 
