@@ -72,7 +72,7 @@ public class SingerController {
 
     @PostMapping("/love-or-unlove/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> loveOrUnlovSinger(@PathVariable(name = "id") Long id, @CurrentUser CustomUserDetail currentUser) {
+    public ResponseEntity<?> loveOrUnloveSinger(@PathVariable(name = "id") Long id, @CurrentUser CustomUserDetail currentUser) {
         singerService.loveOrUnloveSinger(id, currentUser);
         return new ResponseEntity<>(new MessageResponse("Successfully"), HttpStatus.OK);
     }

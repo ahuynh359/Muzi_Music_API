@@ -11,6 +11,7 @@ import com.ahuynh.muzi_music_api.model.entity.Song;
 import com.ahuynh.muzi_music_api.model.entity.User;
 import com.ahuynh.muzi_music_api.model.mapper.SingerMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
+import com.ahuynh.muzi_music_api.model.mapper.UserMapper;
 import com.ahuynh.muzi_music_api.repository.SingerRepository;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
 import com.ahuynh.muzi_music_api.utils.SortName;
@@ -34,6 +35,7 @@ public class SingerService {
     private final SingerMapper singerMapper;
     private final SongMapper songMapper;
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     public SingerDto createSinger(String name, MultipartFile avatar) {
         String url = firebaseService.upload(avatar, "image/png");
@@ -85,9 +87,7 @@ public class SingerService {
         return singerMapper.convertToDtoList(singers);
     }
 
-    public List<SingerDto> getNewSingers() {
-        return singerMapper.convertToDtoList(singerRepository.findTop10ByOrderByCreatedAtDesc());
-    }
+
 
     public List<SongDto> getSongsFromSinger(Long id) {
 
@@ -98,14 +98,13 @@ public class SingerService {
 
     public List<SingerDto> getLoveSingersOfUser(CustomUserDetail currentUser) {
         User user = userRepository.getUser(currentUser);
-        return singerMapper.convertToDtoList(user.getLoveSingers());
+        return singerMapper.convertToDtoList(userRepository.findLoveSingerById(user.getId()));
     }
 
     public void loveOrUnloveSinger(Long id, CustomUserDetail currentUser) {
         User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
         Singer singer = singerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Singer not found " + id));
-        Set<Singer> loveSinger = userRepository.findLoveSingerById(currentUser.getId());
-        System.out.println(loveSinger);
+        System.out.println(user.getLoveSingers());
         if (user.getLoveSingers().contains(singer)) {
             user.removeLoveSinger(singer);
         } else {

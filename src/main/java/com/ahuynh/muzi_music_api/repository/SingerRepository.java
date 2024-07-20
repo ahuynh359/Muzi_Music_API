@@ -14,8 +14,7 @@ import java.util.List;
 public interface SingerRepository extends JpaRepository<Singer, Long> {
     @Query("SELECT s.songs FROM Singer s WHERE s.id = :id ")
     Collection<Song> findSongById(Long id);
-
-    Collection<Singer> findTop10ByOrderByCreatedAtDesc();
+    
 
     Collection<Singer> findByNameContainingIgnoreCase(String query);
 
@@ -26,4 +25,5 @@ public interface SingerRepository extends JpaRepository<Singer, Long> {
     List<Singer> findAllByOrderByCreatedAtDesc();
 
     List<Singer> findAllByOrderByCreatedAtAsc();
+
 }

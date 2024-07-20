@@ -54,8 +54,9 @@ public class User extends DateAudit {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Listen> listens;
+    private Set<Listen> listens = new HashSet<>();
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private Role role;
@@ -63,12 +64,12 @@ public class User extends DateAudit {
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Notification> notifications;
+
     @JsonIgnore
     @ManyToMany
     @JoinTable(name = "user_love_song"
             , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
-
     private Set<Song> loveSongs = new HashSet<>();
 
     @JsonIgnore
@@ -77,9 +78,6 @@ public class User extends DateAudit {
             , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "singer_id", referencedColumnName = "id"))
     private Set<Singer> loveSingers = new HashSet<>();
-
-
-
 
 
     public User(String email, String hashPassword, String username, Role role, String avatar) {
