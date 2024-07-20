@@ -6,6 +6,7 @@ import com.ahuynh.muzi_music_api.payload.request.UpdateAlbumRequest;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
 import com.ahuynh.muzi_music_api.payload.response.MessageResponse;
 import com.ahuynh.muzi_music_api.service.AlbumService;
+import com.ahuynh.muzi_music_api.utils.SortName;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -51,8 +52,8 @@ public class AlbumController {
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getAllAlbum() {
-        return new ResponseEntity<>(new ApiResponse("Get All Albums Successfully", albumService.getAllAlbum()), HttpStatus.OK);
+    public ResponseEntity<?> getAllAlbum(@RequestParam(value = "sort", required = false, defaultValue = "NEW") SortName sort) {
+        return new ResponseEntity<>(new ApiResponse("Get All Albums Successfully", albumService.getAllAlbums(sort)), HttpStatus.OK);
     }
 
 

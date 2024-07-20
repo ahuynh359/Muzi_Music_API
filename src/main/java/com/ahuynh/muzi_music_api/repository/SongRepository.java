@@ -15,20 +15,16 @@ import java.util.Set;
 
 @Repository
 public interface SongRepository extends JpaRepository<Song, Long> {
-    boolean existsByName(String name);
-
-    Optional<Song> findSongById(Long id);
-
-
-    @Query(value = "SELECT song.types FROM Song song where song.id = :id")
-    Optional<List<Type>> findAllTypeById(Long id);
-
-    List<Song> findTop4ByOrderByCreatedAtDesc();
-
     Collection<Song> findByNameContainingIgnoreCase(@NotBlank String name);
 
     @Query(value = "SELECT song.comments FROM Song song where song.id = :id")
     List<Comment> findCommentById(Long id);
 
     List<Song> findAllByOrderByCreatedAtDesc();
+
+    List<Song> findAllByOrderByNameAsc();
+
+    List<Song> findAllByOrderByNameDesc();
+
+    List<Song> findAllByOrderByCreatedAtAsc();
 }

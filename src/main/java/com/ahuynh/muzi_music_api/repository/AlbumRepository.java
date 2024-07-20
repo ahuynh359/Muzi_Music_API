@@ -23,4 +23,12 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
     Optional<Album> findByName(String name);
 
     Collection<Album> findByNameContainingIgnoreCase(@NotBlank String name);
+
+    List<Album> findAllByOrderByNameAsc();
+
+    List<Album> findAllByOrderByNameDesc();
+
+    List<Album> findAllByOrderByCreatedAtDesc();
+
+    List<Album> findAllByOrderByCreatedAtAsc();
 }

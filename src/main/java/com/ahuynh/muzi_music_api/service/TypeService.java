@@ -7,14 +7,18 @@ import com.ahuynh.muzi_music_api.model.dto.SongDto;
 import com.ahuynh.muzi_music_api.model.dto.TypeDto;
 import com.ahuynh.muzi_music_api.model.entity.Album;
 import com.ahuynh.muzi_music_api.model.entity.Type;
+import com.ahuynh.muzi_music_api.model.entity.User;
+import com.ahuynh.muzi_music_api.model.entity.role.RoleName;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
 import com.ahuynh.muzi_music_api.model.mapper.TypeMapper;
 import com.ahuynh.muzi_music_api.payload.request.UpdateTypeRequest;
 import com.ahuynh.muzi_music_api.repository.TypeRepository;
+import com.ahuynh.muzi_music_api.utils.SortName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -57,8 +61,27 @@ public class TypeService {
         return typeMapper.convertToDto(typeRepository.save(updateType));
     }
 
-    public List<TypeDto> getAllType() {
-        return typeMapper.convertToDtoList(typeRepository.findAll());
+    public List<TypeDto> getAllTypes(SortName sort) {
+        List<Type> types = new ArrayList<>();
+        switch (sort) {
+            case A_Z -> {
+                types = typeRepository.findAllByOrderByNameAsc();
+            }
+            case Z_A -> {
+                types = typeRepository.findAllByOrderByNameDesc();
+            }
+            case NEW -> {
+                types = typeRepository.findAllByOrderByCreatedAtDesc();
+            }
+            case OLD -> {
+                types = typeRepository.findAllByOrderByCreatedAtAsc();
+            }
+
+            default -> typeRepository.findAllByOrderByCreatedAtDesc();
+
+        }
+
+        return typeMapper.convertToDtoList(types);
     }
 
     public List<SongDto> getSongFromType(Long id) {

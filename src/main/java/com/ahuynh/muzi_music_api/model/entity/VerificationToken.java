@@ -6,7 +6,6 @@ import org.springframework.data.annotation.CreatedDate;
 
 import java.time.Instant;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "verification_token")
 @Getter
@@ -14,9 +13,8 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class VerificationToken extends DateAudit {
+public class VerificationToken {
 
-    private static final long serialVersionUID = 1L;
 
 
     @Id

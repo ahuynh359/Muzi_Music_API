@@ -4,6 +4,7 @@ import com.ahuynh.muzi_music_api.payload.request.UpdateTypeRequest;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
 import com.ahuynh.muzi_music_api.payload.response.MessageResponse;
 import com.ahuynh.muzi_music_api.service.TypeService;
+import com.ahuynh.muzi_music_api.utils.SortName;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -48,8 +49,8 @@ public class TypeController {
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getAllType() {
-        return new ResponseEntity<>(new ApiResponse("Get All Types Successfully", typeService.getAllType()), HttpStatus.OK);
+    public ResponseEntity<?> getAllTypes(@RequestParam(value = "sort", required = false, defaultValue = "NEW") SortName sort) {
+        return new ResponseEntity<>(new ApiResponse("Get All Types Successfully", typeService.getAllTypes(sort)), HttpStatus.OK);
     }
 
     @PutMapping("/avatar/{id}")

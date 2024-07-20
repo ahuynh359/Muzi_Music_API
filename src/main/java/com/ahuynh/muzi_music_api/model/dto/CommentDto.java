@@ -19,11 +19,11 @@ import java.util.Set;
 @NoArgsConstructor
 public class CommentDto {
     private Long id;
-
     private String content;
-
     private UserDto user;
-    private String time;
+    private Long parentCommentId = null;
+    private String createdAt;
+    private String updatedAt;
 
 
 }

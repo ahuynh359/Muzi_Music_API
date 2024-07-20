@@ -2,6 +2,9 @@ package com.ahuynh.muzi_music_api.controller;
 
 import com.ahuynh.muzi_music_api.config.security.CurrentUser;
 import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
+import com.ahuynh.muzi_music_api.payload.request.UpdateSongRequest;
+import com.ahuynh.muzi_music_api.utils.SortName;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
@@ -39,16 +42,10 @@ public class SongController {
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getAllSongs() {
-        return new ResponseEntity<>(new ApiResponse("Get All Songs Successfully", songService.getAllSong()), HttpStatus.OK);
+    public ResponseEntity<?> getAllSongs(@RequestParam(value = "sort", required = false, defaultValue = "NEW") SortName sort) {
+        return new ResponseEntity<>(new ApiResponse("Get All Songs Successfully", songService.getAllSong(sort)), HttpStatus.OK);
     }
 
-
-    @GetMapping("/new")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getNewSongs() {
-        return new ResponseEntity<>(new ApiResponse("Get New Songs Successfully", songService.getNewSongs()), HttpStatus.OK);
-    }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
@@ -101,6 +98,33 @@ public class SongController {
         songService.listenToSong(currentUser, id);
         return new ResponseEntity<>(new MessageResponse("Listen Successfully"), HttpStatus.OK);
     }
+
+    @PutMapping("/avatar/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') ")
+    public ResponseEntity<?> updateAvatar(@PathVariable Long id,
+                                          @RequestPart("avatar") MultipartFile avatar) {
+
+        return new ResponseEntity<>(new ApiResponse("Change Avatar Successfully",
+                songService.updateAvatar( id, avatar)), HttpStatus.OK);
+    }
+
+    @PutMapping("/music/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') ")
+    public ResponseEntity<?> uploadMusic(@PathVariable Long id,
+                                          @RequestPart("music") MultipartFile music) {
+
+        return new ResponseEntity<>(new ApiResponse("Change Avatar Successfully",
+                songService.uploadMusic( id, music)), HttpStatus.OK);
+    }
+
+    @PutMapping("/update")
+    @PreAuthorize("hasRole('ROLE_ADMIN') ")
+    public ResponseEntity<?> updateSong( @RequestBody UpdateSongRequest updateSongRequest) {
+
+        return new ResponseEntity<>(new ApiResponse("Update Song Successfully",
+                songService.updateSong(updateSongRequest)), HttpStatus.OK);
+    }
+
 
 
 }

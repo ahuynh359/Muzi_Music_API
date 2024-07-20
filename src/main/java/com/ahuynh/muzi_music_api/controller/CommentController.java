@@ -7,6 +7,7 @@ import com.ahuynh.muzi_music_api.payload.request.UpdateCommentRequest;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
 import com.ahuynh.muzi_music_api.payload.response.MessageResponse;
 import com.ahuynh.muzi_music_api.service.CommentService;
+import com.ahuynh.muzi_music_api.utils.SortName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,14 @@ public class CommentController {
 
         return new ResponseEntity<>(new ApiResponse("Get All Comments Of Song Successfully" ,
                 commentService.getAllCommentBySongId(id)), HttpStatus.OK);
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> getAllComments(@RequestParam(value = "sort", required = false, defaultValue = "NEW") SortName sort) {
+
+        return new ResponseEntity<>(new ApiResponse("Get All Comments Successfully" ,
+                commentService.getAllComments(sort)), HttpStatus.OK);
     }
 
 

@@ -5,6 +5,7 @@ import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
 import com.ahuynh.muzi_music_api.payload.response.MessageResponse;
 import com.ahuynh.muzi_music_api.service.SingerService;
+import com.ahuynh.muzi_music_api.utils.SortName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,8 +52,8 @@ public class SingerController {
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
-    public ResponseEntity<?> getAllSinger() {
-        return new ResponseEntity<>(new ApiResponse("Get All Singers Successfully", singerService.getAllSinger()), HttpStatus.OK);
+    public ResponseEntity<?> getAllSingers(@RequestParam(value = "sort", required = false, defaultValue = "NEW") SortName sort) {
+        return new ResponseEntity<>(new ApiResponse("Get All Singers Successfully", singerService.getAllSingers(sort)), HttpStatus.OK);
     }
 
     @GetMapping("/love")
@@ -62,11 +63,6 @@ public class SingerController {
     }
 
 
-    @GetMapping("/new")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
-    public ResponseEntity<?> getNewSingers() {
-        return new ResponseEntity<>(new ApiResponse("Get New Singers Successfully", singerService.getNewSingers()), HttpStatus.OK);
-    }
 
     @GetMapping("/{id}/songs")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")

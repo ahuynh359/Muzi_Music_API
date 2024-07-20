@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
+import java.util.List;
 
 @Repository
 public interface SingerRepository extends JpaRepository<Singer, Long> {
@@ -17,4 +18,12 @@ public interface SingerRepository extends JpaRepository<Singer, Long> {
     Collection<Singer> findTop10ByOrderByCreatedAtDesc();
 
     Collection<Singer> findByNameContainingIgnoreCase(String query);
+
+    List<Singer> findAllByOrderByNameAsc();
+
+    List<Singer> findAllByOrderByNameDesc();
+
+    List<Singer> findAllByOrderByCreatedAtDesc();
+
+    List<Singer> findAllByOrderByCreatedAtAsc();
 }

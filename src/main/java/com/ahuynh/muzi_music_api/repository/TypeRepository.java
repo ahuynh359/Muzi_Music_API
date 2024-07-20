@@ -15,4 +15,12 @@ public interface TypeRepository extends JpaRepository<Type, Long> {
 
     @Query(value = "SELECT type.songs FROM Type type where type.id = :id")
     List<Song> findSongById(Long id);
+
+    List<Type> findAllByOrderByNameAsc();
+
+    List<Type> findAllByOrderByNameDesc();
+
+    List<Type> findAllByOrderByCreatedAtDesc();
+
+    List<Type> findAllByOrderByCreatedAtAsc();
 }

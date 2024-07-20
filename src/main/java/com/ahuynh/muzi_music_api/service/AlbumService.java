@@ -5,14 +5,17 @@ import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.model.dto.AlbumDto;
 import com.ahuynh.muzi_music_api.model.dto.SongDto;
 import com.ahuynh.muzi_music_api.model.entity.Album;
+import com.ahuynh.muzi_music_api.model.entity.Song;
 import com.ahuynh.muzi_music_api.model.mapper.AlbumMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
 import com.ahuynh.muzi_music_api.payload.request.UpdateAlbumRequest;
 import com.ahuynh.muzi_music_api.repository.AlbumRepository;
+import com.ahuynh.muzi_music_api.utils.SortName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -44,8 +47,27 @@ public class AlbumService {
     }
 
 
-    public List<AlbumDto> getAllAlbum() {
-        return albumMapper.convertToDtoList(albumRepository.findAll());
+    public List<AlbumDto> getAllAlbums(SortName sort) {
+        List<Album> albums = new ArrayList<>();
+        switch (sort) {
+            case A_Z -> {
+                albums = albumRepository.findAllByOrderByNameAsc();
+            }
+            case Z_A -> {
+                albums = albumRepository.findAllByOrderByNameDesc();
+            }
+            case NEW -> {
+                albums = albumRepository.findAllByOrderByCreatedAtDesc();
+            }
+            case OLD -> {
+                albums = albumRepository.findAllByOrderByCreatedAtAsc();
+            }
+
+            default -> albumRepository.findAllByOrderByCreatedAtDesc();
+
+        }
+
+        return albumMapper.convertToDtoList(albums);
     }
 
 

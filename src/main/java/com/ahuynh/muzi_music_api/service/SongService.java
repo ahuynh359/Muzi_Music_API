@@ -6,22 +6,22 @@ import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.model.dto.AlbumDto;
 import com.ahuynh.muzi_music_api.model.dto.SingerDto;
 import com.ahuynh.muzi_music_api.model.dto.SongDto;
+import com.ahuynh.muzi_music_api.model.dto.TypeDto;
 import com.ahuynh.muzi_music_api.model.entity.*;
 import com.ahuynh.muzi_music_api.model.mapper.AlbumMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SingerMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
+import com.ahuynh.muzi_music_api.payload.request.UpdateSongRequest;
 import com.ahuynh.muzi_music_api.payload.response.LoveSongResponse;
 import com.ahuynh.muzi_music_api.payload.response.SearchResponse;
 import com.ahuynh.muzi_music_api.repository.*;
+import com.ahuynh.muzi_music_api.utils.SortName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,8 +68,27 @@ public class SongService {
         songRepository.deleteById(id);
     }
 
-    public List<SongDto> getAllSong() {
-        return songMapper.convertToDtoList(songRepository.findAll());
+    public List<SongDto> getAllSong(SortName sort) {
+        List<Song> songs = new ArrayList<>();
+        switch (sort) {
+            case A_Z -> {
+                songs = songRepository.findAllByOrderByNameAsc();
+            }
+            case Z_A -> {
+                songs = songRepository.findAllByOrderByNameDesc();
+            }
+            case NEW -> {
+                songs = songRepository.findAllByOrderByCreatedAtDesc();
+            }
+            case OLD -> {
+                songs = songRepository.findAllByOrderByCreatedAtAsc();
+            }
+
+            default -> songRepository.findAllByOrderByCreatedAtDesc();
+
+        }
+
+        return songMapper.convertToDtoList(songs);
     }
 
     public List<SongDto> getNewSongs() {
@@ -82,7 +101,7 @@ public class SongService {
         Map<Song, Long> songListenCounts = listens.stream()
                 .collect(Collectors.groupingBy(Listen::getSong, Collectors.counting()));
 
-        List<Song> songs =  songListenCounts.entrySet().stream()
+        List<Song> songs = songListenCounts.entrySet().stream()
                 .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
                 .limit(10)
                 .map(Map.Entry::getKey)
@@ -101,7 +120,7 @@ public class SongService {
     public void loveOrUnloveSong(Long songId, CustomUserDetail currentUser) {
         User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
         Song song = songRepository.findById(songId).orElseThrow(() -> new EntityNotFoundException("Song not found " + songId));
-       Set<Song> loveSong = userRepository.findLoveSongById(currentUser.getId());
+        Set<Song> loveSong = userRepository.findLoveSongById(currentUser.getId());
         System.out.println(loveSong);
         if (loveSong.contains(song)) {
             user.removeLoveSong(song);
@@ -131,9 +150,58 @@ public class SongService {
         User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new RuntimeException("User not found " + currentUser.getId()));
         Song song = songRepository.findById(songId).orElseThrow(() -> new RuntimeException("Song not found " + songId));
 
-        Listen listen = new Listen(user,song);
+        Listen listen = new Listen(user, song);
 
         listenRepository.save(listen);
+    }
+
+
+    public SongDto updateAvatar(Long id, MultipartFile avatar) {
+        Song song = songRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Song with id " + id + " not found"));
+        String url = firebaseService.upload(avatar, "image/png");
+        song.setAvatar(url);
+        return songMapper.convertToDto(songRepository.save(song));
+    }
+
+    public SongDto uploadMusic(Long id, MultipartFile file) {
+        Song song = songRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Song with id " + id + " not found"));
+        String url = firebaseService.upload(file, "audio/mpeg");
+        song.setFile(url);
+        return songMapper.convertToDto(songRepository.save(song));
+    }
+
+    public SongDto updateSong(UpdateSongRequest updateSongRequest) {
+        Song song = songRepository.findById(updateSongRequest.getId()).orElseThrow(() ->
+                new EntityNotFoundException("Song with id " + updateSongRequest.getId() + " not found"));
+        if (updateSongRequest.getName() != null) {
+            song.setName(updateSongRequest.getName());
+        }
+        if (updateSongRequest.getLyrics() != null) {
+            song.setLyrics(updateSongRequest.getLyrics());
+        }
+        if (updateSongRequest.getAlbumId() != null) {
+            Album album = albumRepository.findById(updateSongRequest.getAlbumId()).orElseThrow(() -> new EntityNotFoundException("No Album with " + updateSongRequest.getAlbumId()));
+            song.setAlbum(album);
+        }
+        if (updateSongRequest.getSingerId() != null) {
+            Set<Singer> singers = new HashSet<>();
+            for (Long id : updateSongRequest.getSingerId()) {
+                Singer singer = singerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Singer not found " + updateSongRequest.getSingerId()));
+                singers.add(singer);
+            }
+            song.setSingers(singers);
+        }
+        if (updateSongRequest.getTypeId() != null) {
+            Set<Type> types = new HashSet<>();
+            for (Long id : updateSongRequest.getTypeId()) {
+                Type type = typeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Type not found " + updateSongRequest.getTypeId()));
+                types.add(type);
+            }
+            song.setTypes(types);
+        }
+        return songMapper.convertToDto(songRepository.save(song));
     }
 }
 
