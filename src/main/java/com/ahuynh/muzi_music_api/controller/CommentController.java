@@ -23,39 +23,49 @@ public class CommentController {
 
     @GetMapping("/song/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
-    public ResponseEntity<?> getAllCommentBySongId(@PathVariable Long id) {
+    public ResponseEntity<?> getAllCommentBySongId(@PathVariable Long id,@CurrentUser CustomUserDetail currentUser) {
 
-        return new ResponseEntity<>(new ApiResponse("Get All Comments Of Song Successfully" ,
-                commentService.getAllCommentBySongId(id)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse("Get All Comments Of Song Successfully", commentService.getAllCommentBySongId(id,currentUser)), HttpStatus.OK);
     }
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getAllComments(@RequestParam(value = "sort", required = false, defaultValue = "NEW") SortName sort) {
 
-        return new ResponseEntity<>(new ApiResponse("Get All Comments Successfully" ,
-                commentService.getAllComments(sort)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse("Get All Comments Successfully", commentService.getAllComments(sort)), HttpStatus.OK);
     }
 
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
     public ResponseEntity<?> addComment(@RequestBody CommentRequest request, @CurrentUser CustomUserDetail currentUser) {
-        return new ResponseEntity<>(new ApiResponse("Add Comment To Song Successfully", commentService.addComment(request,currentUser)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse("Add Comment To Song Successfully", commentService.addComment(request, currentUser)), HttpStatus.OK);
     }
 
 
     @PutMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')  or hasRole('ROLE_USER')")
     public ResponseEntity<?> editComment(@RequestBody UpdateCommentRequest request, @CurrentUser CustomUserDetail currentUser) {
-        return new ResponseEntity<>(new ApiResponse(" Success",
-                commentService.editComment(request,currentUser)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(" Success", commentService.editComment(request, currentUser)), HttpStatus.OK);
+    }
+
+    @PutMapping("/love/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')  or hasRole('ROLE_USER')")
+    public ResponseEntity<?> editComment(@PathVariable Long id, @CurrentUser CustomUserDetail currentUser) {
+        commentService.loveComment(id, currentUser);
+        return new ResponseEntity<>(new MessageResponse(" Love Comment Successfully"), HttpStatus.OK);
+    }
+
+    @GetMapping("/is-love-comment/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> isUserLoveComment(@CurrentUser CustomUserDetail currentUser, @PathVariable Long id) {
+        return new ResponseEntity<>(new ApiResponse("Successfully", commentService.isUserLoveComment(currentUser, id)), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')  or hasRole('ROLE_USER')")
-    public ResponseEntity<?> deleteComment(@PathVariable Long id,@CurrentUser CustomUserDetail currentUser) {
-        commentService.deleteComment(id,currentUser);
+    public ResponseEntity<?> deleteComment(@PathVariable Long id, @CurrentUser CustomUserDetail currentUser) {
+        commentService.deleteComment(id, currentUser);
         return new ResponseEntity<>(new MessageResponse(" Success"), HttpStatus.OK);
     }
 

@@ -5,6 +5,7 @@ import com.ahuynh.muzi_music_api.exception.InvalidTokenException;
 import com.ahuynh.muzi_music_api.exception.PasswordException;
 import com.ahuynh.muzi_music_api.model.entity.User;
 import com.ahuynh.muzi_music_api.model.entity.VerificationToken;
+import com.ahuynh.muzi_music_api.payload.request.ForgotPassRequest;
 import com.ahuynh.muzi_music_api.payload.request.NewPasswordRequest;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
 import com.ahuynh.muzi_music_api.repository.VerificationTokenRepository;
@@ -24,58 +25,45 @@ public class VerificationTokenService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
     public void saveVerificationToken(User user, String token) {
-
         VerificationToken verificationToken = new VerificationToken(user, token);
         verificationTokenRepository.save(verificationToken);
-
-
-    }
-
-
-    private String validateToken(VerificationToken verificationToken) {
-        User user = verificationToken.getUser();
-        if (verificationToken.getExpiryTime().compareTo(Instant.now()) < 0) {
-            verificationTokenRepository.delete(verificationToken);
-            return "Token is expired";
-        }
-        verificationTokenRepository.delete(verificationToken);
-        userRepository.save(user);
-        return "Valid";
     }
 
 
     public void resetPassword(NewPasswordRequest request) {
-        VerificationToken verificationToken = verificationTokenRepository.findByToken(request.getOtp());
-        if (verificationToken == null) {
+
+        VerificationToken token = verificationTokenRepository.findByToken(request.getOtp());
+        if (token == null) {
             throw new InvalidTokenException("Token is invalid");
         }
-        if (verificationToken.getUser().isLocked()) {
+        if (token.getExpiryTime().isBefore(Instant.now())) {
+            throw new InvalidTokenException("Token is invalid");
+        }
+        User user = token.getUser();
+        if (user.isLocked()) {
             throw new InvalidTokenException("This account is locked. Contact an administrator");
         }
-
-        String verificationResult = validateToken(verificationToken);
-
-        if (verificationResult.equalsIgnoreCase("Valid")) {
-
-            User user = userRepository.findById(verificationToken.getUser().getId()).orElseThrow(() ->
-                    new EntityNotFoundException("User not found with id: " + verificationToken.getUser().getId())
-            );
-
-
-            if (!(request.getNewPassword().equals(request.getConfirmPassword()))) {
-                throw new PasswordException("Password and confirm password don't match");
-            }
-            String encodedPassword = passwordEncoder.encode(request.getNewPassword());
-            user.setHashPassword(encodedPassword);
-            userRepository.save(user);
-            return;
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new PasswordException("Password and confirm password don't match");
         }
-        throw new InvalidTokenException("Invalid verification token");
+
+        String encodedPassword = passwordEncoder.encode(request.getNewPassword());
+        user.setHashPassword(encodedPassword);
+        user.setVerificationToken(null);
+        userRepository.save(user);
     }
 
-    public boolean validatePassword(String rawPassword, String encodedPassword) {
-        return passwordEncoder.matches(rawPassword, encodedPassword);
+    public User sendEmail(ForgotPassRequest request) {
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        if (user.getVerificationToken() != null) {
+            verificationTokenRepository.delete(user.getVerificationToken());
+            user.setVerificationToken(null);
+        }
+
+        return userRepository.save(user);
     }
 }
+
+

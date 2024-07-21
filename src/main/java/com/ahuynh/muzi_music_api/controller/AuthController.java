@@ -37,21 +37,19 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequest request) {
-        User user = authService.createUser(request);
-        return new ResponseEntity<>(new MessageResponse("Sign Up Successfully"), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse("Sign Up Successfully",authService.createUser(request)), HttpStatus.OK);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
-        return
-                new ResponseEntity<>(new ApiResponse
+        return new ResponseEntity<>(new ApiResponse
                         ("Login Successfully", authService.login(request)), HttpStatus.OK);
     }
 
-    @PostMapping("/forgot")
-    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPassRequest request,
+    @PostMapping("/email")
+    public ResponseEntity<?> sendEmail(@Valid @RequestBody ForgotPassRequest request,
                                             final HttpServletRequest httpServletRequest) {
-        User user = authService.forgotPassword(request);
+        User user = verificationTokenService.sendEmail(request);
         applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent
                 (user, getCurrentUrl(httpServletRequest)));
         return new ResponseEntity<>(

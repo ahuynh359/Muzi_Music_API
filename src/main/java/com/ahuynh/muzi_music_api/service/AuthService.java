@@ -5,10 +5,12 @@ import com.ahuynh.muzi_music_api.config.security.JwtTokenProvider;
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.exception.InvalidUserException;
 import com.ahuynh.muzi_music_api.exception.UserAlreadyRegisteredException;
+import com.ahuynh.muzi_music_api.model.dto.UserDto;
 import com.ahuynh.muzi_music_api.model.entity.User;
 import com.ahuynh.muzi_music_api.model.entity.VerificationToken;
 import com.ahuynh.muzi_music_api.model.entity.role.Role;
 import com.ahuynh.muzi_music_api.model.entity.role.RoleName;
+import com.ahuynh.muzi_music_api.model.mapper.UserMapper;
 import com.ahuynh.muzi_music_api.payload.request.ForgotPassRequest;
 import com.ahuynh.muzi_music_api.payload.request.LoginRequest;
 import com.ahuynh.muzi_music_api.payload.request.ResendOtpRequest;
@@ -41,9 +43,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserMapper userMapper;
 
-    @Transactional
-    public User createUser(SignUpRequest request) {
+    public UserDto createUser(SignUpRequest request) {
         //Check exception
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new EntityNotFoundException("This email already registered. Please try other email.");
@@ -57,30 +59,28 @@ public class AuthService {
 
         //Lưu user vào db
         String encodedPassword = passwordEncoder.encode(request.getPassword());
-        Role role = new Role();
+        Role role;
         if (userRepository.count() == 0) {
             role = roleRepository.findByName(RoleName.ROLE_ADMIN).orElseThrow(() -> new EntityNotFoundException("There is no role admin in db"));
 
         } else {
             role = roleRepository.findByName(RoleName.ROLE_USER).orElseThrow(() -> new EntityNotFoundException("There is no role user in db"));
         }
-        return userRepository.save(new User(request.getEmail(), encodedPassword, request.getUsername(), role));
+        return userMapper.convertToDto(userRepository.save(new User(request.getEmail(), encodedPassword, request.getUsername(), role)));
     }
 
 
     public LoginResponse login(LoginRequest request) {
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUserNameOrEmail(), request.getPassword()));
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUserNameOrEmail(), request.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = jwtTokenProvider.generateToken(authentication);
             CustomUserDetail userDetails = (CustomUserDetail) authentication.getPrincipal();
-            User user = userRepository.findUserByUsernameOrEmail(userDetails.getUsername(), userDetails.getEmail()).orElseThrow(() ->
-                    new InvalidUserException("Invalid username or password"));
+            User user = userRepository.findUserByUsernameOrEmail(userDetails.getUsername(), userDetails.getEmail()).orElseThrow(() -> new InvalidUserException("Invalid username or password"));
             if (user.isLocked()) {
                 throw new InvalidUserException("User is locked");
             }
-            return new LoginResponse(user.getId(), user.getUsername(), user.getEmail(), jwt,user.getRole().getName() == RoleName.ROLE_ADMIN);
+            return new LoginResponse(user.getId(), user.getUsername(), user.getEmail(), jwt, user.getRole().getName() == RoleName.ROLE_ADMIN);
         } catch (BadCredentialsException e) {
             throw new InvalidUserException("Invalid username or password");
         }
@@ -88,16 +88,5 @@ public class AuthService {
     }
 
 
-    public User forgotPassword(ForgotPassRequest request) {
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() ->
-                new EntityNotFoundException("This user mail  is not in db " + request.getEmail()));
 
-        VerificationToken verificationToken = verificationTokenRepository.findByUser(user);
-        if (verificationToken != null) {
-            verificationTokenRepository.delete(verificationToken);
-        }
-
-        return user;
-
-    }
 }

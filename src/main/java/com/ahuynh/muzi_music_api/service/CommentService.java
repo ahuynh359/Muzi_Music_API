@@ -4,10 +4,7 @@ import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.model.dto.AlbumDto;
 import com.ahuynh.muzi_music_api.model.dto.CommentDto;
-import com.ahuynh.muzi_music_api.model.entity.Album;
-import com.ahuynh.muzi_music_api.model.entity.Comment;
-import com.ahuynh.muzi_music_api.model.entity.Song;
-import com.ahuynh.muzi_music_api.model.entity.User;
+import com.ahuynh.muzi_music_api.model.entity.*;
 import com.ahuynh.muzi_music_api.model.entity.role.RoleName;
 import com.ahuynh.muzi_music_api.model.mapper.CommentMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
@@ -24,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -34,12 +32,19 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
 
-    public CommentResponse getAllCommentBySongId(Long id) {
-        CommentResponse commentResponse = new CommentResponse();
+    public CommentResponse getAllCommentBySongId(Long id, CustomUserDetail currentUser) {
+        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new RuntimeException("User not found"));
+        Song song = songRepository.findById(id).orElseThrow(() -> new RuntimeException("Song not found"));
+        Set<Comment> comments = song.getComments();
+        Set<CommentDto> commentsDto = commentMapper.convertToDtoSet(comments);
 
-        Song song = songRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No song found"));
-        List<Comment> comments = songRepository.findCommentById(id);
-        return new CommentResponse(commentMapper.convertToDtoList(comments), comments.size());
+        commentsDto.forEach(commentDto -> {
+            boolean isLove = user.getLoveComments().stream()
+                    .anyMatch(lovedComment -> lovedComment.getId().equals(commentDto.getId()));
+            commentDto.setLove(isLove);
+        });
+
+        return new CommentResponse(commentsDto, comments.size());
     }
 
     public List<CommentDto> getAllComments(SortName sort) {
@@ -61,7 +66,6 @@ public class CommentService {
             default -> commentRepository.findAllByOrderByCreatedAtDesc();
 
         }
-
         return commentMapper.convertToDtoList(comments);
     }
 
@@ -100,4 +104,25 @@ public class CommentService {
         commentRepository.delete(comment);
 
     }
+
+    public void loveComment(Long id, CustomUserDetail currentUser) {
+        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
+        Comment comment = commentRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Comment not found " + id));
+        System.out.println(user.getLoveComments());
+        if (user.getLoveComments().contains(comment)) {
+            user.removeLoveComment(comment);
+        } else {
+            user.addLoveComment(comment);
+        }
+        userRepository.save(user);
+
+    }
+
+    public boolean isUserLoveComment(CustomUserDetail currentUser, Long id) {
+
+        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
+        Comment comment = commentRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Comment not found " + id));
+        return user.getLoveComments().contains(comment);
+    }
+
 }

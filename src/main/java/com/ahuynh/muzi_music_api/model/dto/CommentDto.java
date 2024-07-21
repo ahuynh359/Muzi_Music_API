@@ -12,6 +12,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -21,7 +23,9 @@ public class CommentDto {
     private Long id;
     private String content;
     private UserDto user;
-    private Long parentCommentId = null;
+    private Set<CommentDto> replies = new HashSet<>();
+    private String time;
+    private boolean love;
     private String createdAt;
     private String updatedAt;
 

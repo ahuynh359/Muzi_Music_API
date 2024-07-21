@@ -6,12 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentResponse {
 
-    private List<CommentDto> comments;
+    private Set<CommentDto> comments;
     private int  totalComments = 0 ;
 }

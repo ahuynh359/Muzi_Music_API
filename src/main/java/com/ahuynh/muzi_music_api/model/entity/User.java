@@ -50,20 +50,20 @@ public class User extends DateAudit {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Comment> comments;
+    private Set<Comment> comments = new HashSet<>() ;
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Listen> listens = new HashSet<>();
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Notification> notifications;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private VerificationToken verificationToken;
 
     @JsonIgnore
     @ManyToMany
@@ -78,6 +78,13 @@ public class User extends DateAudit {
             , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "singer_id", referencedColumnName = "id"))
     private Set<Singer> loveSingers = new HashSet<>();
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(name = "user_love_comment"
+            , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
+            , inverseJoinColumns = @JoinColumn(name = "comment_id", referencedColumnName = "id"))
+    private Set<Comment> loveComments = new HashSet<>();
 
 
     public User(String email, String hashPassword, String username, Role role, String avatar) {
@@ -114,6 +121,13 @@ public class User extends DateAudit {
 
     public void addLoveSinger(Singer singer) {
         loveSingers.add(singer);
+    }
+
+    public void removeLoveComment(Comment comment) {
+        loveComments.remove(comment);
+    }
+    public void addLoveComment(Comment comment) {
+        loveComments.add(comment);
     }
 }
 

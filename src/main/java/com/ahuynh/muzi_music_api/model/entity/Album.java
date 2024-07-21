@@ -1,5 +1,6 @@
 package com.ahuynh.muzi_music_api.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -28,6 +29,7 @@ public class Album extends DateAudit {
 
     private String avatar = "https://firebasestorage.googleapis.com/v0/b/muzimusic-c2598.appspot.com/o/avatar%2Falbum_1.png?alt=media&token=3507c5d1-2bdf-4d1c-93ad-87f7abdc1541";
 
+    @JsonIgnore
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Song> songs = new HashSet<>();
 

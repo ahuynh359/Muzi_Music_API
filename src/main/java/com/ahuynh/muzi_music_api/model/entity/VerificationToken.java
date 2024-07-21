@@ -1,5 +1,6 @@
 package com.ahuynh.muzi_music_api.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -16,7 +17,6 @@ import java.time.Instant;
 public class VerificationToken {
 
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,16 +24,17 @@ public class VerificationToken {
     private String token;
 
     @Column(name = "expiry_time", nullable = false, updatable = false)
-    private Instant expiryTime = Instant.now().plusSeconds(3600 * 10);
+    private Instant expiryTime = Instant.now().plusSeconds(60);
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     public VerificationToken(User user, String token) {
         this.user = user;
         this.token = token;
     }
+
 
 
 }

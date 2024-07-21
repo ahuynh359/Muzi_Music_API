@@ -33,7 +33,7 @@ public class UserController {
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getNewUsers(@RequestParam(value = "sort", required = false, defaultValue = "NEW") SortName sort) {
+    public ResponseEntity<?> getAllUsers(@RequestParam(value = "sort", required = false, defaultValue = "NEW") SortName sort) {
         return new ResponseEntity<>(new ApiResponse("Get All Users Successfully", userService.getAllUsers(sort)),
                 HttpStatus.OK);
     }

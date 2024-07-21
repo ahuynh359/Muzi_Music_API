@@ -31,8 +31,8 @@ public class Playlist extends DateAudit {
 
     private String avatar = "https://firebasestorage.googleapis.com/v0/b/muzimusic-c2598.appspot.com/o/avatar%2Falbum_2.png?alt=media&token=685627b1-8074-469d-8f3a-30993a6eecd3";
 
-
-    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 

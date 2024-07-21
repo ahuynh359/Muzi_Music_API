@@ -7,7 +7,6 @@ import lombok.*;
 
 import java.util.*;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "song")
 @Getter
@@ -30,24 +29,23 @@ public class Song extends DateAudit {
     private String lyrics;
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "album_id", nullable = false)
     private Album album;
 
     @JsonIgnore
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Comment> comments;
-
+    private Set<Comment> comments = new HashSet<>();
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(name = "song_singer",
             joinColumns = {@JoinColumn(name = "song_id")},
             inverseJoinColumns = {@JoinColumn(name = "singer_id")})
     private Set<Singer> singers = new HashSet<>();
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(name = "song_type"
             , joinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "type_id", referencedColumnName = "id"))

@@ -1,6 +1,7 @@
 package com.ahuynh.muzi_music_api.model.entity;
 
 import com.ahuynh.muzi_music_api.model.entity.role.RoleName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -31,6 +32,7 @@ public class Notification extends DateAudit {
     @NaturalId
     private NotificationStatus status;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
