@@ -47,7 +47,7 @@ public class AuthController {
     }
 
     @PostMapping("/email")
-    public ResponseEntity<?> sendEmail(@Valid @RequestBody ForgotPassRequest request,
+    public ResponseEntity<?> sendEmail(@Valid @RequestBody EmailRequest request,
                                             final HttpServletRequest httpServletRequest) {
         User user = verificationTokenService.sendEmail(request);
         applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent

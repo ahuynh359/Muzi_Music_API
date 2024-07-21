@@ -5,14 +5,15 @@ import com.ahuynh.muzi_music_api.exception.InvalidTokenException;
 import com.ahuynh.muzi_music_api.exception.PasswordException;
 import com.ahuynh.muzi_music_api.model.entity.User;
 import com.ahuynh.muzi_music_api.model.entity.VerificationToken;
-import com.ahuynh.muzi_music_api.payload.request.ForgotPassRequest;
+import com.ahuynh.muzi_music_api.payload.request.EmailRequest;
 import com.ahuynh.muzi_music_api.payload.request.NewPasswordRequest;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
 import com.ahuynh.muzi_music_api.repository.VerificationTokenRepository;
-import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.Instant;
 
@@ -54,7 +55,7 @@ public class VerificationTokenService {
         userRepository.save(user);
     }
 
-    public User sendEmail(ForgotPassRequest request) {
+    public User sendEmail(EmailRequest request) {
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         if (user.getVerificationToken() != null) {

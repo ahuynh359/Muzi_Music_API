@@ -4,22 +4,17 @@ import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.config.security.JwtTokenProvider;
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.exception.InvalidUserException;
-import com.ahuynh.muzi_music_api.exception.UserAlreadyRegisteredException;
 import com.ahuynh.muzi_music_api.model.dto.UserDto;
 import com.ahuynh.muzi_music_api.model.entity.User;
-import com.ahuynh.muzi_music_api.model.entity.VerificationToken;
 import com.ahuynh.muzi_music_api.model.entity.role.Role;
 import com.ahuynh.muzi_music_api.model.entity.role.RoleName;
 import com.ahuynh.muzi_music_api.model.mapper.UserMapper;
-import com.ahuynh.muzi_music_api.payload.request.ForgotPassRequest;
 import com.ahuynh.muzi_music_api.payload.request.LoginRequest;
-import com.ahuynh.muzi_music_api.payload.request.ResendOtpRequest;
 import com.ahuynh.muzi_music_api.payload.request.SignUpRequest;
 import com.ahuynh.muzi_music_api.payload.response.LoginResponse;
 import com.ahuynh.muzi_music_api.repository.RoleRepository;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
 import com.ahuynh.muzi_music_api.repository.VerificationTokenRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,10 +23,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
