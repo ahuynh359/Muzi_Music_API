@@ -18,6 +18,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class User extends DateAudit {
     private static final long serialVersionUID = 1L;
 
@@ -44,47 +45,38 @@ public class User extends DateAudit {
 
     private boolean locked = false;
 
-    @JsonIgnore
+    @ToString.Exclude
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Playlist> playlists = new HashSet<>();
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Comment> comments = new HashSet<>() ;
 
-    @JsonIgnore
+    @ToString.Exclude
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Comment> comments = new HashSet<>();
+
+    @ToString.Exclude
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Listen> listens = new HashSet<>();
 
-    @JsonIgnore
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
 
 
+    @ToString.Exclude
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private VerificationToken verificationToken;
 
-    @JsonIgnore
+    @ToString.Exclude
     @ManyToMany
-    @JoinTable(name = "user_love_song"
-            , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
-            , inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
+    @JoinTable(name = "user_love_song", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
     private Set<Song> loveSongs = new HashSet<>();
 
-    @JsonIgnore
+    @ToString.Exclude
     @ManyToMany
-    @JoinTable(name = "user_love_singer"
-            , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
-            , inverseJoinColumns = @JoinColumn(name = "singer_id", referencedColumnName = "id"))
+    @JoinTable(name = "user_love_singer", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "singer_id", referencedColumnName = "id"))
     private Set<Singer> loveSingers = new HashSet<>();
-
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(name = "user_love_comment"
-            , joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
-            , inverseJoinColumns = @JoinColumn(name = "comment_id", referencedColumnName = "id"))
-    private Set<Comment> loveComments = new HashSet<>();
 
 
     public User(String email, String hashPassword, String username, Role role, String avatar) {
@@ -123,12 +115,7 @@ public class User extends DateAudit {
         loveSingers.add(singer);
     }
 
-    public void removeLoveComment(Comment comment) {
-        loveComments.remove(comment);
-    }
-    public void addLoveComment(Comment comment) {
-        loveComments.add(comment);
-    }
+
 }
 
 

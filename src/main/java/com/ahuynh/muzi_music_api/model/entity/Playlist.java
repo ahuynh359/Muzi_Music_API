@@ -17,6 +17,7 @@ import java.util.Set;
 @Table(name = "playlist", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"name", "user_id"})
 })
+@ToString
 public class Playlist extends DateAudit {
     private static final long serialVersionUID = 1L;
 
@@ -31,12 +32,12 @@ public class Playlist extends DateAudit {
 
     private String avatar = "https://firebasestorage.googleapis.com/v0/b/muzimusic-c2598.appspot.com/o/avatar%2Falbum_2.png?alt=media&token=685627b1-8074-469d-8f3a-30993a6eecd3";
 
-    @JsonIgnore
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @JsonIgnore
+    @ToString.Exclude
     @ManyToMany
     @JoinTable(name = "playlist_song"
             , joinColumns = @JoinColumn(name = "playlist_id", referencedColumnName = "id")

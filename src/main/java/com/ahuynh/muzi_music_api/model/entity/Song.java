@@ -13,6 +13,7 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class Song extends DateAudit {
     private static final long serialVersionUID = 1L;
 
@@ -28,30 +29,30 @@ public class Song extends DateAudit {
     @Column(columnDefinition = "TEXT")
     private String lyrics;
 
-    @JsonIgnore
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "album_id", nullable = false)
     private Album album;
 
-    @JsonIgnore
+    @ToString.Exclude
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments = new HashSet<>();
 
-    @JsonIgnore
+    @ToString.Exclude
     @ManyToMany
     @JoinTable(name = "song_singer",
             joinColumns = {@JoinColumn(name = "song_id")},
             inverseJoinColumns = {@JoinColumn(name = "singer_id")})
     private Set<Singer> singers = new HashSet<>();
 
-    @JsonIgnore
+    @ToString.Exclude
     @ManyToMany
     @JoinTable(name = "song_type"
             , joinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id")
             , inverseJoinColumns = @JoinColumn(name = "type_id", referencedColumnName = "id"))
     private Set<Type> types = new HashSet<>();
 
-    @JsonIgnore
+    @ToString.Exclude
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Listen> listens;
 

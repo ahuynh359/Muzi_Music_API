@@ -4,6 +4,7 @@ import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.model.dto.AlbumDto;
 import com.ahuynh.muzi_music_api.model.dto.CommentDto;
+import com.ahuynh.muzi_music_api.model.dto.UserDto;
 import com.ahuynh.muzi_music_api.model.entity.*;
 import com.ahuynh.muzi_music_api.model.entity.role.RoleName;
 import com.ahuynh.muzi_music_api.model.mapper.CommentMapper;
@@ -16,12 +17,14 @@ import com.ahuynh.muzi_music_api.repository.SongRepository;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
 import com.ahuynh.muzi_music_api.utils.SortName;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,20 +36,16 @@ public class CommentService {
     private final UserRepository userRepository;
 
     public CommentResponse getAllCommentBySongId(Long id, CustomUserDetail currentUser) {
-        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new RuntimeException("User not found"));
-        Song song = songRepository.findById(id).orElseThrow(() -> new RuntimeException("Song not found"));
-        Set<Comment> comments = song.getComments();
-        Set<CommentDto> commentsDto = commentMapper.convertToDtoSet(comments);
 
-        commentsDto.forEach(commentDto -> {
-            boolean isLove = user.getLoveComments().stream()
-                    .anyMatch(lovedComment -> lovedComment.getId().equals(commentDto.getId()));
-            commentDto.setLove(isLove);
-        });
 
-        return new CommentResponse(commentsDto, comments.size());
+        Song song = songRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Song not found"));
+
+
+        Set<CommentDto> commentsDto = commentMapper.convertToDtoSet(song.getComments());
+
+        return new CommentResponse(commentsDto, commentsDto.size());
     }
-
     public List<CommentDto> getAllComments(SortName sort) {
         List<Comment> comments = new ArrayList<>();
         switch (sort) {
@@ -105,24 +104,8 @@ public class CommentService {
 
     }
 
-    public void loveComment(Long id, CustomUserDetail currentUser) {
-        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
-        Comment comment = commentRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Comment not found " + id));
-        System.out.println(user.getLoveComments());
-        if (user.getLoveComments().contains(comment)) {
-            user.removeLoveComment(comment);
-        } else {
-            user.addLoveComment(comment);
-        }
-        userRepository.save(user);
 
-    }
 
-    public boolean isUserLoveComment(CustomUserDetail currentUser, Long id) {
 
-        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
-        Comment comment = commentRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Comment not found " + id));
-        return user.getLoveComments().contains(comment);
-    }
 
 }

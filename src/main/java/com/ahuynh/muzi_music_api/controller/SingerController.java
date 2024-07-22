@@ -29,8 +29,8 @@ public class SingerController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
-    public ResponseEntity<?> getSingerById(@PathVariable(name = "id") Long id) {
-        return new ResponseEntity<>(new ApiResponse("Get Singer Successfully", singerService.getSingerById(id)), HttpStatus.OK);
+    public ResponseEntity<?> getSingerById(@PathVariable(name = "id") Long id, @CurrentUser CustomUserDetail currentUser) {
+        return new ResponseEntity<>(new ApiResponse("Get Singer Successfully", singerService.getSingerById(id,currentUser)), HttpStatus.OK);
     }
 
 
@@ -58,8 +58,8 @@ public class SingerController {
 
     @GetMapping("/love")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
-    public ResponseEntity<?> getLoveSingersOfUser(@CurrentUser CustomUserDetail currentUser) {
-        return new ResponseEntity<>(new ApiResponse("Get Love Singers Successfully", singerService.getLoveSingersOfUser(currentUser)), HttpStatus.OK);
+    public ResponseEntity<?> getLoveSingers(@CurrentUser CustomUserDetail currentUser) {
+        return new ResponseEntity<>(new ApiResponse("Get Love Singers Successfully", singerService.getLoveSingers(currentUser)), HttpStatus.OK);
     }
 
 
@@ -70,18 +70,13 @@ public class SingerController {
         return new ResponseEntity<>(new ApiResponse("Success", singerService.getSongsFromSinger(id)), HttpStatus.OK);
     }
 
-    @PostMapping("/love-or-unlove/{id}")
+    @PostMapping("/love/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> loveOrUnloveSinger(@PathVariable(name = "id") Long id, @CurrentUser CustomUserDetail currentUser) {
         singerService.loveOrUnloveSinger(id, currentUser);
         return new ResponseEntity<>(new MessageResponse("Successfully"), HttpStatus.OK);
     }
 
-    @GetMapping("/love/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> isUserLoveSinger(@CurrentUser CustomUserDetail currentUser, @PathVariable Long id) {
-        return new ResponseEntity<>(new ApiResponse("Successfully", singerService.isUserLoveSinger(currentUser, id)), HttpStatus.OK);
-    }
 
 
 }

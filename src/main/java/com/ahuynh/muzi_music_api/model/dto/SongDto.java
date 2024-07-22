@@ -22,7 +22,6 @@ public class SongDto {
     private String name;
     private String avatar;
     private String file;
-
     private String lyrics;
     private AlbumDto album;
     private Set<SingerDto> singers;

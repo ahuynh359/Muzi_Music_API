@@ -49,18 +49,6 @@ public class CommentController {
         return new ResponseEntity<>(new ApiResponse(" Success", commentService.editComment(request, currentUser)), HttpStatus.OK);
     }
 
-    @PutMapping("/love/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')  or hasRole('ROLE_USER')")
-    public ResponseEntity<?> editComment(@PathVariable Long id, @CurrentUser CustomUserDetail currentUser) {
-        commentService.loveComment(id, currentUser);
-        return new ResponseEntity<>(new MessageResponse(" Love Comment Successfully"), HttpStatus.OK);
-    }
-
-    @GetMapping("/is-love-comment/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> isUserLoveComment(@CurrentUser CustomUserDetail currentUser, @PathVariable Long id) {
-        return new ResponseEntity<>(new ApiResponse("Successfully", commentService.isUserLoveComment(currentUser, id)), HttpStatus.OK);
-    }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')  or hasRole('ROLE_USER')")

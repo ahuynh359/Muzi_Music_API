@@ -23,9 +23,7 @@ public class CommentDto {
     private Long id;
     private String content;
     private UserDto user;
-    private Set<CommentDto> replies = new HashSet<>();
     private String time;
-    private boolean love;
     private String createdAt;
     private String updatedAt;
 
