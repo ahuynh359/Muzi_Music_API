@@ -17,7 +17,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+
 public class Notification extends DateAudit {
     private static final long serialVersionUID = 1L;
 
@@ -32,7 +32,7 @@ public class Notification extends DateAudit {
     @NaturalId
     private NotificationStatus status;
 
-    @ToString.Exclude
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;

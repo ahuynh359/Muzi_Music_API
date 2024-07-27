@@ -1,7 +1,13 @@
 package com.ahuynh.muzi_music_api.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -10,7 +16,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+
 public class Comment extends DateAudit {
     private static final long serialVersionUID = 1L;
 
@@ -20,15 +26,24 @@ public class Comment extends DateAudit {
 
     private String content;
 
-    @ToString.Exclude
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ToString.Exclude
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "song_id", nullable = false)
     private Song song;
+    @JsonManagedReference
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment commentParent;
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "commentParent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Comment> replies = new HashSet<>();
 
 
     public Comment(User user, Song song, String content) {
@@ -38,8 +53,18 @@ public class Comment extends DateAudit {
 
     }
 
+    public Comment(User user, Song song, String content, Comment commentParent) {
+        this.user = user;
+        this.song = song;
+        this.content = content;
+        this.commentParent = commentParent;
+
+    }
 
 
+    public void addReply(Comment reply) {
+        replies.add(reply);
 
+    }
 }
 

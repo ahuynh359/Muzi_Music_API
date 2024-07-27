@@ -23,14 +23,13 @@ public class SingerController {
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> createSinger(@RequestParam String name, @RequestParam MultipartFile avatar) {
-        return new ResponseEntity<>(new ApiResponse("Create Singer Successfully",
-                singerService.createSinger(name, avatar)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse("Create Singer Successfully", singerService.createSinger(name, avatar)), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
-    public ResponseEntity<?> getSingerById(@PathVariable(name = "id") Long id, @CurrentUser CustomUserDetail currentUser) {
-        return new ResponseEntity<>(new ApiResponse("Get Singer Successfully", singerService.getSingerById(id,currentUser)), HttpStatus.OK);
+    public ResponseEntity<?> getSingerById(@PathVariable(name = "id") Long id) {
+        return new ResponseEntity<>(new ApiResponse("Get Singer Successfully", singerService.getSingerById( id)), HttpStatus.OK);
     }
 
 
@@ -45,8 +44,7 @@ public class SingerController {
     @PutMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')  ")
     public ResponseEntity<?> updateSinger(@RequestParam Long id, @RequestParam String name, @RequestParam MultipartFile avatar) {
-        return new ResponseEntity<>(new ApiResponse(" Update Singer Successfully",
-                singerService.updateSinger(id, name, avatar)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(" Update Singer Successfully", singerService.updateSinger(id, name, avatar)), HttpStatus.OK);
     }
 
 
@@ -63,7 +61,6 @@ public class SingerController {
     }
 
 
-
     @GetMapping("/{id}/songs")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
     public ResponseEntity<?> getSongsFromSinger(@PathVariable(name = "id") Long id) {
@@ -75,6 +72,12 @@ public class SingerController {
     public ResponseEntity<?> loveOrUnloveSinger(@PathVariable(name = "id") Long id, @CurrentUser CustomUserDetail currentUser) {
         singerService.loveOrUnloveSinger(id, currentUser);
         return new ResponseEntity<>(new MessageResponse("Successfully"), HttpStatus.OK);
+    }
+
+    @GetMapping("/is-love-singer/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> isUserLoveSinger(@CurrentUser CustomUserDetail currentUser, @PathVariable Long id) {
+        return new ResponseEntity<>(new ApiResponse("Successfully", singerService.isUserLoveSinger(currentUser, id)), HttpStatus.OK);
     }
 
 

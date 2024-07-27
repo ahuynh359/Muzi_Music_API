@@ -9,6 +9,7 @@ import com.ahuynh.muzi_music_api.model.entity.*;
 import com.ahuynh.muzi_music_api.model.entity.role.RoleName;
 import com.ahuynh.muzi_music_api.model.mapper.CommentMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
+import com.ahuynh.muzi_music_api.payload.request.AddReplyRequest;
 import com.ahuynh.muzi_music_api.payload.request.CommentRequest;
 import com.ahuynh.muzi_music_api.payload.request.UpdateCommentRequest;
 import com.ahuynh.muzi_music_api.payload.response.CommentResponse;
@@ -20,10 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,14 +33,20 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
 
-    public CommentResponse getAllCommentBySongId(Long id, CustomUserDetail currentUser) {
-
-
-        Song song = songRepository.findById(id)
+    public CommentResponse getAllCommentsBySongId(Long songId, CustomUserDetail currentUser) {
+        Song song = songRepository.findById(songId)
                 .orElseThrow(() -> new RuntimeException("Song not found"));
 
+        List<Comment> parentComments = commentRepository.findParentCommentsBySongId(songId);
 
-        Set<CommentDto> commentsDto = commentMapper.convertToDtoSet(song.getComments());
+        // Fetch and set replies
+        Set<CommentDto> commentsDto = parentComments.stream().map(comment -> {
+            Set<Comment> replies = commentRepository.findAllByCommentParent(comment.getId());
+            CommentDto commentDto = commentMapper.convertToDto(comment);
+            Set<CommentDto> repliesDto = commentMapper.convertToDtoSet(replies);
+            commentDto.setReplies(repliesDto);
+            return commentDto;
+        }).collect(Collectors.toSet());
 
         return new CommentResponse(commentsDto, commentsDto.size());
     }
@@ -93,19 +97,30 @@ public class CommentService {
         User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("No user found"));
         Comment comment = commentRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No comment found"));
         if (user.getRole().getName().equals(RoleName.ROLE_ADMIN)) {
-            commentRepository.delete(comment);
+            commentRepository.deleteByParentId(comment.getId());
+            commentRepository.deleteById(comment.getId());
             return;
         }
         if (!Objects.equals(user.getId(), comment.getUser().getId())) {
             throw new EntityNotFoundException("Don't allow to delete comment");
         }
 
-        commentRepository.delete(comment);
+        commentRepository.deleteByParentId(comment.getId());
+        commentRepository.deleteById(comment.getId());
 
     }
 
 
+    public CommentDto addReply(AddReplyRequest addReplyRequest, CustomUserDetail customUserDetail) {
+        User user = userRepository.findById(customUserDetail.getId())
+                .orElseThrow(() -> new EntityNotFoundException("No user found"));
+        Song song = songRepository.findById(addReplyRequest.getSongId())
+                .orElseThrow(() -> new EntityNotFoundException("No song found"));
+        Comment parent = commentRepository.findById(addReplyRequest.getParentId())
+                .orElseThrow(() -> new EntityNotFoundException("No comment found"));
 
+        Comment reply = new Comment(user, song, addReplyRequest.getContent(), parent);
 
-
+        return commentMapper.convertToDto(commentRepository.save(reply));
+    }
 }

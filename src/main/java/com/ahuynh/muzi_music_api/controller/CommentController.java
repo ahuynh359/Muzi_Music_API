@@ -2,12 +2,15 @@ package com.ahuynh.muzi_music_api.controller;
 
 import com.ahuynh.muzi_music_api.config.security.CurrentUser;
 import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
+import com.ahuynh.muzi_music_api.model.entity.Comment;
+import com.ahuynh.muzi_music_api.payload.request.AddReplyRequest;
 import com.ahuynh.muzi_music_api.payload.request.CommentRequest;
 import com.ahuynh.muzi_music_api.payload.request.UpdateCommentRequest;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
 import com.ahuynh.muzi_music_api.payload.response.MessageResponse;
 import com.ahuynh.muzi_music_api.service.CommentService;
 import com.ahuynh.muzi_music_api.utils.SortName;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +26,9 @@ public class CommentController {
 
     @GetMapping("/song/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
-    public ResponseEntity<?> getAllCommentBySongId(@PathVariable Long id,@CurrentUser CustomUserDetail currentUser) {
+    public ResponseEntity<?> getAllCommentBySongId(@PathVariable Long id, @CurrentUser CustomUserDetail currentUser) {
 
-        return new ResponseEntity<>(new ApiResponse("Get All Comments Of Song Successfully", commentService.getAllCommentBySongId(id,currentUser)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse("Get All Comments Of Song Successfully", commentService.getAllCommentsBySongId(id, currentUser)), HttpStatus.OK);
     }
 
     @GetMapping("/all")
@@ -40,6 +43,11 @@ public class CommentController {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
     public ResponseEntity<?> addComment(@RequestBody CommentRequest request, @CurrentUser CustomUserDetail currentUser) {
         return new ResponseEntity<>(new ApiResponse("Add Comment To Song Successfully", commentService.addComment(request, currentUser)), HttpStatus.OK);
+    }
+
+    @PostMapping("/reply")
+    public ResponseEntity<?> addReply(@Valid @RequestBody AddReplyRequest addReplyRequest, @CurrentUser CustomUserDetail currentUser) {
+        return new ResponseEntity<>(new ApiResponse("Reply Comment Successfully", commentService.addReply(addReplyRequest, currentUser)), HttpStatus.OK);
     }
 
 

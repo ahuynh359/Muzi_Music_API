@@ -41,12 +41,9 @@ public class SingerService {
         return singerMapper.convertToDto(singerRepository.save(new Singer(name, url)));
     }
 
-    public SingerDto getSingerById(Long id, CustomUserDetail currentUser) {
-        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    public SingerDto getSingerById(Long id) {
         Singer singer = singerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Singer with id " + id + " not found"));
-        SingerDto singerDto = singerMapper.convertToDto(singer);
-        singerDto.setLove(user.getLoveSingers().contains(singer));
-        return singerDto;
+        return singerMapper.convertToDto(singer);
     }
 
     public void deleteSinger(Long id) {
@@ -113,4 +110,10 @@ public class SingerService {
     }
 
 
+    public boolean isUserLoveSinger(CustomUserDetail currentUser, Long id) {
+
+        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
+        Singer singer = singerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Song not found " + id));
+        return user.getLoveSingers().contains(singer);
+    }
 }

@@ -18,7 +18,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+
 public class User extends DateAudit {
     private static final long serialVersionUID = 1L;
 
@@ -45,35 +45,36 @@ public class User extends DateAudit {
 
     private boolean locked = false;
 
-    @ToString.Exclude
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Playlist> playlists = new HashSet<>();
 
 
-    @ToString.Exclude
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments = new HashSet<>();
 
-    @ToString.Exclude
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     private Set<Listen> listens = new HashSet<>();
 
-    @ToString.Exclude
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
 
 
-    @ToString.Exclude
+    @JsonIgnore
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private VerificationToken verificationToken;
 
-    @ToString.Exclude
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "user_love_song", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "song_id", referencedColumnName = "id"))
     private Set<Song> loveSongs = new HashSet<>();
 
-    @ToString.Exclude
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "user_love_singer", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "singer_id", referencedColumnName = "id"))
     private Set<Singer> loveSingers = new HashSet<>();

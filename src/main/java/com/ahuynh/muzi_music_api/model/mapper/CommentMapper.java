@@ -29,11 +29,13 @@ public class CommentMapper extends BaseMapper<Comment, CommentDto> {
     public CommentDto convertToDto(Comment entity, Object... args) {
         CommentDto dto = new CommentDto();
         if (entity != null) {
-            BeanUtils.copyProperties(entity, dto,  "users", "createdAt", "updatedAt", "time");
+            BeanUtils.copyProperties(entity, dto, "users", "createdAt", "updatedAt", "time", "commentParentId");
             dto.setUser(userMapper.convertToDto(entity.getUser()));
             dto.setCreatedAt(Utils.convertInstantToTime(entity.getCreatedAt()));
             dto.setUpdatedAt(Utils.convertInstantToTime(entity.getUpdatedAt()));
             dto.setTime(Utils.getTime(entity.getCreatedAt()));
+            if (entity.getCommentParent() != null)
+                dto.setCommentParentId(entity.getCommentParent().getId());
         }
         return dto;
     }
