@@ -1,5 +1,6 @@
 package com.ahuynh.muzi_music_api.model.entity;
 
+import com.ahuynh.muzi_music_api.model.entity.notification.Notification;
 import com.ahuynh.muzi_music_api.model.entity.role.Role;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
@@ -45,6 +46,11 @@ public class User extends DateAudit {
 
     private boolean locked = false;
 
+    @Column(name = "device_token")
+    private String deviceToken = "erAxKAnqQnC5sgxv6RbkNs:APA91bEnItKurZcr3gEZAUxLOgVsoyTKx0sMTOBXf-tFcxbGH-X0XamgKf1vAWmWO5q41xrH_1vSJRmK931sFeOsfZle7IQt5IXGUqOR2xpnkPRQBSayry-HOrunf1nyt4NoXPZIfLXU";
+
+
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Playlist> playlists = new HashSet<>();
@@ -79,6 +85,9 @@ public class User extends DateAudit {
     @JoinTable(name = "user_love_singer", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "singer_id", referencedColumnName = "id"))
     private Set<Singer> loveSingers = new HashSet<>();
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Notification> notifications = new HashSet<>();
 
     public User(String email, String hashPassword, String username, Role role, String avatar) {
         this.email = email;

@@ -9,11 +9,9 @@ import com.ahuynh.muzi_music_api.payload.request.EmailRequest;
 import com.ahuynh.muzi_music_api.payload.request.NewPasswordRequest;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
 import com.ahuynh.muzi_music_api.repository.VerificationTokenRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.Instant;
 

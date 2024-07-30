@@ -1,21 +1,16 @@
 package com.ahuynh.muzi_music_api.service;
 
 import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
-import com.ahuynh.muzi_music_api.exception.CustomException;
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.model.dto.SingerDto;
 import com.ahuynh.muzi_music_api.model.dto.SongDto;
-import com.ahuynh.muzi_music_api.model.entity.Playlist;
 import com.ahuynh.muzi_music_api.model.entity.Singer;
-import com.ahuynh.muzi_music_api.model.entity.Song;
 import com.ahuynh.muzi_music_api.model.entity.User;
 import com.ahuynh.muzi_music_api.model.mapper.SingerMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
-import com.ahuynh.muzi_music_api.model.mapper.UserMapper;
 import com.ahuynh.muzi_music_api.repository.SingerRepository;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
 import com.ahuynh.muzi_music_api.utils.SortName;
-import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/singer")

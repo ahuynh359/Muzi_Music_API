@@ -5,7 +5,9 @@ import com.ahuynh.muzi_music_api.model.dto.UserDto;
 import com.ahuynh.muzi_music_api.model.entity.User;
 import com.ahuynh.muzi_music_api.model.entity.role.Role;
 import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RoleMapper extends BaseMapper<Role, RoleDto> {
 
     @Override

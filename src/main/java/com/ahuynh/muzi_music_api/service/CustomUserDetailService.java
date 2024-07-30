@@ -1,7 +1,6 @@
 package com.ahuynh.muzi_music_api.service;
 
 import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
-import com.ahuynh.muzi_music_api.exception.CustomException;
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.model.entity.User;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
@@ -10,11 +9,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 @Service
-
-
 public class CustomUserDetailService implements UserDetailsService {
     @Autowired
-    private  UserRepository userRepository;
+    private UserRepository userRepository;
 
     public CustomUserDetail loadUserByUsername(String usernameOrEmail) {
         User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail).orElseThrow(

@@ -22,6 +22,7 @@ public class UserDto {
     private String username;
     private String avatar;
     private boolean locked;
+    private String deviceToken;
     private RoleDto role;
     private String createdAt;
     private String updatedAt;

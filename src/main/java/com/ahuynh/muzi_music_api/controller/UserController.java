@@ -56,6 +56,14 @@ public class UserController {
                 userService.updateAvatar(id, currentUser, avatar)), HttpStatus.OK);
     }
 
+    @PutMapping("/token")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> updateToken(@RequestParam("token")  String token, @CurrentUser CustomUserDetail currentUser) {
+
+        return new ResponseEntity<>(new ApiResponse("Update Token Successfully",
+                userService.updateToken(token, currentUser)), HttpStatus.OK);
+    }
+
     @PutMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> updateUser(@Valid @RequestBody UpdateUserRequest updateUserRequest, @CurrentUser CustomUserDetail currentUser) {

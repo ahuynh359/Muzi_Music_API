@@ -1,5 +1,6 @@
 package com.ahuynh.muzi_music_api.model.entity;
 
+import com.ahuynh.muzi_music_api.model.entity.notification.Notification;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

@@ -113,7 +113,7 @@ public class SongController {
     public ResponseEntity<?> uploadMusic(@PathVariable Long id,
                                           @RequestPart("music") MultipartFile music) {
 
-        return new ResponseEntity<>(new ApiResponse("Change Avatar Successfully",
+        return new ResponseEntity<>(new ApiResponse("Change File Successfully",
                 songService.uploadMusic( id, music)), HttpStatus.OK);
     }
 

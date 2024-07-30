@@ -6,6 +6,7 @@ import com.ahuynh.muzi_music_api.model.dto.SongDto;
 import com.ahuynh.muzi_music_api.model.dto.TypeDto;
 import com.ahuynh.muzi_music_api.model.entity.Song;
 import com.ahuynh.muzi_music_api.utils.Utils;
+import lombok.RequiredArgsConstructor;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -13,17 +14,13 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 
 @Component
+@RequiredArgsConstructor
 public class SongMapper extends BaseMapper<Song, SongDto> {
     private final SingerMapper singerMapper;
     private final TypeMapper typeMapper;
     private final AlbumMapper albumMapper ;
 
-    public SongMapper(SingerMapper singerMapper, TypeMapper typeMapper, AlbumMapper albumMapper) {
-        super();
-        this.singerMapper = singerMapper;
-        this.typeMapper = typeMapper;
-        this.albumMapper = albumMapper;
-    }
+
 
 
     @Override

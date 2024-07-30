@@ -3,12 +3,14 @@ package com.ahuynh.muzi_music_api.model.mapper;
 import com.ahuynh.muzi_music_api.model.dto.UserDto;
 import com.ahuynh.muzi_music_api.model.entity.User;
 import com.ahuynh.muzi_music_api.utils.Utils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class UserMapper extends BaseMapper<User, UserDto> {
-    private RoleMapper roleMapper = new RoleMapper();
+    private final RoleMapper roleMapper;
 
     @Override
     public User convertToEntity(UserDto dto, Object... args) {

@@ -3,6 +3,7 @@ package com.ahuynh.muzi_music_api.model.mapper;
 import com.ahuynh.muzi_music_api.model.dto.CommentDto;
 import com.ahuynh.muzi_music_api.model.entity.Comment;
 import com.ahuynh.muzi_music_api.utils.Utils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
@@ -12,8 +13,9 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @Component
+@RequiredArgsConstructor
 public class CommentMapper extends BaseMapper<Comment, CommentDto> {
-    private UserMapper userMapper = new UserMapper();
+    private  final UserMapper userMapper ;
 
     @Override
     public Comment convertToEntity(CommentDto dto, Object... args) {

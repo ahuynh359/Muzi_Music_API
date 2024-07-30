@@ -1,14 +1,12 @@
-package com.ahuynh.muzi_music_api.model.entity;
+package com.ahuynh.muzi_music_api.model.entity.notification;
 
-import com.ahuynh.muzi_music_api.model.entity.role.RoleName;
+import com.ahuynh.muzi_music_api.model.entity.DateAudit;
+import com.ahuynh.muzi_music_api.model.entity.Song;
+import com.ahuynh.muzi_music_api.model.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import org.hibernate.annotations.NaturalId;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -26,11 +24,16 @@ public class Notification extends DateAudit {
     private Long id;
 
     @NotBlank
-    private String content ;
+    private String title;
+
+    @NotBlank
+    private String content;
 
     @Enumerated(EnumType.STRING)
-    @NaturalId
-    private NotificationStatus status;
+    private NotificationStatus status = NotificationStatus.NOT_READ;
+
+    @Enumerated(EnumType.STRING)
+    private NotificationType type = NotificationType.SONG;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,6 +41,14 @@ public class Notification extends DateAudit {
     private User user;
 
 
+
+
+    public Notification(String title, String content,  User user) {
+        this.title = title;
+        this.content = content;
+        this.user = user;
+
+    }
 
 
 }

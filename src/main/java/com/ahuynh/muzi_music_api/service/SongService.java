@@ -1,13 +1,12 @@
 package com.ahuynh.muzi_music_api.service;
 
-import com.ahuynh.muzi_music_api.config.security.CurrentUser;
 import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.model.dto.AlbumDto;
 import com.ahuynh.muzi_music_api.model.dto.SingerDto;
 import com.ahuynh.muzi_music_api.model.dto.SongDto;
-import com.ahuynh.muzi_music_api.model.dto.TypeDto;
 import com.ahuynh.muzi_music_api.model.entity.*;
+import com.ahuynh.muzi_music_api.model.entity.notification.Notification;
 import com.ahuynh.muzi_music_api.model.mapper.AlbumMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SingerMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
@@ -18,7 +17,6 @@ import com.ahuynh.muzi_music_api.repository.*;
 import com.ahuynh.muzi_music_api.utils.SortName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -37,6 +35,8 @@ public class SongService {
     private final SingerMapper singerMapper;
     private final UserRepository userRepository;
     private final ListenRepository listenRepository;
+    private final UserService userService;
+    private final NotificationRepository notificationRepository;
 
 
     public SongDto createSong(String name, MultipartFile avatar, MultipartFile file, String lyrics, Long albumIb, Set<Long> singerId, Set<Long> typeId) {
@@ -54,12 +54,21 @@ public class SongService {
             types.add(type);
         }
         Song s = new Song(name, urlAvatar, urlFile, lyrics, album, singers, types);
-        return songMapper.convertToDto(songRepository.save(s));
+        Song saved = songRepository.save(s);
+        Set<User> users = new HashSet<>(userRepository.findAll());
+
+        for (User user : users) {
+            Notification notification = new Notification("New song is uploaded" + s.getName(),"Listen to this song now", user);
+            notificationRepository.save(notification);
+            System.out.println(user.getDeviceToken());
+            firebaseService.sendNotification(user.getDeviceToken(), notification.getTitle(), notification.getContent());
+        }
+
+        return songMapper.convertToDto(saved);
     }
 
     public SongDto getSongById(Long id) {
-        return songMapper.convertToDto(songRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("Song with id " + id + " not found")));
+        return songMapper.convertToDto(songRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Song with id " + id + " not found")));
 
     }
 
@@ -98,14 +107,9 @@ public class SongService {
     public List<SongDto> getTop10Songs() {
         List<Listen> listens = listenRepository.findAll();
 
-        Map<Song, Long> songListenCounts = listens.stream()
-                .collect(Collectors.groupingBy(Listen::getSong, Collectors.counting()));
+        Map<Song, Long> songListenCounts = listens.stream().collect(Collectors.groupingBy(Listen::getSong, Collectors.counting()));
 
-        List<Song> songs = songListenCounts.entrySet().stream()
-                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
-                .limit(10)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+        List<Song> songs = songListenCounts.entrySet().stream().sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())).limit(10).map(Map.Entry::getKey).collect(Collectors.toList());
         return songMapper.convertToDtoList(songs);
     }
 
@@ -157,24 +161,21 @@ public class SongService {
 
 
     public SongDto updateAvatar(Long id, MultipartFile avatar) {
-        Song song = songRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("Song with id " + id + " not found"));
+        Song song = songRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Song with id " + id + " not found"));
         String url = firebaseService.upload(avatar, "image/png");
         song.setAvatar(url);
         return songMapper.convertToDto(songRepository.save(song));
     }
 
     public SongDto uploadMusic(Long id, MultipartFile file) {
-        Song song = songRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("Song with id " + id + " not found"));
+        Song song = songRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Song with id " + id + " not found"));
         String url = firebaseService.upload(file, "audio/mpeg");
         song.setFile(url);
         return songMapper.convertToDto(songRepository.save(song));
     }
 
     public SongDto updateSong(UpdateSongRequest updateSongRequest) {
-        Song song = songRepository.findById(updateSongRequest.getId()).orElseThrow(() ->
-                new EntityNotFoundException("Song with id " + updateSongRequest.getId() + " not found"));
+        Song song = songRepository.findById(updateSongRequest.getId()).orElseThrow(() -> new EntityNotFoundException("Song with id " + updateSongRequest.getId() + " not found"));
         if (updateSongRequest.getName() != null) {
             song.setName(updateSongRequest.getName());
         }

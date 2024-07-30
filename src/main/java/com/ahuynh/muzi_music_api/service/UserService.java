@@ -17,7 +17,6 @@ import com.ahuynh.muzi_music_api.repository.UserRepository;
 import com.ahuynh.muzi_music_api.utils.SortName;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -123,7 +122,7 @@ public class UserService {
     public UserDto getUserById(Long id, CustomUserDetail currentUser) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found " + id));
-        if (currentUser.getAuthorities().contains(new SimpleGrantedAuthority(RoleName.ROLE_USER.name()))) {
+        if (user.getRole().getName().equals(RoleName.ROLE_USER)) {
             if (!currentUser.getId().equals(id)) {
                 throw new CustomException("You are not authorized to view this user");
             }
@@ -161,6 +160,13 @@ public class UserService {
         }
         updateUser.setEmail(updateUserRequest.getEmail());
         updateUser.setUsername(updateUserRequest.getUsername());
+        return userMapper.convertToDto(userRepository.save(updateUser));
+    }
+
+    public UserDto updateToken(String token, CustomUserDetail currentUser) {
+        User updateUser = userRepository.findById(currentUser.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
+        updateUser.setDeviceToken(token);
         return userMapper.convertToDto(userRepository.save(updateUser));
     }
 }
