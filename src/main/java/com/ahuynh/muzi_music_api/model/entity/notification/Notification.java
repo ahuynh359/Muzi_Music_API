@@ -1,5 +1,6 @@
 package com.ahuynh.muzi_music_api.model.entity.notification;
 
+import com.ahuynh.muzi_music_api.model.entity.Comment;
 import com.ahuynh.muzi_music_api.model.entity.DateAudit;
 import com.ahuynh.muzi_music_api.model.entity.Song;
 import com.ahuynh.muzi_music_api.model.entity.User;
@@ -40,13 +41,23 @@ public class Notification extends DateAudit {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "song_id")
+   private Song song;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comment_id")
+    private Comment comment;
 
 
 
-    public Notification(String title, String content,  User user) {
+
+    public Notification(String title, String content,  User user,NotificationType type, Song song) {
         this.title = title;
         this.content = content;
         this.user = user;
+        this.type = type;
+        this.song = song;
 
     }
 

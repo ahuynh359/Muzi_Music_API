@@ -4,6 +4,8 @@ import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.model.dto.CommentDto;
 import com.ahuynh.muzi_music_api.model.entity.*;
+import com.ahuynh.muzi_music_api.model.entity.notification.Notification;
+import com.ahuynh.muzi_music_api.model.entity.notification.NotificationType;
 import com.ahuynh.muzi_music_api.model.entity.role.RoleName;
 import com.ahuynh.muzi_music_api.model.mapper.CommentMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
@@ -12,6 +14,7 @@ import com.ahuynh.muzi_music_api.payload.request.CommentRequest;
 import com.ahuynh.muzi_music_api.payload.request.UpdateCommentRequest;
 import com.ahuynh.muzi_music_api.payload.response.CommentResponse;
 import com.ahuynh.muzi_music_api.repository.CommentRepository;
+import com.ahuynh.muzi_music_api.repository.NotificationRepository;
 import com.ahuynh.muzi_music_api.repository.SongRepository;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
 import com.ahuynh.muzi_music_api.utils.SortName;
@@ -29,6 +32,8 @@ public class CommentService {
     private final SongMapper songMapper;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final NotificationRepository notificationRepository;
+    private final FirebaseService firebaseService;
 
     public CommentResponse getAllCommentsBySongId(Long songId, CustomUserDetail currentUser) {
         Song song = songRepository.findById(songId)
@@ -116,8 +121,11 @@ public class CommentService {
         Comment parent = commentRepository.findById(addReplyRequest.getParentId())
                 .orElseThrow(() -> new EntityNotFoundException("No comment found"));
 
-        Comment reply = new Comment(user, song, addReplyRequest.getContent(), parent);
-
-        return commentMapper.convertToDto(commentRepository.save(reply));
+        Comment reply = commentRepository.save(new Comment(user, song, addReplyRequest.getContent(), parent));
+        Notification notification = new Notification(addReplyRequest.getContent(),user.getUsername() + " has replied your comment", parent.getUser(), NotificationType.COMMENT,song);
+        notification.setComment(reply);
+        notificationRepository.save(notification);
+        firebaseService.sendNotification(notification.getUser().getDeviceToken(),notification.getTitle(),notification.getContent(),String.valueOf(notification.getType()), String.valueOf(notification.getSong().getId()));
+        return commentMapper.convertToDto(reply);
     }
 }

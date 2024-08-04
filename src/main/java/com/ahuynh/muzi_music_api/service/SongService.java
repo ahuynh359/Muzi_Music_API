@@ -7,6 +7,7 @@ import com.ahuynh.muzi_music_api.model.dto.SingerDto;
 import com.ahuynh.muzi_music_api.model.dto.SongDto;
 import com.ahuynh.muzi_music_api.model.entity.*;
 import com.ahuynh.muzi_music_api.model.entity.notification.Notification;
+import com.ahuynh.muzi_music_api.model.entity.notification.NotificationType;
 import com.ahuynh.muzi_music_api.model.mapper.AlbumMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SingerMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
@@ -35,7 +36,6 @@ public class SongService {
     private final SingerMapper singerMapper;
     private final UserRepository userRepository;
     private final ListenRepository listenRepository;
-    private final UserService userService;
     private final NotificationRepository notificationRepository;
 
 
@@ -58,10 +58,9 @@ public class SongService {
         Set<User> users = new HashSet<>(userRepository.findAll());
 
         for (User user : users) {
-            Notification notification = new Notification("New song is uploaded" + s.getName(),"Listen to this song now", user);
+            Notification notification = new Notification("Listen to this song now","New song is uploaded" + s.getName(), user, NotificationType.SONG,s);
             notificationRepository.save(notification);
-            System.out.println(user.getDeviceToken());
-            firebaseService.sendNotification(user.getDeviceToken(), notification.getTitle(), notification.getContent());
+            firebaseService.sendNotification(user.getDeviceToken(), notification.getTitle(), notification.getContent(), String.valueOf(notification.getType()), String.valueOf(notification.getSong().getId()));
         }
 
         return songMapper.convertToDto(saved);
@@ -100,9 +99,6 @@ public class SongService {
         return songMapper.convertToDtoList(songs);
     }
 
-    public List<SongDto> getNewSongs() {
-        return songMapper.convertToDtoList(songRepository.findAllByOrderByCreatedAtDesc());
-    }
 
     public List<SongDto> getTop10Songs() {
         List<Listen> listens = listenRepository.findAll();

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 public class NotificationMapper extends BaseMapper<Notification, NotificationDto> {
 
     private final UserMapper userMapper;
-    private final SongMapper songMapper;
 
 
     @Override
@@ -29,9 +28,11 @@ public class NotificationMapper extends BaseMapper<Notification, NotificationDto
     public NotificationDto convertToDto(Notification entity, Object... args) {
         NotificationDto dto = new NotificationDto();
         if (entity != null) {
-            BeanUtils.copyProperties(entity, dto, "createdAt", "updatedAt", "time", "user");
+            BeanUtils.copyProperties(entity, dto, "createdAt", "updatedAt", "time", "user","songId","commentId");
             dto.setUser(userMapper.convertToDto(entity.getUser()));
             dto.setTime(Utils.getTime(entity.getCreatedAt()));
+            dto.setSongId(entity.getSong().getId());
+            dto.setSongId(entity.getComment().getId());
             dto.setCreatedAt(Utils.convertInstantToTime(entity.getCreatedAt()));
             dto.setUpdatedAt(Utils.convertInstantToTime(entity.getUpdatedAt()));
         }

@@ -24,7 +24,7 @@ public class Utils {
         long days = duration.toDays();
 
         if (seconds < 59) {
-            return seconds + " seconds ago";
+            return "Now";
         } else if (minutes < 59) {
             return minutes + " minutes ago";
         } else if (hours < 24) {

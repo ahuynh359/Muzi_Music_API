@@ -56,7 +56,11 @@ public class NotificationService {
         if (!notification.getUser().getId().equals(user.getId())) {
             throw new CustomException("You are not allowed to mark this notification");
         }
-        notification.setStatus(NotificationStatus.READ);
+        if(notification.getStatus() == NotificationStatus.READ) {
+            notification.setStatus(NotificationStatus.NOT_READ);
+        } else
+            notification.setStatus(NotificationStatus.READ);
+
         return notificationMapper.convertToDto(notificationRepository.save(notification));
     }
 
@@ -71,7 +75,7 @@ public class NotificationService {
 
     public CountUnreadNotificationResponse countUnreadNotification(CustomUserDetail customUserDetail) {
         User user = userRepository.findById(customUserDetail.getId()).orElseThrow(() -> new EntityNotFoundException("No User Found"));
-        List<Notification> notifications = notificationRepository.findAllByStatusAndUser(NotificationStatus.READ, user);
+        List<Notification> notifications = notificationRepository.findAllByStatusAndUser(NotificationStatus.NOT_READ, user);
         return new CountUnreadNotificationResponse(notifications.size());
     }
 }

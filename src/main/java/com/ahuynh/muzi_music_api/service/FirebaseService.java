@@ -80,7 +80,7 @@ public class FirebaseService {
         }
     }
 
-    public void sendNotification(String deviceToken, String title, String body) {
+    public void sendNotification(String deviceToken, String title, String body,String type,String referenceId) {
         if (deviceToken == null) {
             System.err.println("Invalid device token format: " + deviceToken);
             return;
@@ -92,6 +92,9 @@ public class FirebaseService {
                         .setTitle(title)
                         .setBody(body)
                         .build())
+                .putData("type",type)
+                .putData("referenceId",referenceId)
+
                 .build();
 
         try {
