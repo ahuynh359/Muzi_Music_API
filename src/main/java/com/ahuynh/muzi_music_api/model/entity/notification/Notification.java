@@ -45,9 +45,6 @@ public class Notification extends DateAudit {
     @JoinColumn(name = "song_id")
    private Song song;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comment_id")
-    private Comment comment;
 
 
 

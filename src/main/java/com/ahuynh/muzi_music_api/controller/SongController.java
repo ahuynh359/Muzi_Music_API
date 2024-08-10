@@ -59,6 +59,11 @@ public class SongController {
         return new ResponseEntity<>(new ApiResponse("Get Top 10 Songs Successfully", songService.getTop10Songs()), HttpStatus.OK);
     }
 
+    @GetMapping("/top3")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getTop3Songs() {
+        return new ResponseEntity<>(new ApiResponse("Get Top 3 Songs Successfully", songService.getTop3Songs()), HttpStatus.OK);
+    }
 
 
     @GetMapping("/search")

@@ -38,6 +38,13 @@ public class CommentController {
         return new ResponseEntity<>(new ApiResponse("Get All Comments Successfully", commentService.getAllComments(sort)), HttpStatus.OK);
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
+    public ResponseEntity<?> getCommentById(@PathVariable Long id) {
+
+        return new ResponseEntity<>(new ApiResponse("Get All Comment Successfully", commentService.getCommentById(id)), HttpStatus.OK);
+    }
+
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")

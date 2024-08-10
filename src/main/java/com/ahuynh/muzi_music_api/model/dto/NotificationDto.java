@@ -12,7 +12,7 @@ public class NotificationDto {
     private NotificationType type;
     private NotificationStatus status;
     private Long songId;
-    private Long commentId;
+    private Long commentId = null;
     private String time;
     private UserDto user;
     private String createdAt;

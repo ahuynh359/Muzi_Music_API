@@ -12,8 +12,10 @@ import com.ahuynh.muzi_music_api.model.mapper.AlbumMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SingerMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
 import com.ahuynh.muzi_music_api.payload.request.UpdateSongRequest;
+import com.ahuynh.muzi_music_api.payload.response.ListenOfDayResponse;
 import com.ahuynh.muzi_music_api.payload.response.LoveSongResponse;
 import com.ahuynh.muzi_music_api.payload.response.SearchResponse;
+import com.ahuynh.muzi_music_api.payload.response.SongListenResponse;
 import com.ahuynh.muzi_music_api.repository.*;
 import com.ahuynh.muzi_music_api.utils.SortName;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +60,7 @@ public class SongService {
         Set<User> users = new HashSet<>(userRepository.findAll());
 
         for (User user : users) {
-            Notification notification = new Notification("Listen to this song now","New song is uploaded" + s.getName(), user, NotificationType.SONG,s);
+            Notification notification = new Notification("Listen to this song now", "New song is uploaded" + s.getName(), user, NotificationType.SONG, s);
             notificationRepository.save(notification);
             firebaseService.sendNotification(user.getDeviceToken(), notification.getTitle(), notification.getContent(), String.valueOf(notification.getType()), String.valueOf(notification.getSong().getId()));
         }
@@ -109,7 +111,36 @@ public class SongService {
         return songMapper.convertToDtoList(songs);
     }
 
+    public List<SongListenResponse> getTop3Songs() {
+        // Fetch song listen details
+        List<Object[]> results = listenRepository.findSongListenDetailsGroupedByDay();
 
+        // Aggregate listen details by song
+        Map<Long, SongListenResponse> songListenMap = new LinkedHashMap<>();
+        for (Object[] result : results) {
+            Long songId = ((Number) result[0]).longValue();
+            String day = (String) result[2];
+            Integer listenCount = ((Number) result[3]).intValue();
+
+            SongListenResponse response = songListenMap.computeIfAbsent(songId, id -> {
+                Song song = songRepository.findById(id).orElseThrow(() -> new RuntimeException("Song not found"));
+                return new SongListenResponse(
+                        songMapper.convertToDto(song),
+                        new ArrayList<>()
+                );
+            });
+
+            response.getListenDetail().add(new ListenOfDayResponse(day, listenCount));
+        }
+
+        // Sort by listen count and limit to top 3
+        return songListenMap.values().stream()
+                .sorted((s1, s2) -> Integer.compare(
+                        s2.getListenDetail().stream().mapToInt(ListenOfDayResponse::getListen).sum(),
+                        s1.getListenDetail().stream().mapToInt(ListenOfDayResponse::getListen).sum()))
+                .limit(3)
+                .collect(Collectors.toList());
+    }
     public SearchResponse search(String query) {
         List<SongDto> songs = songMapper.convertToDtoList(songRepository.findByNameContainingIgnoreCase(query));
         List<AlbumDto> albums = albumMapper.convertToDtoList(albumRepository.findByNameContainingIgnoreCase(query));

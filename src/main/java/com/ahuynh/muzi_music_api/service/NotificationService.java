@@ -27,7 +27,7 @@ public class NotificationService {
 
     public List<NotificationDto> getAllNotifications(CustomUserDetail customUserDetail) {
         User user = userRepository.findById(customUserDetail.getId()).orElseThrow(() -> new EntityNotFoundException("No User Found"));
-        return notificationMapper.convertToDtoList(notificationRepository.findAllByUser(user));
+        return notificationMapper.convertToDtoList(notificationRepository.findAllByUserOrderByCreatedAtDesc(user));
     }
 
     public NotificationDto getNotificationById(Long id) {

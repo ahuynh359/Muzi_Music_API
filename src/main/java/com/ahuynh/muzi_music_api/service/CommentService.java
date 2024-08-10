@@ -122,10 +122,17 @@ public class CommentService {
                 .orElseThrow(() -> new EntityNotFoundException("No comment found"));
 
         Comment reply = commentRepository.save(new Comment(user, song, addReplyRequest.getContent(), parent));
+
         Notification notification = new Notification(addReplyRequest.getContent(),user.getUsername() + " has replied your comment", parent.getUser(), NotificationType.COMMENT,song);
-        notification.setComment(reply);
         notificationRepository.save(notification);
-        firebaseService.sendNotification(notification.getUser().getDeviceToken(),notification.getTitle(),notification.getContent(),String.valueOf(notification.getType()), String.valueOf(notification.getSong().getId()));
+        if(!customUserDetail.getId().equals(parent.getUser().getId())) {
+            firebaseService.sendNotification(notification.getUser().getDeviceToken(),notification.getTitle(),notification.getContent(),String.valueOf(notification.getType()), String.valueOf(notification.getSong().getId()));
+        }
+
         return commentMapper.convertToDto(reply);
+    }
+
+    public CommentDto getCommentById(Long id) {
+        return commentMapper.convertToDto(commentRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No comment found")));
     }
 }

@@ -1,5 +1,6 @@
 package com.ahuynh.muzi_music_api.model.entity;
 
+import com.ahuynh.muzi_music_api.model.entity.notification.Notification;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -44,6 +45,8 @@ public class Comment extends DateAudit {
     @JsonBackReference
     @OneToMany(mappedBy = "commentParent", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> replies = new HashSet<>();
+
+
 
 
     public Comment(User user, Song song, String content) {
