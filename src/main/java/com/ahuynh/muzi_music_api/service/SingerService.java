@@ -30,9 +30,9 @@ public class SingerService {
     private final SongMapper songMapper;
     private final UserRepository userRepository;
 
-    public SingerDto createSinger(String name, MultipartFile avatar) {
+    public SingerDto createSinger(String name, String description, MultipartFile avatar) {
         String url = firebaseService.upload(avatar, "image/png");
-        return singerMapper.convertToDto(singerRepository.save(new Singer(name, url)));
+        return singerMapper.convertToDto(singerRepository.save(new Singer(name, description, url)));
     }
 
     public SingerDto getSingerById(Long id) {

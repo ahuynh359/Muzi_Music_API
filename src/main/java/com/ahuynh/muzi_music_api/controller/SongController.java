@@ -91,6 +91,12 @@ public class SongController {
         return new ResponseEntity<>(new ApiResponse("Successfully", songService.isUserLoveSong(currentUser, songId)), HttpStatus.OK);
     }
 
+    @GetMapping("/total")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> getTotal() {
+        return new ResponseEntity<>(new ApiResponse("Successfully", songService.getTotal()), HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') ")
     public ResponseEntity<?> deleteSong(@PathVariable Long id) {

@@ -31,13 +31,21 @@ public class Singer extends DateAudit {
     private String avatar = "https://firebasestorage.googleapis.com/v0/b/muzimusic-c2598.appspot.com/o/avatar%2Fsinger.png?alt=media&token=88843039-e083-4713-befd-18e19c365536";
 
     @JsonIgnore
-    @ManyToMany( mappedBy = "singers")
+    @ManyToMany(mappedBy = "singers")
     private Set<Song> songs = new HashSet<>();
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
 
+    public Singer(String name, String avatar) {
+        this.name = name;
+        this.avatar = avatar;
+    }
 
-    public Singer(String name , String avatar) {
+
+    public Singer(String name, String description, String avatar) {
+        this.description = description;
         this.name = name;
         this.avatar = avatar;
     }

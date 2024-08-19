@@ -12,10 +12,7 @@ import com.ahuynh.muzi_music_api.model.mapper.AlbumMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SingerMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
 import com.ahuynh.muzi_music_api.payload.request.UpdateSongRequest;
-import com.ahuynh.muzi_music_api.payload.response.ListenOfDayResponse;
-import com.ahuynh.muzi_music_api.payload.response.LoveSongResponse;
-import com.ahuynh.muzi_music_api.payload.response.SearchResponse;
-import com.ahuynh.muzi_music_api.payload.response.SongListenResponse;
+import com.ahuynh.muzi_music_api.payload.response.*;
 import com.ahuynh.muzi_music_api.repository.*;
 import com.ahuynh.muzi_music_api.utils.SortName;
 import lombok.RequiredArgsConstructor;
@@ -138,7 +135,6 @@ public class SongService {
                 .sorted((s1, s2) -> Integer.compare(
                         s2.getListenDetail().stream().mapToInt(ListenOfDayResponse::getListen).sum(),
                         s1.getListenDetail().stream().mapToInt(ListenOfDayResponse::getListen).sum()))
-                .limit(3)
                 .collect(Collectors.toList());
     }
     public SearchResponse search(String query) {
@@ -230,6 +226,16 @@ public class SongService {
             song.setTypes(types);
         }
         return songMapper.convertToDto(songRepository.save(song));
+    }
+
+    public TotalResponse getTotal() {
+        TotalResponse totalResponse = new TotalResponse();
+        totalResponse.setTotalAlbum(albumRepository.findAll().size() + " albums");
+        totalResponse.setTotalSinger(singerRepository.findAll().size() + " singers");
+        totalResponse.setTotalSong(songRepository.findAll().size() + " songs");
+        totalResponse.setTotalUser(userRepository.findAll().size() + " users");
+        totalResponse.setTotalType(typeRepository.findAll().size() + " types");
+        return totalResponse;
     }
 }
 

@@ -82,14 +82,11 @@ public class UserService {
     public UserDto updateAvatar(Long id, CustomUserDetail currentUser, MultipartFile avatar) {
         User curUser = userRepository.findById(currentUser.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
-        if (curUser.getRole().getName().equals(RoleName.ROLE_USER) && !curUser.getId().equals(id)) {
-            throw new CustomException("You cannot edit avatar");
-        }
+//        if (curUser.getRole().getName().equals(RoleName.ROLE_USER) && !curUser.getId().equals(id)) {
+//            throw new CustomException("You cannot edit avatar");
+//        }
+
         String url = firebaseService.upload(avatar, "image/png");
-        if (curUser.getRole().getName().equals(RoleName.ROLE_USER)) {
-            curUser.setAvatar(url);
-            return userMapper.convertToDto(userRepository.save(curUser));
-        }
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found " + currentUser.getId()));
         user.setAvatar(url);
@@ -122,7 +119,9 @@ public class UserService {
     public UserDto getUserById(Long id, CustomUserDetail currentUser) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found " + id));
-        if (user.getRole().getName().equals(RoleName.ROLE_USER)) {
+        User cUser  = userRepository.findById(currentUser.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found " + id));
+        if (cUser.getRole().getName().equals(RoleName.ROLE_USER)) {
             if (!currentUser.getId().equals(id)) {
                 throw new CustomException("You are not authorized to view this user");
             }
@@ -158,6 +157,7 @@ public class UserService {
         if (user.getRole().getName().equals(RoleName.ROLE_USER) && !customUserDetail.getId().equals(updateUserRequest.getId())) {
             throw new CustomException("You cannot update other users");
         }
+
         updateUser.setEmail(updateUserRequest.getEmail());
         updateUser.setUsername(updateUserRequest.getUsername());
         return userMapper.convertToDto(userRepository.save(updateUser));
