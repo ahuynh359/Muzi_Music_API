@@ -1,6 +1,5 @@
 package com.ahuynh.muzi_music_api.model.entity;
 
-import com.ahuynh.muzi_music_api.model.entity.notification.Notification;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -57,6 +56,34 @@ public class Song extends DateAudit {
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Listen> listens;
 
+    @Column(name = "`key`")
+    private Float key;
+
+    private Float danceability;
+
+    @Column(name = "`mode`")
+    private Float mode;
+    
+    private Float loudness;
+    
+    private Float energy;
+    
+    private Float acousticness;
+    
+    private Float tempo;
+    
+    private Float instrumentalness;
+    
+    private Float valence;
+    
+    private Float liveness;
+    
+    private Float speechiness;
+
+    @Column(name = "`time_signature`")
+    private Float timeSignature;
+    @Column(name = "`track_popularity`")
+    private Float trackPopularity;
 
     public Song(String name, String avatar, String file, String lyrics, Album album) {
         this.name = name;

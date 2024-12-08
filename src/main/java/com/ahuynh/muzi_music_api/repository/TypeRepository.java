@@ -2,6 +2,8 @@ package com.ahuynh.muzi_music_api.repository;
 
 import com.ahuynh.muzi_music_api.model.entity.Song;
 import com.ahuynh.muzi_music_api.model.entity.Type;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -16,11 +18,11 @@ public interface TypeRepository extends JpaRepository<Type, Long> {
     @Query(value = "SELECT type.songs FROM Type type where type.id = :id")
     List<Song> findSongById(Long id);
 
-    List<Type> findAllByOrderByNameAsc();
+    Page<Type> findAllByOrderByNameAsc(Pageable pageable);
 
-    List<Type> findAllByOrderByNameDesc();
+    Page<Type> findAllByOrderByNameDesc(Pageable pageable);
 
-    List<Type> findAllByOrderByCreatedAtDesc();
+    Page<Type> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-    List<Type> findAllByOrderByCreatedAtAsc();
+    Page<Type> findAllByOrderByCreatedAtAsc(Pageable pageable);
 }

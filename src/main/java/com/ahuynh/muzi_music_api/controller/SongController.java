@@ -2,9 +2,12 @@ package com.ahuynh.muzi_music_api.controller;
 
 import com.ahuynh.muzi_music_api.config.security.CurrentUser;
 import com.ahuynh.muzi_music_api.config.security.CustomUserDetail;
+import com.ahuynh.muzi_music_api.model.dto.SongDto;
 import com.ahuynh.muzi_music_api.payload.request.UpdateSongRequest;
 import com.ahuynh.muzi_music_api.utils.SortName;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
@@ -16,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -39,11 +44,20 @@ public class SongController {
                 songService.createSong(name, avatar, file, lyrics, albumId, singerId, typeId)), HttpStatus.OK);
     }
 
+    @GetMapping("/recommendations")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> getRecommendedSongs(@RequestParam(value = "userId") Long userId) {
+        List<SongDto> recommendedSongs = songService.getRecommendedSongs(userId);
+        return new ResponseEntity<>(new ApiResponse("Get Recommended Songs Successfully", recommendedSongs), HttpStatus.OK);
+    }
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> getAllSongs(@RequestParam(value = "sort", required = false, defaultValue = "NEW") SortName sort) {
-        return new ResponseEntity<>(new ApiResponse("Get All Songs Successfully", songService.getAllSong(sort)), HttpStatus.OK);
+    public ResponseEntity<?> getAllSongs(@RequestParam(value = "page", defaultValue = "0") int page,
+                                         @RequestParam(value = "size", defaultValue = "10") int size,
+                                         @RequestParam(value = "sort", required = false, defaultValue = "NEW") SortName sort) {
+        Pageable pageable = PageRequest.of(page, size);
+        return new ResponseEntity<>(new ApiResponse("Get All Songs Successfully", songService.getAllSong(sort,pageable)), HttpStatus.OK);
     }
 
 
@@ -68,8 +82,12 @@ public class SongController {
 
     @GetMapping("/search")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> search(@RequestParam(value = "query") String query) {
-        return new ResponseEntity<>(new ApiResponse("Search Successfully", songService.search(query)), HttpStatus.OK);
+    public ResponseEntity<?> search(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "query") String query) {
+        Pageable pageable = PageRequest.of(page, size);
+        return new ResponseEntity<>(new ApiResponse("Search Successfully", songService.search(query,pageable)), HttpStatus.OK);
     }
 
     @PostMapping("/love/{id}")

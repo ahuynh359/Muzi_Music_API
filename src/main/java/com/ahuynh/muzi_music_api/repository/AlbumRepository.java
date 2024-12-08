@@ -1,10 +1,10 @@
 package com.ahuynh.muzi_music_api.repository;
 
 import com.ahuynh.muzi_music_api.model.entity.Album;
-import com.ahuynh.muzi_music_api.model.entity.Song;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -17,12 +17,9 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
 
     boolean existsByName(String name);
 
-    @Query(value = "SELECT album.songs FROM Album album where album.id = :id")
-    List<Song> findSongById(Long id);
-
     Optional<Album> findByName(String name);
 
-    Collection<Album> findByNameContainingIgnoreCase(@NotBlank String name);
+    Page<Album> findByNameContainingIgnoreCase(@NotBlank String name, Pageable pageable);
 
     List<Album> findAllByOrderByNameAsc();
 
@@ -31,4 +28,10 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
     List<Album> findAllByOrderByCreatedAtDesc();
 
     List<Album> findAllByOrderByCreatedAtAsc();
+
+    Page<Album> findAllByOrderByNameAsc(Pageable pageable);
+    Page<Album> findAllByOrderByNameDesc(Pageable pageable);
+    Page<Album> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    Page<Album> findAllByOrderByCreatedAtAsc(Pageable pageable);
+
 }

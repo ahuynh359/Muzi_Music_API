@@ -10,8 +10,11 @@ import com.ahuynh.muzi_music_api.model.mapper.AlbumMapper;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
 import com.ahuynh.muzi_music_api.payload.request.UpdateAlbumRequest;
 import com.ahuynh.muzi_music_api.repository.AlbumRepository;
+import com.ahuynh.muzi_music_api.repository.SongRepository;
 import com.ahuynh.muzi_music_api.utils.SortName;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +28,7 @@ public class AlbumService {
     private final AlbumMapper albumMapper;
     private final FirebaseService firebaseService;
     private final SongMapper songMapper;
+    private final SongRepository songRepository;
 
     public AlbumDto createAlbum(String name, MultipartFile avatar) {
         if (albumRepository.existsByName(name)) {
@@ -47,34 +51,26 @@ public class AlbumService {
     }
 
 
-    public List<AlbumDto> getAllAlbums(SortName sort) {
-        List<Album> albums = new ArrayList<>();
+    public List<AlbumDto> getAllAlbums(SortName sort, Pageable pageable) {
+        List<Album> albums;
         switch (sort) {
-            case A_Z -> {
-                albums = albumRepository.findAllByOrderByNameAsc();
-            }
-            case Z_A -> {
-                albums = albumRepository.findAllByOrderByNameDesc();
-            }
-            case NEW -> {
-                albums = albumRepository.findAllByOrderByCreatedAtDesc();
-            }
-            case OLD -> {
-                albums = albumRepository.findAllByOrderByCreatedAtAsc();
-            }
-
-            default -> albumRepository.findAllByOrderByCreatedAtDesc();
-
+            case A_Z -> albums = albumRepository.findAllByOrderByNameAsc(pageable).getContent();
+            case Z_A -> albums = albumRepository.findAllByOrderByNameDesc(pageable).getContent();
+            case NEW -> albums = albumRepository.findAllByOrderByCreatedAtDesc(pageable).getContent();
+            case OLD -> albums = albumRepository.findAllByOrderByCreatedAtAsc(pageable).getContent();
+            default -> albums = albumRepository.findAllByOrderByCreatedAtDesc(pageable).getContent();
         }
-
         return albumMapper.convertToDtoList(albums);
     }
 
 
-    public List<SongDto> getSongsFromAlbum(Long id) {
-        albumRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Album not exits id " + id));
-        return songMapper.convertToDtoList(albumRepository.findSongById(id));
+    public Page<SongDto> getSongsFromAlbum(Long albumId, Pageable pageable) {
+        albumRepository.findById(albumId)
+                .orElseThrow(() -> new EntityNotFoundException("Album not exists with id " + albumId));
+        Page<Song> songsPage = songRepository.findByAlbumId(albumId, pageable);
+        return songsPage.map(songMapper::convertToDto);
     }
+
 
     public AlbumDto updateAlbum(UpdateAlbumRequest request) {
         Album album = albumRepository.findById(request.getId()).orElseThrow(() ->

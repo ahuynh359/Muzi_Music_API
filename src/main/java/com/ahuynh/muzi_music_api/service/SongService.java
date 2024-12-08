@@ -5,6 +5,7 @@ import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
 import com.ahuynh.muzi_music_api.model.dto.AlbumDto;
 import com.ahuynh.muzi_music_api.model.dto.SingerDto;
 import com.ahuynh.muzi_music_api.model.dto.SongDto;
+import com.ahuynh.muzi_music_api.model.dto.TypeDto;
 import com.ahuynh.muzi_music_api.model.entity.*;
 import com.ahuynh.muzi_music_api.model.entity.notification.Notification;
 import com.ahuynh.muzi_music_api.model.entity.notification.NotificationType;
@@ -16,7 +17,11 @@ import com.ahuynh.muzi_music_api.payload.response.*;
 import com.ahuynh.muzi_music_api.repository.*;
 import com.ahuynh.muzi_music_api.utils.SortName;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -36,7 +41,7 @@ public class SongService {
     private final UserRepository userRepository;
     private final ListenRepository listenRepository;
     private final NotificationRepository notificationRepository;
-
+    private final RestTemplate restTemplate;
 
     public SongDto createSong(String name, MultipartFile avatar, MultipartFile file, String lyrics, Long albumIb, Set<Long> singerId, Set<Long> typeId) {
         Album album = albumRepository.findById(albumIb).orElseThrow(() -> new EntityNotFoundException("No Album with " + albumIb));
@@ -75,27 +80,16 @@ public class SongService {
         songRepository.deleteById(id);
     }
 
-    public List<SongDto> getAllSong(SortName sort) {
-        List<Song> songs = new ArrayList<>();
+    public List<SongDto> getAllSong(SortName sort, Pageable pageable) {
+        List<Song> songs;
         switch (sort) {
-            case A_Z -> {
-                songs = songRepository.findAllByOrderByNameAsc();
-            }
-            case Z_A -> {
-                songs = songRepository.findAllByOrderByNameDesc();
-            }
-            case NEW -> {
-                songs = songRepository.findAllByOrderByCreatedAtDesc();
-            }
-            case OLD -> {
-                songs = songRepository.findAllByOrderByCreatedAtAsc();
-            }
-
-            default -> songRepository.findAllByOrderByCreatedAtDesc();
-
+            case A_Z -> songs = songRepository.findAllByOrderByNameAsc(pageable).getContent();
+            case Z_A -> songs = songRepository.findAllByOrderByNameDesc(pageable).getContent();
+            case NEW -> songs = songRepository.findAllByOrderByCreatedAtDesc(pageable).getContent();
+            case OLD -> songs = songRepository.findAllByOrderByCreatedAtAsc(pageable).getContent();
+            default -> songs = songRepository.findAllByOrderByCreatedAtDesc(pageable).getContent();
         }
-
-        return songMapper.convertToDtoList(songs);
+        return songs.stream().map(songMapper::convertToDto).toList();
     }
 
 
@@ -137,11 +131,35 @@ public class SongService {
                         s1.getListenDetail().stream().mapToInt(ListenOfDayResponse::getListen).sum()))
                 .collect(Collectors.toList());
     }
-    public SearchResponse search(String query) {
-        List<SongDto> songs = songMapper.convertToDtoList(songRepository.findByNameContainingIgnoreCase(query));
-        List<AlbumDto> albums = albumMapper.convertToDtoList(albumRepository.findByNameContainingIgnoreCase(query));
-        List<SingerDto> singers = singerMapper.convertToDtoList(singerRepository.findByNameContainingIgnoreCase(query));
+    public SearchResponse search(String query,Pageable pageable) {
+        List<SongDto> songs = songMapper.convertToDtoList(
+                songRepository.findByNameContainingIgnoreCase(query, pageable).getContent()
+        );
+
+        List<AlbumDto> albums = albumMapper.convertToDtoList(
+                albumRepository.findByNameContainingIgnoreCase(query, pageable).getContent()
+        );
+        List<SingerDto> singers = singerMapper.convertToDtoList(
+                singerRepository.findByNameContainingIgnoreCase(query, pageable).getContent()
+        );
         return new SearchResponse(songs, albums, singers);
+    }
+
+    public List<SongDto> getRecommendedSongs(Long userId) {
+        // Gọi API Python để lấy danh sách track_id
+        String pythonApiUrl = "http://127.0.0.1:8001/recommendations/utu/" + userId;
+        ResponseEntity<Map> response = restTemplate.getForEntity(pythonApiUrl, Map.class);
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            Map<String, Object> responseBody = response.getBody();
+            List<Long> trackIds = (List<Long>) responseBody.get("recommended_track_ids");
+
+            return songRepository.findAllById(trackIds).stream()
+                    .map(songMapper::convertToDto) // Sử dụng SongMapper để ánh xạ
+                    .collect(Collectors.toList());
+        } else {
+            throw new RuntimeException("Failed to fetch recommendations from Python API");
+        }
     }
 
     public void loveOrUnloveSong(Long id, CustomUserDetail currentUser) {

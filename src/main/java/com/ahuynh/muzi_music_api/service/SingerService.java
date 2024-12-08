@@ -12,6 +12,7 @@ import com.ahuynh.muzi_music_api.repository.SingerRepository;
 import com.ahuynh.muzi_music_api.repository.UserRepository;
 import com.ahuynh.muzi_music_api.utils.SortName;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,9 +31,9 @@ public class SingerService {
     private final SongMapper songMapper;
     private final UserRepository userRepository;
 
-    public SingerDto createSinger(String name, String description, MultipartFile avatar) {
+    public SingerDto createSinger(String name, String description, MultipartFile avatar, Long followers, int popularity) {
         String url = firebaseService.upload(avatar, "image/png");
-        return singerMapper.convertToDto(singerRepository.save(new Singer(name, description, url)));
+        return singerMapper.convertToDto(singerRepository.save(new Singer(name, description, url,followers, popularity)));
     }
 
     public SingerDto getSingerById(Long id) {
@@ -57,23 +58,23 @@ public class SingerService {
         return singerMapper.convertToDto(singerRepository.save(singer));
     }
 
-    public List<SingerDto> getAllSingers(SortName sort) {
+    public List<SingerDto> getAllSingers(SortName sort, Pageable pageable) {
         List<Singer> singers = new ArrayList<>();
         switch (sort) {
             case A_Z -> {
-                singers = singerRepository.findAllByOrderByNameAsc();
+                singers = singerRepository.findAllByOrderByNameAsc(pageable).getContent();
             }
             case Z_A -> {
-                singers = singerRepository.findAllByOrderByNameDesc();
+                singers = singerRepository.findAllByOrderByNameDesc(pageable).getContent();
             }
             case NEW -> {
-                singers = singerRepository.findAllByOrderByCreatedAtDesc();
+                singers = singerRepository.findAllByOrderByCreatedAtDesc(pageable).getContent();
             }
             case OLD -> {
-                singers = singerRepository.findAllByOrderByCreatedAtAsc();
+                singers = singerRepository.findAllByOrderByCreatedAtAsc(pageable).getContent();
             }
 
-            default -> singerRepository.findAllByOrderByCreatedAtDesc();
+            default -> singerRepository.findAllByOrderByCreatedAtDesc(pageable).getContent();
 
         }
 

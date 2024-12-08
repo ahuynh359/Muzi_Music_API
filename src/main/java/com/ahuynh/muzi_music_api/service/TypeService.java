@@ -2,19 +2,25 @@ package com.ahuynh.muzi_music_api.service;
 
 import com.ahuynh.muzi_music_api.exception.DuplicateException;
 import com.ahuynh.muzi_music_api.exception.EntityNotFoundException;
-import com.ahuynh.muzi_music_api.model.dto.AlbumDto;
+import com.ahuynh.muzi_music_api.model.dto.TypeDto;
 import com.ahuynh.muzi_music_api.model.dto.SongDto;
 import com.ahuynh.muzi_music_api.model.dto.TypeDto;
-import com.ahuynh.muzi_music_api.model.entity.Album;
+import com.ahuynh.muzi_music_api.model.entity.Song;
+import com.ahuynh.muzi_music_api.model.entity.Type;
 import com.ahuynh.muzi_music_api.model.entity.Type;
 import com.ahuynh.muzi_music_api.model.entity.User;
 import com.ahuynh.muzi_music_api.model.entity.role.RoleName;
 import com.ahuynh.muzi_music_api.model.mapper.SongMapper;
 import com.ahuynh.muzi_music_api.model.mapper.TypeMapper;
 import com.ahuynh.muzi_music_api.payload.request.UpdateTypeRequest;
+import com.ahuynh.muzi_music_api.repository.SongRepository;
 import com.ahuynh.muzi_music_api.repository.TypeRepository;
 import com.ahuynh.muzi_music_api.utils.SortName;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +34,7 @@ public class TypeService {
     private final TypeMapper typeMapper;
     private final SongMapper songMapper;
     private final FirebaseService firebaseService;
+    private final SongRepository songRepository;
 
     public TypeDto createType(String name, MultipartFile avatar) {
         if (typeRepository.existsByName(name)) {
@@ -61,34 +68,26 @@ public class TypeService {
         return typeMapper.convertToDto(typeRepository.save(updateType));
     }
 
-    public List<TypeDto> getAllTypes(SortName sort) {
-        List<Type> types = new ArrayList<>();
+    public List<TypeDto> getAllTypes(SortName sort, Pageable pageable) {
+        List<Type> types;
         switch (sort) {
-            case A_Z -> {
-                types = typeRepository.findAllByOrderByNameAsc();
-            }
-            case Z_A -> {
-                types = typeRepository.findAllByOrderByNameDesc();
-            }
-            case NEW -> {
-                types = typeRepository.findAllByOrderByCreatedAtDesc();
-            }
-            case OLD -> {
-                types = typeRepository.findAllByOrderByCreatedAtAsc();
-            }
-
-            default -> typeRepository.findAllByOrderByCreatedAtDesc();
-
+            case A_Z -> types = typeRepository.findAllByOrderByNameAsc(pageable).getContent();
+            case Z_A -> types = typeRepository.findAllByOrderByNameDesc(pageable).getContent();
+            case NEW -> types = typeRepository.findAllByOrderByCreatedAtDesc(pageable).getContent();
+            case OLD -> types = typeRepository.findAllByOrderByCreatedAtAsc(pageable).getContent();
+            default -> types = typeRepository.findAllByOrderByCreatedAtDesc(pageable).getContent();
         }
-
-        return typeMapper.convertToDtoList(types);
+        return types.stream().map(typeMapper::convertToDto).toList();
     }
 
-    public List<SongDto> getSongFromType(Long id) {
 
-        return songMapper.convertToDtoList(typeRepository.findSongById(id));
-
+    public Page<SongDto> getSongsFromType(Long typeId, Pageable pageable) {
+        typeRepository.findById(typeId)
+                .orElseThrow(() -> new EntityNotFoundException("Type not exists with id " + typeId));
+        Page<Song> songsPage = songRepository.findByTypeId(typeId, pageable);
+        return songsPage.map(songMapper::convertToDto);
     }
+
 
 
     public TypeDto updateAvatar(Long id, MultipartFile avatar) {

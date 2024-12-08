@@ -2,10 +2,11 @@ package com.ahuynh.muzi_music_api.repository;
 
 import com.ahuynh.muzi_music_api.model.entity.Singer;
 import com.ahuynh.muzi_music_api.model.entity.Song;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,14 +17,14 @@ public interface SingerRepository extends JpaRepository<Singer, Long> {
     Collection<Song> findSongById(Long id);
 
 
-    Collection<Singer> findByNameContainingIgnoreCase(String query);
+    Page<Singer> findByNameContainingIgnoreCase(String query, Pageable pageable);
 
-    List<Singer> findAllByOrderByNameAsc();
+    Page<Singer> findAllByOrderByNameAsc(Pageable pageable);
 
-    List<Singer> findAllByOrderByNameDesc();
+    Page<Singer> findAllByOrderByNameDesc(Pageable pageable);
 
-    List<Singer> findAllByOrderByCreatedAtDesc();
+    Page<Singer> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-    List<Singer> findAllByOrderByCreatedAtAsc();
+    Page<Singer> findAllByOrderByCreatedAtAsc(Pageable pageable);
 
 }

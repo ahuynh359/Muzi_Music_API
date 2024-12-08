@@ -37,6 +37,10 @@ public class Singer extends DateAudit {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    private Long followers;
+
+    private int popularity;
+
 
     public Singer(String name, String avatar) {
         this.name = name;
@@ -44,10 +48,12 @@ public class Singer extends DateAudit {
     }
 
 
-    public Singer(String name, String description, String avatar) {
+    public Singer(String name, String description, String avatar, Long followers, int popularity) {
         this.description = description;
         this.name = name;
         this.avatar = avatar;
+        this.followers = followers;
+        this.popularity = popularity;
     }
 
 }

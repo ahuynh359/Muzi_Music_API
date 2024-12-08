@@ -7,6 +7,8 @@ import com.ahuynh.muzi_music_api.payload.response.MessageResponse;
 import com.ahuynh.muzi_music_api.service.SingerService;
 import com.ahuynh.muzi_music_api.utils.SortName;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,8 +24,9 @@ public class SingerController {
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> createSinger(@RequestParam String name, @RequestParam(required = false) String description, @RequestParam MultipartFile avatar) {
-        return new ResponseEntity<>(new ApiResponse("Create Singer Successfully", singerService.createSinger(name,description, avatar)), HttpStatus.OK);
+    public ResponseEntity<?> createSinger(@RequestParam String name, @RequestParam(required = false) String description, @RequestParam MultipartFile avatar,
+                                          @RequestParam(required = false) Long followers, @RequestParam(required = false) int popularity) {
+        return new ResponseEntity<>(new ApiResponse("Create Singer Successfully", singerService.createSinger(name,description, avatar,followers, popularity)), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -50,8 +53,12 @@ public class SingerController {
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') ")
-    public ResponseEntity<?> getAllSingers(@RequestParam(value = "sort", required = false, defaultValue = "NEW") SortName sort) {
-        return new ResponseEntity<>(new ApiResponse("Get All Singers Successfully", singerService.getAllSingers(sort)), HttpStatus.OK);
+    public ResponseEntity<?> getAllSingers(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sort", required = false, defaultValue = "NEW") SortName sort) {
+        Pageable pageable = PageRequest.of(page, size);
+        return new ResponseEntity<>(new ApiResponse("Get All Singers Successfully", singerService.getAllSingers(sort,pageable)), HttpStatus.OK);
     }
 
 

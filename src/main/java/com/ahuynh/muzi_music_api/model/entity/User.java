@@ -49,9 +49,6 @@ public class User extends DateAudit {
     @Column(name = "device_token")
     private String deviceToken = "erAxKAnqQnC5sgxv6RbkNs:APA91bEnItKurZcr3gEZAUxLOgVsoyTKx0sMTOBXf-tFcxbGH-X0XamgKf1vAWmWO5q41xrH_1vSJRmK931sFeOsfZle7IQt5IXGUqOR2xpnkPRQBSayry-HOrunf1nyt4NoXPZIfLXU";
 
-
-
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Playlist> playlists = new HashSet<>();
 
