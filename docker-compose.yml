@@ -1,0 +1,17 @@
+services:
+  mysql_db:
+    image: mysql:8.0
+    container_name: my_mysql_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 'admin'       # Mật khẩu root
+      MYSQL_DATABASE: 'my_database'     # Tên DB khởi tạo sẵn
+      MYSQL_USER: 'user_dev'            # User phụ (tùy chọn)
+      MYSQL_PASSWORD: 'password123'     # Pass user phụ
+    ports:
+      - '3306:3306'                     # Thông cổng (Máy thật : Docker)
+    volumes:
+      - mysql_data:/var/lib/mysql       # Lưu trữ dữ liệu lâu dài
+
+volumes:
+  mysql_data:
