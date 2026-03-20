@@ -6,6 +6,7 @@ import com.ahuynh.muzi_music_api.payload.request.*;
 import com.ahuynh.muzi_music_api.payload.response.ApiResponse;
 import com.ahuynh.muzi_music_api.payload.response.MessageResponse;
 import com.ahuynh.muzi_music_api.service.AuthService;
+import com.ahuynh.muzi_music_api.service.UserService;
 import com.ahuynh.muzi_music_api.service.VerificationTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -25,9 +26,15 @@ public class AuthController {
     private final AuthService authService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final VerificationTokenService verificationTokenService;
+    private final UserService userService;
 
     public String getCurrentUrl(HttpServletRequest request) {
         return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+    }
+    @PostMapping("/create")
+    public ResponseEntity<?> createUser(@Valid @RequestBody AddUserRequest request) {
+
+        return new ResponseEntity<>(new ApiResponse("Create User Successfully", userService.createUser(request)), HttpStatus.OK);
     }
 
     @GetMapping()
