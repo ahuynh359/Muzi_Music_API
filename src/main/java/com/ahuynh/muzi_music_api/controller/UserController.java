@@ -81,7 +81,6 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> createUser(@Valid @RequestBody AddUserRequest request) {
 
         return new ResponseEntity<>(new ApiResponse("Create User Successfully", userService.createUser(request)), HttpStatus.OK);
